@@ -1,60 +1,36 @@
 // ============================================================
-// FIREBASE CONFIGURATION - ZOE VEOS
-// ⚠️ SUSTITUYE ESTOS VALORES CON TU CONFIGURACIÓN REAL
-// Obtén estos datos en: https://console.firebase.google.com
+// FIREBASE CONFIGURATION — ZOE VEOS
 // ============================================================
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI",
-  authDomain: "TU_AUTH_DOMAIN.firebaseapp.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET.appspot.com",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyClydiw5NBkPu2yE4VPxbNw6raQW8sqXsg",
+  authDomain: "zoeveos.firebaseapp.com",
+  projectId: "zoeveos",
+  storageBucket: "zoeveos.firebasestorage.app",
+  messagingSenderId: "440531916711",
+  appId: "1:440531916711:web:572ec2dfd022ffe54a4882"
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-export const storage = getStorage(app);
 
-// ============================================================
-// CLOUDINARY CONFIGURATION
-// ⚠️ SUSTITUYE CON TUS DATOS DE CLOUDINARY
-// Obtén en: https://cloudinary.com/console
-// ============================================================
-export const CLOUDINARY_CONFIG = {
-  cloudName: "TU_CLOUD_NAME",
-  uploadPreset: "TU_UPLOAD_PRESET", // unsigned preset
-  uploadUrl: "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload"
+export {
+  collection, getDocs, addDoc, updateDoc, deleteDoc,
+  doc, query, orderBy, setDoc, getDoc,
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
 };
 
 // ============================================================
-// CORREO ARGENTINO - MiCorreo API
-// ⚠️ SUSTITUYE CON TUS CREDENCIALES
-// Solicitar en: https://www.correoargentino.com.ar
+// CLOUDINARY — dbjwnfjcn
 // ============================================================
-export const CORREO_CONFIG = {
-  baseUrl: "https://api.correoargentino.com.ar/micorreo/v1",
-  baseUrlTest: "https://apitest.correoargentino.com.ar/micorreo/v1",
-  user: "TU_USUARIO_CORREO",
-  password: "TU_PASSWORD_CORREO",
-  customerId: "TU_CUSTOMER_ID",
-  // Datos del remitente (ZOE VEOS)
-  sender: {
-    name: "Anabella Vanesa Kruger",
-    dni: "32193519",
-    streetName: "Bernardino Rivadavia",
-    streetNumber: "505",
-    city: "Córdoba",
-    provinceCode: "X",
-    postalCode: "2434"
-  }
+export const CLOUDINARY = {
+  cloudName: "dbjwnfjcn",
+  uploadPreset: "zoeveos-upload",
+  uploadUrl: "https://api.cloudinary.com/v1_1/dbjwnfjcn/image/upload"
 };
 
 // ============================================================
@@ -63,6 +39,6 @@ export const CORREO_CONFIG = {
 export const WHATSAPP_NUMBER = "5493576466145";
 
 // ============================================================
-// ADMIN CREDENTIALS (cambiar por Firebase Auth en producción)
+// CORREO ARGENTINO
 // ============================================================
-export const ADMIN_EMAIL = "admin@zoeveos.com";
+export const CORREO_ORIGIN_POSTAL = "2434";

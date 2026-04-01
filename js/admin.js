@@ -1,6 +1,12 @@
 // ============================================================
-// ZOE VEOS — Panel Administrativo JS
+// ZOE VEOS — admin.js (Firebase + Cloudinary reais)
 // ============================================================
+import {
+  db, auth, CLOUDINARY,
+  collection, getDocs, addDoc, updateDoc, deleteDoc,
+  doc, query, orderBy, setDoc, getDoc,
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from './firebase-config.js';
 
 // ============================================================
 // ESTADO
@@ -9,97 +15,74 @@ let currentSection = 'dashboard';
 let editingProduct = null;
 let editingSlide = null;
 let editingArticle = null;
-let editingCoupon = null;
-
-// Storage helpers (reemplazar con Firebase en producción)
-const DB = {
-  get: (key, def = []) => JSON.parse(localStorage.getItem(`zoeveos_${key}`) || JSON.stringify(def)),
-  set: (key, val) => localStorage.setItem(`zoeveos_${key}`, JSON.stringify(val)),
-  push: (key, item) => {
-    const arr = DB.get(key);
-    const newItem = { ...item, id: item.id || Date.now().toString(), createdAt: item.createdAt || Date.now() };
-    arr.push(newItem);
-    DB.set(key, arr);
-    return newItem;
-  },
-  update: (key, id, data) => {
-    const arr = DB.get(key);
-    const idx = arr.findIndex(i => i.id === id);
-    if (idx >= 0) arr[idx] = { ...arr[idx], ...data };
-    DB.set(key, arr);
-  },
-  delete: (key, id) => {
-    const arr = DB.get(key).filter(i => i.id !== id);
-    DB.set(key, arr);
-  }
-};
 
 // ============================================================
-// LOGIN
+// AUTH
 // ============================================================
-const ADMIN_CREDS = { email: 'admin@zoeveos.com', password: 'ZoeVeos2024!' };
-
 function initLogin() {
-  const loginScreen = document.getElementById('login-screen');
-  const adminApp = document.getElementById('admin-app');
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-app').classList.add('show');
+      initAdmin();
+    }
+  });
 
-  if (localStorage.getItem('zoeveos_admin_auth') === 'true') {
-    loginScreen.style.display = 'none';
-    adminApp.classList.add('show');
-    initAdmin();
-    return;
-  }
-
-  document.getElementById('login-form').addEventListener('submit', (e) => {
+  document.getElementById('login-form').addEventListener('submit', async e => {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-pass').value;
     const errEl = document.getElementById('login-error');
-
-    if (email === ADMIN_CREDS.email && pass === ADMIN_CREDS.password) {
-      localStorage.setItem('zoeveos_admin_auth', 'true');
-      loginScreen.style.display = 'none';
-      adminApp.classList.add('show');
-      initAdmin();
-    } else {
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch(err) {
       errEl.classList.add('show');
-      errEl.textContent = '❌ Credenciales incorrectas';
+      errEl.textContent = '❌ Email o contraseña incorrectos';
     }
   });
 }
 
-function logout() {
-  localStorage.removeItem('zoeveos_admin_auth');
+async function logout() {
+  await signOut(auth);
   location.reload();
 }
 
 // ============================================================
-// SIDEBAR NAVIGATION
+// CLOUDINARY UPLOAD
+// ============================================================
+async function uploadToCloudinary(file, targetInput, previewEl) {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY.uploadPreset);
+  adminToast('⬆️ Subiendo imagen...');
+  try {
+    const res = await fetch(CLOUDINARY.uploadUrl, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.secure_url) {
+      if (targetInput) targetInput.value = data.secure_url;
+      if (previewEl) previewEl.innerHTML = `<div class="img-preview-item"><img src="${data.secure_url}"></div>`;
+      adminToast('✅ Imagen subida', 'ok');
+    } else { adminToast('❌ Error Cloudinary', 'err'); }
+  } catch(e) { adminToast('❌ Error al subir imagen', 'err'); }
+}
+window.uploadToCloudinary = uploadToCloudinary;
+
+// ============================================================
+// SIDEBAR
 // ============================================================
 function initSidebar() {
-  // Dropdown nav items
   document.querySelectorAll('.nav-item[data-dropdown]').forEach(item => {
-    const link = item.querySelector('.nav-link');
-    link.addEventListener('click', () => {
-      item.classList.toggle('open');
-    });
+    item.querySelector('.nav-link').addEventListener('click', () => item.classList.toggle('open'));
   });
-
-  // Section links
   document.querySelectorAll('[data-section]').forEach(el => {
-    el.addEventListener('click', (e) => {
+    el.addEventListener('click', e => {
       e.preventDefault();
-      const section = el.dataset.section;
-      navigateTo(section);
-      // Close mobile sidebar
+      navigateTo(el.dataset.section);
       document.getElementById('sidebar').classList.remove('open');
     });
   });
-
-  // Logout
   document.getElementById('sidebar-logout')?.addEventListener('click', logout);
-
-  // Mobile hamburger
   document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
   });
@@ -107,49 +90,28 @@ function initSidebar() {
 
 function navigateTo(section) {
   currentSection = section;
-
-  // Update active states
-  document.querySelectorAll('[data-section]').forEach(el => {
-    el.classList.toggle('active-sub', el.dataset.section === section);
-  });
-
-  // Show section
+  document.querySelectorAll('[data-section]').forEach(el => el.classList.toggle('active-sub', el.dataset.section === section));
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(`section-${section}`);
-  if (target) {
-    target.classList.add('active');
-    // Update topbar title
-    const titles = {
-      dashboard: 'Dashboard', products: 'Productos', categories: 'Categorías',
-      slides: 'Slides del Hero', blog: 'Blog & Artículos',
-      cupones: 'Cupones', promotions: 'Promociones', pricing: 'Precios en Masa',
-      shipping: 'Configuración de Frete', orders: 'Pedidos', destaque: 'Sección Destaque',
-      promo_section: 'Sección Promoción', config: 'Configuración'
-    };
-    const topbar = document.getElementById('topbar-title');
-    if (topbar) topbar.textContent = titles[section] || section;
-  }
-
+  document.getElementById(`section-${section}`)?.classList.add('active');
+  const titles = {
+    dashboard:'Dashboard', products:'Productos', categories:'Categorías',
+    slides:'Slides del Hero', blog:'Blog & Artículos',
+    cupones:'Cupones', promotions:'Promociones', pricing:'Precios en Masa',
+    shipping:'Configuración de Flete', orders:'Pedidos',
+    destaque:'Sección Destaque', promo_section:'Sección Promoción'
+  };
+  const topbar = document.getElementById('topbar-title');
+  if (topbar) topbar.textContent = titles[section] || section;
   loadSection(section);
 }
 
-// ============================================================
-// LOAD SECTION DATA
-// ============================================================
 function loadSection(section) {
   const loaders = {
-    dashboard: loadDashboard,
-    products: loadProducts,
-    categories: loadCategories,
-    slides: loadSlides,
-    blog: loadBlog,
-    cupones: loadCupones,
-    promotions: loadPromotions,
-    pricing: loadPricing,
-    shipping: loadShipping,
-    orders: loadOrders,
-    destaque: loadDestaque,
-    promo_section: loadPromoSection,
+    dashboard: loadDashboard, products: loadProducts, categories: loadCategories,
+    slides: loadSlides, blog: loadBlog, cupones: loadCupones,
+    promotions: loadPromotions, pricing: loadPricing,
+    shipping: loadShipping, orders: loadOrders,
+    destaque: loadDestaque, promo_section: loadPromoSection
   };
   loaders[section]?.();
 }
@@ -157,389 +119,307 @@ function loadSection(section) {
 // ============================================================
 // DASHBOARD
 // ============================================================
-function loadDashboard() {
-  const products = DB.get('products');
-  const articles = DB.get('articles');
-  const cupones = DB.get('cupones').filter(c => c.expiry > Date.now());
-  const slides = DB.get('slides');
-
-  document.getElementById('stat-products').textContent = products.length;
-  document.getElementById('stat-articles').textContent = articles.length;
-  document.getElementById('stat-cupones').textContent = cupones.length;
-  document.getElementById('stat-slides').textContent = slides.length;
+async function loadDashboard() {
+  try {
+    const [prods, arts, cups, slides] = await Promise.all([
+      getDocs(collection(db,'products')),
+      getDocs(collection(db,'articles')),
+      getDocs(collection(db,'cupones')),
+      getDocs(collection(db,'slides'))
+    ]);
+    document.getElementById('stat-products').textContent = prods.size;
+    document.getElementById('stat-articles').textContent = arts.size;
+    const now = Date.now();
+    document.getElementById('stat-cupones').textContent = cups.docs.filter(d => d.data().expiry > now).length;
+    document.getElementById('stat-slides').textContent = slides.size;
+  } catch(e) { console.error(e); }
 }
 
 // ============================================================
 // SLIDES
 // ============================================================
-function loadSlides() {
-  const slides = DB.get('slides');
+async function loadSlides() {
   const container = document.getElementById('slides-list');
   if (!container) return;
-
-  if (slides.length === 0) {
-    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">
-      No hay slides. Agrega el primero 👆</div>`;
-    return;
-  }
-
-  container.innerHTML = slides.map((s, i) => `
-    <div class="slide-item">
-      <div class="slide-img-wrap">
-        ${s.image ? `<img src="${s.image}" alt="${s.title}">` : '<div style="width:100%;height:100%;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;color:var(--text-muted)">Sin imagen</div>'}
-        <div class="slide-order-badge">${i+1}</div>
-      </div>
-      <div class="slide-info">
-        <div class="slide-title">${s.title || '(Sin título)'}</div>
-        <div class="slide-subtitle">${s.subtitle || ''}</div>
-        <div class="slide-actions">
-          <button class="tbl-btn tbl-edit" onclick="editSlide('${s.id}')">✏️ Editar</button>
-          <button class="tbl-btn tbl-delete" onclick="deleteSlide('${s.id}')">🗑️</button>
+  try {
+    const snap = await getDocs(query(collection(db,'slides'), orderBy('createdAt','asc')));
+    const slides = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (slides.length === 0) {
+      container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">No hay slides. Agrega el primero 👆</div>`;
+      return;
+    }
+    container.innerHTML = slides.map((s,i) => `
+      <div class="slide-item">
+        <div class="slide-img-wrap">
+          ${s.image?`<img src="${s.image}" alt="${s.title}">`:'<div style="width:100%;height:100%;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;color:var(--text-muted)">Sin imagen</div>'}
+          <div class="slide-order-badge">${i+1}</div>
         </div>
-      </div>
-    </div>
-  `).join('');
+        <div class="slide-info">
+          <div class="slide-title">${s.title||'(Sin título)'}</div>
+          <div class="slide-subtitle">${s.subtitle||''}</div>
+          <div class="slide-actions">
+            <button class="tbl-btn tbl-edit" onclick="editSlide('${s.id}')">✏️ Editar</button>
+            <button class="tbl-btn tbl-delete" onclick="deleteSlide('${s.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) { adminToast('Error al cargar slides','err'); }
 }
 
-function openSlideModal(slide = null) {
+window.openSlideModal = function(slide=null) {
   editingSlide = slide;
   document.getElementById('slide-modal-title').textContent = slide ? 'Editar Slide' : 'Nuevo Slide';
-  document.getElementById('slide-title').value = slide?.title || '';
-  document.getElementById('slide-subtitle').value = slide?.subtitle || '';
-  document.getElementById('slide-cta').value = slide?.cta || 'Ver Productos';
-  document.getElementById('slide-image-preview').innerHTML = slide?.image
-    ? `<img src="${slide.image}" style="max-height:120px;border-radius:8px;">` : '';
-  document.getElementById('slide-image-url').value = slide?.image || '';
+  document.getElementById('slide-title').value = slide?.title||'';
+  document.getElementById('slide-subtitle').value = slide?.subtitle||'';
+  document.getElementById('slide-cta').value = slide?.cta||'Ver Productos';
+  document.getElementById('slide-image-url').value = slide?.image||'';
+  document.getElementById('slide-image-preview').innerHTML = slide?.image?`<img src="${slide.image}" style="max-height:120px;border-radius:8px;">`:'';
   openModal('slide-modal');
-}
+};
 
-function editSlide(id) {
-  const slide = DB.get('slides').find(s => s.id === id);
-  if (slide) openSlideModal(slide);
-}
+window.editSlide = async function(id) {
+  const d = await getDoc(doc(db,'slides',id));
+  if (d.exists()) window.openSlideModal({ id: d.id, ...d.data() });
+};
 
-function deleteSlide(id) {
+window.deleteSlide = async function(id) {
   if (!confirm('¿Eliminar este slide?')) return;
-  DB.delete('slides', id);
-  loadSlides();
-  adminToast('Slide eliminado', 'ok');
-}
+  await deleteDoc(doc(db,'slides',id));
+  loadSlides(); adminToast('Slide eliminado','ok');
+};
 
-function saveSlide() {
+window.saveSlide = async function() {
   const title = document.getElementById('slide-title').value.trim();
   const subtitle = document.getElementById('slide-subtitle').value.trim();
   const cta = document.getElementById('slide-cta').value.trim();
   const image = document.getElementById('slide-image-url').value.trim();
-
-  if (!title) { adminToast('El título es obligatorio', 'err'); return; }
-
-  const data = { title, subtitle, cta, image };
-  if (editingSlide) {
-    DB.update('slides', editingSlide.id, data);
-    adminToast('Slide actualizado', 'ok');
-  } else {
-    DB.push('slides', data);
-    adminToast('Slide creado', 'ok');
-  }
-  closeModal('slide-modal');
-  loadSlides();
-}
+  if (!title) { adminToast('El título es obligatorio','err'); return; }
+  const data = { title, subtitle, cta, image, createdAt: editingSlide?.createdAt || Date.now() };
+  try {
+    if (editingSlide) { await updateDoc(doc(db,'slides',editingSlide.id), data); adminToast('Slide actualizado','ok'); }
+    else { await addDoc(collection(db,'slides'), data); adminToast('Slide creado','ok'); }
+    closeModal('slide-modal'); loadSlides();
+  } catch(e) { adminToast('Error al guardar','err'); }
+};
 
 // ============================================================
 // PRODUCTOS
 // ============================================================
-function loadProducts() {
-  const products = DB.get('products');
+async function loadProducts() {
   const tbody = document.getElementById('products-tbody');
   if (!tbody) return;
-
-  if (products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No hay productos. Agrega el primero 👆</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = products.map(p => `
-    <tr>
-      <td><img src="${p.image || ''}" onerror="this.style.background='var(--cream-dark)'"></td>
-      <td><strong>${p.name}</strong></td>
-      <td>${p.category || '-'}</td>
-      <td><strong>$${Number(p.price).toLocaleString('es-AR')}</strong></td>
-      <td>${buildBadgeHtml(p.badge)}</td>
-      <td>${p.stock >= 0 ? p.stock : '∞'}</td>
-      <td class="table-actions">
-        <button class="tbl-btn tbl-edit" onclick="editProduct('${p.id}')">Editar</button>
-        <button class="tbl-btn tbl-delete" onclick="deleteProduct('${p.id}')">Eliminar</button>
-      </td>
-    </tr>
-  `).join('');
-
-  // Search
-  document.getElementById('products-search')?.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase();
-    tbody.querySelectorAll('tr').forEach(tr => {
-      tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  try {
+    const snap = await getDocs(query(collection(db,'products'), orderBy('createdAt','desc')));
+    const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (products.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No hay productos. Agrega el primero 👆</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = products.map(p => `
+      <tr>
+        <td><img src="${p.image||''}" onerror="this.style.background='var(--cream-dark)'"></td>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.category||'-'}</td>
+        <td><strong>$${Number(p.price).toLocaleString('es-AR')}</strong></td>
+        <td>${buildBadge(p.badge)}</td>
+        <td>${p.stock>=0?p.stock:'∞'}</td>
+        <td class="table-actions">
+          <button class="tbl-btn tbl-edit" onclick="editProduct('${p.id}')">Editar</button>
+          <button class="tbl-btn tbl-delete" onclick="deleteProduct('${p.id}')">Eliminar</button>
+        </td>
+      </tr>`).join('');
+    document.getElementById('products-search')?.addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      tbody.querySelectorAll('tr').forEach(tr => { tr.style.display = tr.textContent.toLowerCase().includes(q)?'':'none'; });
     });
-  });
+  } catch(e) { adminToast('Error al cargar productos','err'); }
 }
 
-function buildBadgeHtml(badge) {
+function buildBadge(badge) {
   if (!badge) return '<span class="badge badge-gray">Normal</span>';
-  const map = {
-    destaque: ['badge-gold', '⭐ Destaque'],
-    promo: ['badge-terra', '🔥 Promo'],
-    nuevo: ['badge-rose', '✨ Nuevo']
-  };
-  const [cls, label] = map[badge] || ['badge-gray', badge];
-  return `<span class="badge ${cls}">${label}</span>`;
+  const m = { destaque:['badge-gold','⭐ Destaque'], promo:['badge-terra','🔥 Promo'], nuevo:['badge-rose','✨ Nuevo'] };
+  const [cls,lbl] = m[badge]||['badge-gray',badge];
+  return `<span class="badge ${cls}">${lbl}</span>`;
 }
 
-function openProductModal(product = null) {
+window.openProductModal = async function(product=null) {
   editingProduct = product;
-  document.getElementById('product-modal-title').textContent = product ? 'Editar Producto' : 'Nuevo Producto';
+  document.getElementById('product-modal-title').textContent = product?'Editar Producto':'Nuevo Producto';
+  document.getElementById('p-name').value = product?.name||'';
+  document.getElementById('p-price').value = product?.price||'';
+  document.getElementById('p-old-price').value = product?.oldPrice||'';
+  document.getElementById('p-description').value = product?.description||'';
+  document.getElementById('p-stock').value = product?.stock??'';
+  document.getElementById('p-badge').value = product?.badge||'';
+  document.getElementById('p-image-url').value = product?.image||'';
+  document.getElementById('p-weight').value = product?.weight||'';
+  document.getElementById('p-height').value = product?.height||'';
+  document.getElementById('p-width').value = product?.width||'';
+  document.getElementById('p-depth').value = product?.depth||'';
+  document.getElementById('p-image-preview').innerHTML = product?.image?`<div class="img-preview-item"><img src="${product.image}"></div>`:'';
 
-  // Fill form
-  document.getElementById('p-name').value = product?.name || '';
-  document.getElementById('p-category').value = product?.category || '';
-  document.getElementById('p-price').value = product?.price || '';
-  document.getElementById('p-old-price').value = product?.oldPrice || '';
-  document.getElementById('p-description').value = product?.description || '';
-  document.getElementById('p-stock').value = product?.stock ?? '';
-  document.getElementById('p-badge').value = product?.badge || '';
-  document.getElementById('p-image-url').value = product?.image || '';
-  document.getElementById('p-weight').value = product?.weight || '';
-  document.getElementById('p-height').value = product?.height || '';
-  document.getElementById('p-width').value = product?.width || '';
-  document.getElementById('p-depth').value = product?.depth || '';
-
-  // Image preview
-  const preview = document.getElementById('p-image-preview');
-  preview.innerHTML = product?.image
-    ? `<div class="img-preview-item"><img src="${product.image}"></div>` : '';
-
-  // Populate categories
-  const cats = DB.get('categories');
-  const catSelect = document.getElementById('p-category');
-  catSelect.innerHTML = '<option value="">Sin categoría</option>' +
-    cats.map(c => `<option value="${c.name}" ${product?.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('');
+  // Load categories
+  const snap = await getDocs(collection(db,'categories'));
+  const cats = snap.docs.map(d => d.data());
+  document.getElementById('p-category').innerHTML = '<option value="">Sin categoría</option>' +
+    cats.map(c => `<option value="${c.name}" ${product?.category===c.name?'selected':''}>${c.name}</option>`).join('');
 
   openModal('product-modal');
-}
+};
 
-function editProduct(id) {
-  const p = DB.get('products').find(p => p.id === id);
-  if (p) openProductModal(p);
-}
+window.editProduct = async function(id) {
+  const d = await getDoc(doc(db,'products',id));
+  if (d.exists()) window.openProductModal({ id: d.id, ...d.data() });
+};
 
-function deleteProduct(id) {
+window.deleteProduct = async function(id) {
   if (!confirm('¿Eliminar este producto?')) return;
-  DB.delete('products', id);
-  loadProducts();
-  adminToast('Producto eliminado', 'ok');
-}
+  await deleteDoc(doc(db,'products',id));
+  loadProducts(); adminToast('Producto eliminado','ok');
+};
 
-function saveProduct() {
+window.saveProduct = async function() {
   const name = document.getElementById('p-name').value.trim();
-  const category = document.getElementById('p-category').value;
   const price = parseFloat(document.getElementById('p-price').value);
-  const oldPrice = parseFloat(document.getElementById('p-old-price').value) || null;
-  const description = document.getElementById('p-description').value.trim();
-  const stock = parseInt(document.getElementById('p-stock').value) || -1;
-  const badge = document.getElementById('p-badge').value;
-  const image = document.getElementById('p-image-url').value.trim();
-  const weight = parseInt(document.getElementById('p-weight').value) || null;
-  const height = parseInt(document.getElementById('p-height').value) || null;
-  const width = parseInt(document.getElementById('p-width').value) || null;
-  const depth = parseInt(document.getElementById('p-depth').value) || null;
-
-  if (!name || !price) { adminToast('Nombre y precio son obligatorios', 'err'); return; }
-
-  const data = { name, category, price, oldPrice, description, stock, badge, image, weight, height, width, depth };
-
-  if (editingProduct) {
-    DB.update('products', editingProduct.id, data);
-    adminToast('Producto actualizado ✅', 'ok');
-  } else {
-    DB.push('products', data);
-    adminToast('Producto creado ✅', 'ok');
-  }
-  closeModal('product-modal');
-  loadProducts();
-}
-
-// ============================================================
-// CLOUDINARY UPLOAD
-// ============================================================
-async function uploadToCloudinary(file, targetInput, previewEl) {
-  const config = { cloudName: 'TU_CLOUD_NAME', uploadPreset: 'TU_UPLOAD_PRESET' };
-  if (config.cloudName === 'TU_CLOUD_NAME') {
-    // Modo demo: convertir a base64
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (targetInput) targetInput.value = e.target.result;
-      if (previewEl) previewEl.innerHTML = `<div class="img-preview-item"><img src="${e.target.result}"></div>`;
-    };
-    reader.readAsDataURL(file);
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', config.uploadPreset);
-
+  if (!name||!price) { adminToast('Nombre y precio son obligatorios','err'); return; }
+  const data = {
+    name,
+    category: document.getElementById('p-category').value,
+    price,
+    oldPrice: parseFloat(document.getElementById('p-old-price').value)||null,
+    description: document.getElementById('p-description').value.trim(),
+    stock: parseInt(document.getElementById('p-stock').value)||-1,
+    badge: document.getElementById('p-badge').value,
+    image: document.getElementById('p-image-url').value.trim(),
+    weight: parseInt(document.getElementById('p-weight').value)||null,
+    height: parseInt(document.getElementById('p-height').value)||null,
+    width: parseInt(document.getElementById('p-width').value)||null,
+    depth: parseInt(document.getElementById('p-depth').value)||null,
+    createdAt: editingProduct?.createdAt||Date.now()
+  };
   try {
-    adminToast('⬆️ Subiendo imagen...');
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`, {
-      method: 'POST', body: formData
-    });
-    const data = await res.json();
-    if (data.secure_url) {
-      if (targetInput) targetInput.value = data.secure_url;
-      if (previewEl) previewEl.innerHTML = `<div class="img-preview-item"><img src="${data.secure_url}"></div>`;
-      adminToast('✅ Imagen subida', 'ok');
-    }
-  } catch (e) {
-    adminToast('❌ Error al subir imagen', 'err');
-  }
-}
+    if (editingProduct) { await updateDoc(doc(db,'products',editingProduct.id), data); adminToast('Producto actualizado ✅','ok'); }
+    else { await addDoc(collection(db,'products'), data); adminToast('Producto creado ✅','ok'); }
+    closeModal('product-modal'); loadProducts();
+  } catch(e) { adminToast('Error al guardar','err'); }
+};
 
 // ============================================================
 // CATEGORÍAS
 // ============================================================
-function loadCategories() {
-  const cats = DB.get('categories');
+async function loadCategories() {
   const tbody = document.getElementById('categories-tbody');
   if (!tbody) return;
-
+  const snap = await getDocs(collection(db,'categories'));
+  const cats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   tbody.innerHTML = cats.map(c => `
     <tr>
-      <td>${c.icon || '🎀'}</td>
+      <td>${c.icon||'🎀'}</td>
       <td><strong>${c.name}</strong></td>
-      <td>${c.description || '-'}</td>
+      <td>${c.description||'-'}</td>
       <td class="table-actions">
         <button class="tbl-btn tbl-edit" onclick="editCategory('${c.id}')">Editar</button>
         <button class="tbl-btn tbl-delete" onclick="deleteCategory('${c.id}')">Eliminar</button>
       </td>
-    </tr>
-  `).join('') || `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">Sin categorías</td></tr>`;
+    </tr>`).join('') || `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">Sin categorías</td></tr>`;
 }
 
-function openCategoryModal(cat = null) {
-  document.getElementById('cat-id').value = cat?.id || '';
-  document.getElementById('cat-name').value = cat?.name || '';
-  document.getElementById('cat-icon').value = cat?.icon || '';
-  document.getElementById('cat-description').value = cat?.description || '';
-  document.getElementById('category-modal-title').textContent = cat ? 'Editar Categoría' : 'Nueva Categoría';
+window.openCategoryModal = function(cat=null) {
+  document.getElementById('cat-id').value = cat?.id||'';
+  document.getElementById('cat-name').value = cat?.name||'';
+  document.getElementById('cat-icon').value = cat?.icon||'';
+  document.getElementById('cat-description').value = cat?.description||'';
+  document.getElementById('category-modal-title').textContent = cat?'Editar Categoría':'Nueva Categoría';
   openModal('category-modal');
-}
+};
 
-function editCategory(id) {
-  const cat = DB.get('categories').find(c => c.id === id);
-  if (cat) openCategoryModal(cat);
-}
+window.editCategory = async function(id) {
+  const d = await getDoc(doc(db,'categories',id));
+  if (d.exists()) window.openCategoryModal({ id: d.id, ...d.data() });
+};
 
-function deleteCategory(id) {
-  if (!confirm('¿Eliminar esta categoría?')) return;
-  DB.delete('categories', id);
-  loadCategories();
-  adminToast('Categoría eliminada', 'ok');
-}
+window.deleteCategory = async function(id) {
+  if (!confirm('¿Eliminar?')) return;
+  await deleteDoc(doc(db,'categories',id));
+  loadCategories(); adminToast('Categoría eliminada','ok');
+};
 
-function saveCategory() {
+window.saveCategory = async function() {
   const id = document.getElementById('cat-id').value;
   const name = document.getElementById('cat-name').value.trim();
-  const icon = document.getElementById('cat-icon').value.trim();
-  const description = document.getElementById('cat-description').value.trim();
-
-  if (!name) { adminToast('El nombre es obligatorio', 'err'); return; }
-
-  const data = { name, icon, description };
-  if (id) {
-    DB.update('categories', id, data);
-    adminToast('Categoría actualizada ✅', 'ok');
-  } else {
-    DB.push('categories', data);
-    adminToast('Categoría creada ✅', 'ok');
-  }
-  closeModal('category-modal');
-  loadCategories();
-}
+  if (!name) { adminToast('El nombre es obligatorio','err'); return; }
+  const data = { name, icon: document.getElementById('cat-icon').value.trim(), description: document.getElementById('cat-description').value.trim() };
+  try {
+    if (id) { await updateDoc(doc(db,'categories',id), data); adminToast('Categoría actualizada ✅','ok'); }
+    else { await addDoc(collection(db,'categories'), data); adminToast('Categoría creada ✅','ok'); }
+    closeModal('category-modal'); loadCategories();
+  } catch(e) { adminToast('Error al guardar','err'); }
+};
 
 // ============================================================
 // CUPONES
 // ============================================================
-function loadCupones() {
-  const now = Date.now();
-  const cupones = DB.get('cupones');
-  // Auto-remove expired
-  const active = cupones.filter(c => c.expiry > now);
-  if (active.length !== cupones.length) DB.set('cupones', active);
-
+async function loadCupones() {
   const container = document.getElementById('cupones-list');
   if (!container) return;
-
+  const snap = await getDocs(collection(db,'cupones'));
+  const now = Date.now();
+  const active = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(c => c.expiry > now);
+  // Auto-delete expired
+  snap.docs.forEach(d => { if (d.data().expiry <= now) deleteDoc(doc(db,'cupones',d.id)); });
   if (active.length === 0) {
     container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">No hay cupones activos</div>`;
     return;
   }
-
   container.innerHTML = active.map(c => `
     <div class="cupon-card">
       <div class="cupon-card-info">
         <div class="cupon-card-name">🎟️ ${c.code}</div>
-        <div class="cupon-card-detail">${c.discount}% de descuento · Vence: ${new Date(c.expiry).toLocaleDateString('es-AR')}</div>
+        <div class="cupon-card-detail">${c.discount}% descuento · Vence: ${new Date(c.expiry).toLocaleDateString('es-AR')}</div>
       </div>
       <div class="promo-card-actions">
         <span class="badge badge-green">Activo</span>
         <button class="tbl-btn tbl-delete" onclick="deleteCupon('${c.id}')">🗑️</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function openCuponModal() {
-  document.getElementById('cupon-code').value = '';
-  document.getElementById('cupon-discount').value = '';
-  document.getElementById('cupon-expiry').value = '';
+window.openCuponModal = function() {
+  document.getElementById('cupon-code').value='';
+  document.getElementById('cupon-discount').value='';
+  document.getElementById('cupon-expiry').value='';
   openModal('cupon-modal');
-}
+};
 
-function deleteCupon(id) {
-  if (!confirm('¿Eliminar este cupón?')) return;
-  DB.delete('cupones', id);
-  loadCupones();
-  adminToast('Cupón eliminado', 'ok');
-}
+window.deleteCupon = async function(id) {
+  if (!confirm('¿Eliminar cupón?')) return;
+  await deleteDoc(doc(db,'cupones',id));
+  loadCupones(); adminToast('Cupón eliminado','ok');
+};
 
-function saveCupon() {
+window.saveCupon = async function() {
   const code = document.getElementById('cupon-code').value.trim().toUpperCase();
   const discount = parseFloat(document.getElementById('cupon-discount').value);
   const expiryStr = document.getElementById('cupon-expiry').value;
-
-  if (!code || !discount || !expiryStr) { adminToast('Todos los campos son obligatorios', 'err'); return; }
-  if (discount <= 0 || discount > 100) { adminToast('El descuento debe ser entre 1 y 100', 'err'); return; }
-
+  if (!code||!discount||!expiryStr) { adminToast('Todos los campos son obligatorios','err'); return; }
   const expiry = new Date(expiryStr).getTime();
-  if (expiry <= Date.now()) { adminToast('La fecha debe ser futura', 'err'); return; }
-
-  DB.push('cupones', { code, discount, expiry });
-  closeModal('cupon-modal');
-  loadCupones();
-  adminToast(`Cupón ${code} creado ✅`, 'ok');
-}
+  if (expiry <= Date.now()) { adminToast('La fecha debe ser futura','err'); return; }
+  await addDoc(collection(db,'cupones'), { code, discount, expiry, createdAt: Date.now() });
+  closeModal('cupon-modal'); loadCupones(); adminToast(`Cupón ${code} creado ✅`,'ok');
+};
 
 // ============================================================
 // PROMOCIONES
 // ============================================================
-function loadPromotions() {
-  const promos = DB.get('promotions');
+async function loadPromotions() {
   const container = document.getElementById('promos-list');
   if (!container) return;
-
+  const snap = await getDocs(collection(db,'promotions'));
+  const promos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   if (promos.length === 0) {
-    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">No hay promociones activas</div>`;
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">No hay promociones</div>`;
     return;
   }
-
   container.innerHTML = promos.map(p => `
     <div class="promo-card">
       <div class="promo-card-info">
@@ -547,337 +427,271 @@ function loadPromotions() {
         <div class="promo-card-detail">${getPromoDetail(p)}</div>
       </div>
       <div class="promo-card-actions">
-        <label class="toggle-wrap">
-          <label class="toggle">
-            <input type="checkbox" ${p.active ? 'checked' : ''} onchange="togglePromo('${p.id}', this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
-        </label>
+        <label class="toggle"><input type="checkbox" ${p.active?'checked':''} onchange="togglePromo('${p.id}',this.checked)"><span class="toggle-slider"></span></label>
         <button class="tbl-btn tbl-delete" onclick="deletePromo('${p.id}')">🗑️</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function getPromoLabel(p) {
-  const labels = {
-    valor_minimo: '💰 Descuento por monto mínimo',
-    leve_n: '🛍️ Llevá N productos',
-    frete_gratis: '🚚 Envío Gratis'
-  };
-  return labels[p.type] || p.type;
+  return { valor_minimo:'💰 Descuento por monto mínimo', leve_n:'🛍️ Llevá N productos', frete_gratis:'🚚 Envío Gratis' }[p.type]||p.type;
 }
-
 function getPromoDetail(p) {
-  if (p.type === 'valor_minimo') {
-    const disc = p.discountType === 'percent' ? `${p.discountValue}%` : `$${p.discountValue}`;
-    return `A partir de $${p.minValue} → ${disc} de descuento`;
-  }
-  if (p.type === 'leve_n') {
-    const disc = p.discountType === 'percent' ? `${p.discountValue}%` : `$${p.discountValue}`;
-    const cat = p.limitCategory || 'todas las categorías';
-    return `Llevá ${p.minQty}+ productos de ${cat} → ${disc} de descuento`;
-  }
-  if (p.type === 'frete_gratis') {
-    return `Envío gratis a partir de $${p.minValue}`;
-  }
+  if (p.type==='valor_minimo') return `A partir de $${p.minValue} → ${p.discountType==='percent'?p.discountValue+'%':'$'+p.discountValue} descuento`;
+  if (p.type==='leve_n') return `Llevá ${p.minQty}+ de ${p.limitCategory||'todas las categorías'} → ${p.discountType==='percent'?p.discountValue+'%':'$'+p.discountValue} descuento`;
+  if (p.type==='frete_gratis') return `Envío gratis a partir de $${p.minValue}`;
   return '';
 }
 
-function togglePromo(id, active) {
-  DB.update('promotions', id, { active });
-  adminToast(active ? 'Promoción activada' : 'Promoción desactivada', 'ok');
-}
+window.togglePromo = async function(id, active) {
+  await updateDoc(doc(db,'promotions',id), { active });
+  adminToast(active?'Promoción activada':'Desactivada','ok');
+};
 
-function deletePromo(id) {
-  if (!confirm('¿Eliminar esta promoción?')) return;
-  DB.delete('promotions', id);
-  loadPromotions();
-  adminToast('Promoción eliminada', 'ok');
-}
+window.deletePromo = async function(id) {
+  if (!confirm('¿Eliminar?')) return;
+  await deleteDoc(doc(db,'promotions',id));
+  loadPromotions(); adminToast('Promoción eliminada','ok');
+};
 
-function openPromoModal(type) {
-  const modal = document.getElementById('promo-modal');
-  if (!modal) return;
-
+window.openPromoModal = async function(type) {
   document.getElementById('promo-type').value = type;
-  document.getElementById('promo-modal-title').textContent = getPromoLabel({ type });
-
-  // Show/hide fields based on type
-  document.getElementById('promo-fields-valor').style.display = type === 'valor_minimo' ? 'block' : 'none';
-  document.getElementById('promo-fields-leve').style.display = type === 'leve_n' ? 'block' : 'none';
-  document.getElementById('promo-fields-frete').style.display = type === 'frete_gratis' ? 'block' : 'none';
-
-  // Populate category select
-  const cats = DB.get('categories');
-  const catSel = document.getElementById('promo-category');
-  if (catSel) catSel.innerHTML = '<option value="">Todas las categorías</option>' +
-    cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-
+  document.getElementById('promo-modal-title').textContent = getPromoLabel({type});
+  document.getElementById('promo-fields-valor').style.display = type==='valor_minimo'?'block':'none';
+  document.getElementById('promo-fields-leve').style.display = type==='leve_n'?'block':'none';
+  document.getElementById('promo-fields-frete').style.display = type==='frete_gratis'?'block':'none';
+  const snap = await getDocs(collection(db,'categories'));
+  const sel = document.getElementById('promo-category');
+  if (sel) sel.innerHTML = '<option value="">Todas las categorías</option>'+snap.docs.map(d=>`<option value="${d.data().name}">${d.data().name}</option>`).join('');
   openModal('promo-modal');
-}
+};
 
-function savePromo() {
+window.savePromo = async function() {
   const type = document.getElementById('promo-type').value;
-  let data = { type, active: true };
-
-  if (type === 'valor_minimo') {
+  let data = { type, active: true, createdAt: Date.now() };
+  if (type==='valor_minimo') {
     data.minValue = parseFloat(document.getElementById('promo-min-value').value);
     data.discountType = document.getElementById('promo-discount-type').value;
     data.discountValue = parseFloat(document.getElementById('promo-discount-value').value);
-    if (!data.minValue || !data.discountValue) { adminToast('Completa todos los campos', 'err'); return; }
-  } else if (type === 'leve_n') {
+    if (!data.minValue||!data.discountValue) { adminToast('Completa todos los campos','err'); return; }
+  } else if (type==='leve_n') {
     data.minQty = parseInt(document.getElementById('promo-min-qty').value);
     data.limitCategory = document.getElementById('promo-category').value;
     data.discountType = document.getElementById('promo-leve-discount-type').value;
     data.discountValue = parseFloat(document.getElementById('promo-leve-discount-value').value);
-    if (!data.minQty || !data.discountValue) { adminToast('Completa todos los campos', 'err'); return; }
-  } else if (type === 'frete_gratis') {
+    if (!data.minQty||!data.discountValue) { adminToast('Completa todos los campos','err'); return; }
+  } else if (type==='frete_gratis') {
     data.minValue = parseFloat(document.getElementById('promo-frete-min').value);
-    if (!data.minValue) { adminToast('Ingresa el monto mínimo', 'err'); return; }
+    if (!data.minValue) { adminToast('Ingresa el monto mínimo','err'); return; }
   }
-
-  DB.push('promotions', data);
-  closeModal('promo-modal');
-  loadPromotions();
-  adminToast('Promoción creada ✅', 'ok');
-}
+  await addDoc(collection(db,'promotions'), data);
+  closeModal('promo-modal'); loadPromotions(); adminToast('Promoción creada ✅','ok');
+};
 
 // ============================================================
-// PRECIO EN MASA
+// PRECIOS EN MASA
 // ============================================================
-function loadPricing() {
-  const products = DB.get('products');
-  document.getElementById('pricing-count').textContent = `${products.length} productos`;
+async function loadPricing() {
+  const snap = await getDocs(collection(db,'products'));
+  document.getElementById('pricing-count').textContent = `${snap.size} productos en la tienda`;
+  const cats = await getDocs(collection(db,'categories'));
+  const sel = document.getElementById('mass-category');
+  if (sel) sel.innerHTML = '<option value="">Todas las categorías</option>'+cats.docs.map(d=>`<option value="${d.data().name}">${d.data().name}</option>`).join('');
 }
 
-function applyMassPrice() {
+window.applyMassPrice = async function() {
   const type = document.getElementById('mass-type').value;
   const value = parseFloat(document.getElementById('mass-value').value);
   const category = document.getElementById('mass-category').value;
-
-  if (!value) { adminToast('Ingresa un valor', 'err'); return; }
-
-  const products = DB.get('products');
-  const updated = products.map(p => {
-    if (category && p.category !== category) return p;
-
+  if (!value) { adminToast('Ingresa un valor','err'); return; }
+  const snap = await getDocs(collection(db,'products'));
+  let count = 0;
+  for (const d of snap.docs) {
+    const p = d.data();
+    if (category && p.category !== category) continue;
     let newPrice = p.price;
-    if (type === 'add') newPrice = p.price + value;
-    else if (type === 'subtract') newPrice = Math.max(0, p.price - value);
-    else if (type === 'percent_add') newPrice = p.price * (1 + value/100);
-    else if (type === 'percent_sub') newPrice = p.price * (1 - value/100);
-    else if (type === 'set') newPrice = value;
-
-    return { ...p, price: Math.round(newPrice) };
-  });
-
-  DB.set('products', updated);
-  adminToast(`✅ Precios actualizados (${updated.filter(p => !category || p.category === category).length} productos)`, 'ok');
-}
+    if (type==='add') newPrice = p.price + value;
+    else if (type==='subtract') newPrice = Math.max(0, p.price - value);
+    else if (type==='percent_add') newPrice = p.price * (1 + value/100);
+    else if (type==='percent_sub') newPrice = p.price * (1 - value/100);
+    else if (type==='set') newPrice = value;
+    await updateDoc(doc(db,'products',d.id), { price: Math.round(newPrice) });
+    count++;
+  }
+  adminToast(`✅ ${count} productos actualizados`,'ok');
+};
 
 // ============================================================
 // SHIPPING CONFIG
 // ============================================================
-function loadShipping() {
-  const config = DB.get('shipping_config', {
-    correoUser: '',
-    correoPass: '',
-    correoCustomerId: '',
-    originPostal: '2434',
-    originCity: 'Córdoba',
-    defaultShipping: 1500,
-  });
-
-  document.getElementById('sh-correo-user').value = config.correoUser || '';
-  document.getElementById('sh-correo-pass').value = config.correoPass || '';
-  document.getElementById('sh-customer-id').value = config.correoCustomerId || '';
-  document.getElementById('sh-origin-postal').value = config.originPostal || '2434';
-  document.getElementById('sh-origin-city').value = config.originCity || 'Córdoba';
-  document.getElementById('sh-default').value = config.defaultShipping || '';
+async function loadShipping() {
+  const d = await getDoc(doc(db,'config','shipping'));
+  if (d.exists()) {
+    const cfg = d.data();
+    document.getElementById('sh-correo-user').value = cfg.correoUser||'';
+    document.getElementById('sh-correo-pass').value = cfg.correoPass||'';
+    document.getElementById('sh-customer-id').value = cfg.correoCustomerId||'';
+    document.getElementById('sh-origin-postal').value = cfg.originPostal||'2434';
+    document.getElementById('sh-origin-city').value = cfg.originCity||'Córdoba';
+    document.getElementById('sh-default').value = cfg.defaultShipping||'';
+  }
 }
 
-function saveShippingConfig() {
-  DB.set('shipping_config', {
+window.saveShippingConfig = async function() {
+  const data = {
     correoUser: document.getElementById('sh-correo-user').value,
     correoPass: document.getElementById('sh-correo-pass').value,
     correoCustomerId: document.getElementById('sh-customer-id').value,
     originPostal: document.getElementById('sh-origin-postal').value,
     originCity: document.getElementById('sh-origin-city').value,
-    defaultShipping: parseFloat(document.getElementById('sh-default').value) || 0,
-  });
-  adminToast('Configuración de frete guardada ✅', 'ok');
-}
+    defaultShipping: parseFloat(document.getElementById('sh-default').value)||0
+  };
+  await setDoc(doc(db,'config','shipping'), data);
+  adminToast('Configuración guardada ✅','ok');
+};
 
 // ============================================================
 // BLOG
 // ============================================================
-function loadBlog() {
-  const articles = DB.get('articles');
+async function loadBlog() {
   const tbody = document.getElementById('blog-tbody');
   if (!tbody) return;
-
-  if (articles.length === 0) {
+  const snap = await getDocs(query(collection(db,'articles'), orderBy('createdAt','desc')));
+  const arts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (arts.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No hay artículos. Crea el primero 👆</td></tr>`;
     return;
   }
-
-  const sorted = [...articles].sort((a,b) => b.createdAt - a.createdAt);
-  tbody.innerHTML = sorted.map(a => `
+  tbody.innerHTML = arts.map(a => `
     <tr>
-      <td>${a.image ? `<img src="${a.image}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;">` : '-'}</td>
+      <td>${a.image?`<img src="${a.image}" style="width:60px;height:40px;object-fit:cover;border-radius:6px;">`:'-'}</td>
       <td><strong>${a.title}</strong></td>
       <td>${new Date(a.createdAt).toLocaleDateString('es-AR')}</td>
-      <td><span class="badge ${a.published ? 'badge-green' : 'badge-gray'}">${a.published ? 'Publicado' : 'Borrador'}</span></td>
+      <td><span class="badge ${a.published!==false?'badge-green':'badge-gray'}">${a.published!==false?'Publicado':'Borrador'}</span></td>
       <td class="table-actions">
         <button class="tbl-btn tbl-edit" onclick="editArticle('${a.id}')">Editar</button>
         <button class="tbl-btn tbl-delete" onclick="deleteArticle('${a.id}')">Eliminar</button>
       </td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
-function openArticleModal(article = null) {
+window.openArticleModal = function(article=null) {
   editingArticle = article;
-  document.getElementById('article-modal-title').textContent = article ? 'Editar Artículo' : 'Nuevo Artículo';
-  document.getElementById('art-title').value = article?.title || '';
-  document.getElementById('art-excerpt').value = article?.excerpt || '';
-  document.getElementById('art-image-url').value = article?.image || '';
-  document.getElementById('art-seo-title').value = article?.seoTitle || '';
-  document.getElementById('art-seo-desc').value = article?.seoDesc || '';
-  document.getElementById('art-seo-keywords').value = article?.seoKeywords || '';
-  document.getElementById('art-published').checked = article?.published ?? true;
-
-  // Rich text content
-  const editor = document.getElementById('art-content');
-  if (editor) editor.innerHTML = article?.content || '';
-
-  document.getElementById('art-image-preview').innerHTML = article?.image
-    ? `<div class="img-preview-item"><img src="${article.image}"></div>` : '';
-
+  document.getElementById('article-modal-title').textContent = article?'Editar Artículo':'Nuevo Artículo';
+  document.getElementById('art-title').value = article?.title||'';
+  document.getElementById('art-excerpt').value = article?.excerpt||'';
+  document.getElementById('art-image-url').value = article?.image||'';
+  document.getElementById('art-seo-title').value = article?.seoTitle||'';
+  document.getElementById('art-seo-desc').value = article?.seoDesc||'';
+  document.getElementById('art-seo-keywords').value = article?.seoKeywords||'';
+  document.getElementById('art-published').checked = article?.published??true;
+  document.getElementById('art-content').innerHTML = article?.content||'';
+  document.getElementById('art-image-preview').innerHTML = article?.image?`<div class="img-preview-item"><img src="${article.image}"></div>`:'';
   openModal('article-modal');
-}
+};
 
-function editArticle(id) {
-  const a = DB.get('articles').find(a => a.id === id);
-  if (a) openArticleModal(a);
-}
+window.editArticle = async function(id) {
+  const d = await getDoc(doc(db,'articles',id));
+  if (d.exists()) window.openArticleModal({ id: d.id, ...d.data() });
+};
 
-function deleteArticle(id) {
+window.deleteArticle = async function(id) {
   if (!confirm('¿Eliminar este artículo?')) return;
-  DB.delete('articles', id);
-  loadBlog();
-  adminToast('Artículo eliminado', 'ok');
-}
+  await deleteDoc(doc(db,'articles',id));
+  loadBlog(); adminToast('Artículo eliminado','ok');
+};
 
-function saveArticle() {
+window.saveArticle = async function() {
   const title = document.getElementById('art-title').value.trim();
-  const excerpt = document.getElementById('art-excerpt').value.trim();
-  const content = document.getElementById('art-content').innerHTML;
-  const image = document.getElementById('art-image-url').value.trim();
-  const seoTitle = document.getElementById('art-seo-title').value.trim();
-  const seoDesc = document.getElementById('art-seo-desc').value.trim();
-  const seoKeywords = document.getElementById('art-seo-keywords').value.trim();
-  const published = document.getElementById('art-published').checked;
+  if (!title) { adminToast('El título es obligatorio','err'); return; }
+  const data = {
+    title,
+    excerpt: document.getElementById('art-excerpt').value.trim(),
+    content: document.getElementById('art-content').innerHTML,
+    image: document.getElementById('art-image-url').value.trim(),
+    seoTitle: document.getElementById('art-seo-title').value.trim(),
+    seoDesc: document.getElementById('art-seo-desc').value.trim(),
+    seoKeywords: document.getElementById('art-seo-keywords').value.trim(),
+    published: document.getElementById('art-published').checked,
+    createdAt: editingArticle?.createdAt||Date.now()
+  };
+  try {
+    if (editingArticle) { await updateDoc(doc(db,'articles',editingArticle.id), data); adminToast('Artículo actualizado ✅','ok'); }
+    else { await addDoc(collection(db,'articles'), data); adminToast('Artículo creado ✅','ok'); }
+    closeModal('article-modal'); loadBlog();
+  } catch(e) { adminToast('Error al guardar','err'); }
+};
 
-  if (!title) { adminToast('El título es obligatorio', 'err'); return; }
-
-  const data = { title, excerpt, content, image, seoTitle, seoDesc, seoKeywords, published };
-
-  if (editingArticle) {
-    DB.update('articles', editingArticle.id, data);
-    adminToast('Artículo actualizado ✅', 'ok');
-  } else {
-    DB.push('articles', data);
-    adminToast('Artículo creado ✅', 'ok');
-  }
-  closeModal('article-modal');
-  loadBlog();
-}
-
-// Toolbar de editor
-function execCmd(cmd, value = null) {
+window.execCmd = function(cmd, value=null) {
   document.getElementById('art-content').focus();
   document.execCommand(cmd, false, value);
-}
+};
 
 // ============================================================
 // DESTAQUE / PROMO SECTION
 // ============================================================
-function loadDestaque() {
-  const products = DB.get('products');
+async function loadDestaque() {
+  const snap = await getDocs(collection(db,'products'));
+  const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   const sel = document.getElementById('destaque-product-select');
   if (!sel) return;
-
-  const current = DB.get('destaque_product', null);
+  const current = await getDoc(doc(db,'config','destaque'));
+  const currentId = current.exists() ? current.data().id : '';
   sel.innerHTML = '<option value="">Sin producto destacado</option>' +
-    products.map(p => `<option value="${p.id}" ${current?.id === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+    products.map(p => `<option value="${p.id}" ${currentId===p.id?'selected':''}>${p.name}</option>`).join('');
 }
 
-function saveDestaque() {
+window.saveDestaque = async function() {
   const id = document.getElementById('destaque-product-select').value;
-  if (!id) { DB.set('destaque_product', null); adminToast('Destaque removido', 'ok'); return; }
-  const product = DB.get('products').find(p => p.id === id);
-  DB.set('destaque_product', product);
-  adminToast('Producto destacado guardado ✅', 'ok');
-}
+  if (!id) { await setDoc(doc(db,'config','destaque'), {}); adminToast('Destaque removido','ok'); return; }
+  const d = await getDoc(doc(db,'products',id));
+  if (d.exists()) { await setDoc(doc(db,'config','destaque'), { id, ...d.data() }); adminToast('Destaque guardado ✅','ok'); }
+};
 
-function loadPromoSection() {
-  const products = DB.get('products');
+async function loadPromoSection() {
+  const snap = await getDocs(collection(db,'products'));
+  const products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   const sel = document.getElementById('promo-section-select');
   if (!sel) return;
-
-  const current = DB.get('promo_product', null);
-  sel.innerHTML = '<option value="">Sin producto en promoción</option>' +
-    products.map(p => `<option value="${p.id}" ${current?.id === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
-
-  document.getElementById('promo-section-text').value = DB.get('promo_section_text', '¡Oferta especial!');
+  const current = await getDoc(doc(db,'config','promo_section'));
+  const currentId = current.exists() ? current.data()?.product?.id : '';
+  sel.innerHTML = '<option value="">Sin producto</option>' +
+    products.map(p => `<option value="${p.id}" ${currentId===p.id?'selected':''}>${p.name}</option>`).join('');
+  if (current.exists()) document.getElementById('promo-section-text').value = current.data()?.text||'';
 }
 
-function savePromoSection() {
+window.savePromoSection = async function() {
   const id = document.getElementById('promo-section-select').value;
   const text = document.getElementById('promo-section-text').value;
-  DB.set('promo_section_text', text);
-  if (!id) { DB.set('promo_product', null); adminToast('Promo removida', 'ok'); return; }
-  const product = DB.get('products').find(p => p.id === id);
-  DB.set('promo_product', product);
-  adminToast('Sección promo guardada ✅', 'ok');
-}
+  if (!id) { await setDoc(doc(db,'config','promo_section'), { text }); adminToast('Promo removida','ok'); return; }
+  const d = await getDoc(doc(db,'products',id));
+  if (d.exists()) { await setDoc(doc(db,'config','promo_section'), { text, product: { id, ...d.data() } }); adminToast('Sección promo guardada ✅','ok'); }
+};
 
-// ============================================================
-// ORDERS (placeholder)
-// ============================================================
-function loadOrders() {
+async function loadOrders() {
   document.getElementById('orders-tbody').innerHTML =
-    `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">
-      Los pedidos llegarán aquí cuando los clientes finalicen sus compras por WhatsApp.</td></tr>`;
+    `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">Los pedidos llegan por WhatsApp. Próximamente integración completa.</td></tr>`;
 }
 
 // ============================================================
-// MODAL HELPERS
+// MODALES
 // ============================================================
-function openModal(id) {
-  document.getElementById(id)?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(id) {
-  document.getElementById(id)?.classList.remove('open');
-  document.body.style.overflow = '';
-}
+window.openModal = function(id) { document.getElementById(id)?.classList.add('open'); document.body.style.overflow='hidden'; };
+window.closeModal = function(id) { document.getElementById(id)?.classList.remove('open'); document.body.style.overflow=''; };
 
 // ============================================================
 // TOAST
 // ============================================================
-function adminToast(msg, type = '') {
+function adminToast(msg, type='') {
   const container = document.getElementById('admin-toast');
   if (!container) return;
   const t = document.createElement('div');
   t.className = `a-toast ${type}`;
   t.innerHTML = msg;
   container.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3200);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 400); }, 3200);
 }
+window.adminToast = adminToast;
 
 // ============================================================
 // INIT
@@ -885,14 +699,6 @@ function adminToast(msg, type = '') {
 function initAdmin() {
   initSidebar();
   navigateTo('dashboard');
-
-  // Load mass pricing categories
-  const massCatSel = document.getElementById('mass-category');
-  if (massCatSel) {
-    const cats = DB.get('categories');
-    massCatSel.innerHTML = '<option value="">Todas las categorías</option>' +
-      cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-  }
 }
 
 document.addEventListener('DOMContentLoaded', initLogin);
