@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOE VEOS — Artículos de Maternidad | Argentina</title>
+  <meta name="description" content="ZOE VEOS — Los mejores artículos de maternidad para mamás y bebés en Argentina. Ropa, accesorios, lactancia y mucho más.">
+  <meta name="keywords" content="maternidad, bebé, ropa bebé, lactancia, Argentina, artículos maternidad, ZOE VEOS">
+  <meta name="author" content="ZOE VEOS">
+  <meta property="og:title" content="ZOE VEOS — Artículos de Maternidad">
+  <meta property="og:description" content="Los mejores artículos de maternidad para mamás y bebés en Argentina.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://zoeveos.vercel.app/">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LOADER
+     ============================================================ -->
+<div id="loader">
+  <video id="loader-video" autoplay muted playsinline>
+    <source src="assets/video/intro.mp4" type="video/mp4">
+  </video>
+  <div class="loader-overlay">
+    <div class="loader-brand">ZOE VEOS</div>
+    <div class="loader-tagline">Artículos de maternidad con amor</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header id="header">
+  <nav class="nav-inner">
+    <a href="/" class="nav-logo">ZOE VEOS</a>
+
+    <ul class="nav-links">
+      <li><a href="#categories">Categorías</a></li>
+      <li><a href="#products">Productos</a></li>
+      <li><a href="#destaque-section">Destacados</a></li>
+      <li><a href="#blog-section">Blog</a></li>
+      <li><a href="#footer">Contacto</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button id="cart-btn" class="cart-btn" aria-label="Carrito">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span id="cart-count" class="cart-count">0</span>
+      </button>
+      <button id="hamburger" class="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- Mobile Nav -->
+<nav id="mobile-nav" class="mobile-nav">
+  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Cerrar">✕</button>
+  <a href="#categories" onclick="document.getElementById('mobile-nav').classList.remove('open')">Categorías</a>
+  <a href="#products" onclick="document.getElementById('mobile-nav').classList.remove('open')">Productos</a>
+  <a href="#destaque-section" onclick="document.getElementById('mobile-nav').classList.remove('open')">Destacados</a>
+  <a href="#blog-section" onclick="document.getElementById('mobile-nav').classList.remove('open')">Blog</a>
+  <a href="#footer" onclick="document.getElementById('mobile-nav').classList.remove('open')">Contacto</a>
+</nav>
+
+<!-- ============================================================
+     HERO SLIDER
+     ============================================================ -->
+<section id="hero">
+  <div id="hero-slides"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">✨ Nueva Colección Disponible</div>
+    <h1 class="hero-title">
+      Para mamás<br>
+      <em>con amor</em>
+    </h1>
+    <p class="hero-sub">Artículos de maternidad seleccionados con cariño, para que cada momento sea especial.</p>
+    <a href="#products" class="hero-cta">
+      <i class="fa-solid fa-heart"></i>
+      Ver Colección
+    </a>
+  </div>
+
+  <div class="hero-arrows">
+    <button id="hero-prev" class="hero-arrow" aria-label="Anterior">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button id="hero-next" class="hero-arrow" aria-label="Siguiente">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div id="hero-dots" class="hero-nav"></div>
+</section>
+
+<!-- ============================================================
+     CATEGORÍAS
+     ============================================================ -->
+<section id="categories">
+  <div class="section-header">
+    <span class="section-label">Explorar</span>
+    <h2 class="section-title">Nuestras <em>Categorías</em></h2>
+    <p class="section-desc">Encuentra todo lo que necesitas para tu maternidad con amor y dedicación.</p>
+  </div>
+  <div id="categories-grid" class="categories-grid stagger-children"></div>
+</section>
+
+<!-- ============================================================
+     PRODUCTOS
+     ============================================================ -->
+<section id="products">
+  <div class="section-header">
+    <span class="section-label">Tienda</span>
+    <h2 class="section-title">Nuestros <em>Productos</em></h2>
+    <p class="section-desc">Artículos de maternidad de la más alta calidad, seleccionados especialmente para vos.</p>
+  </div>
+
+  <div class="products-controls">
+    <div id="filter-tabs" class="filter-tabs"></div>
+    <select id="sort-select" class="sort-select" onchange="handleSort(this.value)">
+      <option value="default">Ordenar por...</option>
+      <option value="price-asc">Precio: menor a mayor</option>
+      <option value="price-desc">Precio: mayor a menor</option>
+      <option value="newest">Más nuevos</option>
+    </select>
+  </div>
+
+  <div id="products-grid" class="products-grid"></div>
+  <button id="load-more-btn" class="load-more-btn" style="display:none;">
+    Ver más productos <i class="fa-solid fa-arrow-down"></i>
+  </button>
+</section>
+
+<!-- ============================================================
+     SECCIÓN DESTAQUE
+     ============================================================ -->
+<section id="destaque-section" style="display:none;">
+  <div class="destaque-inner">
+    <div class="destaque-img-wrap reveal-left">
+      <img id="destaque-img" src="" alt="Producto Destacado">
+      <div class="destaque-img-deco"></div>
+    </div>
+    <div class="destaque-content reveal-right">
+      <div class="destaque-label">Producto Destacado</div>
+      <h2 class="destaque-title" id="destaque-name"></h2>
+      <p class="destaque-desc" id="destaque-desc"></p>
+      <div class="destaque-price" id="destaque-price"></div>
+      <button id="destaque-btn" class="btn-primary">
+        <i class="fa-solid fa-bag-shopping"></i>
+        Agregar al Carrito
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECCIÓN PROMOCIÓN
+     ============================================================ -->
+<section id="promo-section" style="display:none;">
+  <div class="promo-inner">
+    <div class="promo-banner reveal">
+      <div>
+        <div class="promo-badge">Oferta Especial</div>
+        <h2 class="promo-title"><strong id="promo-section-text">¡Oferta especial!</strong></h2>
+        <p class="promo-desc">Aprovechá esta oportunidad única. ¡Mientras dure el stock!</p>
+      </div>
+      <div class="promo-product-card">
+        <img id="promo-product-img" class="promo-product-img" src="" alt="">
+        <div class="promo-product-name" id="promo-product-name"></div>
+        <div class="promo-product-price" id="promo-product-price"></div>
+        <button id="promo-add-btn" class="promo-btn">
+          <i class="fa-solid fa-cart-plus"></i>
+          Agregar
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BLOG
+     ============================================================ -->
+<section id="blog-section">
+  <div class="section-header">
+    <span class="section-label">Blog</span>
+    <h2 class="section-title">Artículos para <em>Mamás</em></h2>
+    <p class="section-desc">Consejos, guías y amor para acompañarte en esta hermosa etapa.</p>
+  </div>
+  <div id="blog-grid" class="blog-grid"></div>
+  <a href="blog.html" class="blog-more-btn">Ver todos los artículos</a>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ZOE VEOS</div>
+        <p class="footer-tagline">Artículos de maternidad con amor, para acompañarte en cada momento de esta hermosa etapa.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://wa.me/5493576466145" aria-label="WhatsApp" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Tienda</h4>
+        <ul>
+          <li><a href="#products">Todos los productos</a></li>
+          <li><a href="#categories">Categorías</a></li>
+          <li><a href="#destaque-section">Destacados</a></li>
+          <li><a href="#promo-section">Promociones</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Información</h4>
+        <ul>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="#">Envíos y entregas</a></li>
+          <li><a href="#">Preguntas frecuentes</a></li>
+          <li><a href="#">Política de devolución</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://wa.me/5493576466145" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
+          <li><a href="#">Córdoba, Argentina</a></li>
+          <li><a href="admin/index.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ZOE VEOS — Todos los derechos reservados</span>
+      <span>Hecho con 🌸 en Argentina</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     CARRITO DRAWER
+     ============================================================ -->
+<div id="cart-overlay"></div>
+<aside id="cart-drawer">
+  <div class="cart-header">
+    <h2 class="cart-title">Tu Carrito</h2>
+    <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+  </div>
+
+  <div id="cart-empty" class="cart-empty" style="display:flex;">
+    <div class="cart-empty-icon">🛍️</div>
+    <p>Tu carrito está vacío</p>
+  </div>
+
+  <div id="cart-items" class="cart-items"></div>
+
+  <div class="cart-footer">
+    <div class="cart-coupon-row">
+      <input type="text" id="coupon-input" class="cart-coupon-input" placeholder="Código de cupón">
+      <button id="coupon-apply-btn" class="cart-coupon-btn">Aplicar</button>
+    </div>
+    <div id="coupon-msg" class="cart-coupon-msg"></div>
+
+    <div class="cart-summary">
+      <div class="cart-summary-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal">$0</span>
+      </div>
+      <div class="cart-summary-row" id="discount-row" style="display:none;">
+        <span>Descuento</span>
+        <span id="cart-discount" style="color:var(--terra)">-$0</span>
+      </div>
+      <div class="cart-summary-row total">
+        <span>Total</span>
+        <span id="cart-total">$0</span>
+      </div>
+    </div>
+
+    <button id="checkout-btn" class="cart-checkout-btn">
+      <i class="fa-brands fa-whatsapp"></i>
+      Finalizar Compra
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MODAL CHECKOUT
+     ============================================================ -->
+<div id="checkout-modal">
+  <div class="checkout-box">
+    <button class="checkout-close" id="checkout-close" aria-label="Cerrar">✕</button>
+    <h2 class="checkout-title">Finalizar Compra</h2>
+    <p class="checkout-subtitle">Completa tus datos y te contactamos por WhatsApp para confirmar tu pedido.</p>
+
+    <div class="form-section-title">Tus datos</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="co-name">Nombre completo *</label>
+        <input type="text" id="co-name" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label for="co-whatsapp">WhatsApp *</label>
+        <input type="tel" id="co-whatsapp" placeholder="+549 351 000 0000">
+      </div>
+    </div>
+
+    <div class="form-section-title">Dirección de entrega</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="co-street">Calle *</label>
+        <input type="text" id="co-street" placeholder="Nombre de la calle">
+      </div>
+      <div class="form-group">
+        <label for="co-number">Número *</label>
+        <input type="text" id="co-number" placeholder="Número">
+      </div>
+      <div class="form-group">
+        <label for="co-barrio">Barrio</label>
+        <input type="text" id="co-barrio" placeholder="Barrio (opcional)">
+      </div>
+      <div class="form-group">
+        <label for="co-city">Ciudad *</label>
+        <input type="text" id="co-city" placeholder="Tu ciudad">
+      </div>
+      <div class="form-group">
+        <label for="co-postal">Código Postal *</label>
+        <input type="text" id="co-postal" placeholder="Ej: 5000" maxlength="8">
+      </div>
+      <div class="form-group">
+        <label for="co-province">Provincia</label>
+        <select id="co-province">
+          <option value="X">Córdoba</option>
+          <option value="B">Buenos Aires</option>
+          <option value="C">CABA</option>
+          <option value="S">Santa Fe</option>
+          <option value="M">Mendoza</option>
+          <option value="T">Tucumán</option>
+          <option value="A">Salta</option>
+          <option value="G">Santiago del Estero</option>
+          <option value="E">Entre Ríos</option>
+          <option value="H">Chaco</option>
+          <option value="N">Misiones</option>
+          <option value="W">Corrientes</option>
+          <option value="J">San Juan</option>
+          <option value="D">San Luis</option>
+          <option value="K">Catamarca</option>
+          <option value="F">La Rioja</option>
+          <option value="L">La Pampa</option>
+          <option value="Q">Neuquén</option>
+          <option value="R">Río Negro</option>
+          <option value="U">Chubut</option>
+          <option value="Z">Santa Cruz</option>
+          <option value="V">Tierra del Fuego</option>
+          <option value="P">Formosa</option>
+          <option value="Y">Jujuy</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-title">Opciones de envío</div>
+    <div id="shipping-options" class="shipping-options">
+      <div class="shipping-loading">Ingresa tu código postal para calcular el flete</div>
+    </div>
+
+    <div class="cart-summary">
+      <div class="cart-summary-row">
+        <span>Subtotal + descuento</span>
+        <span id="checkout-subtotal">$0</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Envío</span>
+        <span id="checkout-shipping-cost">-</span>
+      </div>
+      <div class="cart-summary-row total">
+        <span>TOTAL</span>
+        <span id="checkout-total">$0</span>
+      </div>
+    </div>
+
+    <button id="checkout-submit" class="checkout-submit-btn">
+      <i class="fa-brands fa-whatsapp"></i>
+      Confirmar por WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL PRODUCTO
+     ============================================================ -->
+<div id="product-modal">
+  <div class="product-modal-box">
+    <div class="product-modal-img">
+      <img id="pm-img" src="" alt="">
+    </div>
+    <div class="product-modal-info">
+      <button id="product-modal-close" class="product-modal-close" aria-label="Cerrar">✕</button>
+      <div class="product-modal-cat" id="pm-cat"></div>
+      <h2 class="product-modal-name" id="pm-name"></h2>
+      <div class="product-modal-price" id="pm-price"></div>
+      <p class="product-modal-desc" id="pm-desc"></p>
+      <button id="pm-add" class="product-modal-add">
+        <i class="fa-solid fa-bag-shopping"></i>
+        Agregar al Carrito
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOAST
+     ============================================================ -->
+<div id="toast-container"></div>
+
+<!-- WhatsApp flotante -->
+<a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<!-- Scripts -->
+<script>
+  function handleSort(value) {
+    if (!window.allProducts) return;
+    let sorted = [...window.filteredProducts || window.allProducts];
+    if (value === 'price-asc') sorted.sort((a,b) => a.price - b.price);
+    else if (value === 'price-desc') sorted.sort((a,b) => b.price - a.price);
+    else if (value === 'newest') sorted.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    const grid = document.getElementById('products-grid');
+    if (grid) grid.innerHTML = '';
+    window.currentPage = 0;
+    window.filteredProducts = sorted;
+    window.renderProducts(sorted);
+  }
+</script>
+<script src="js/main.js" type="module"></script>
+</body>
+</html>
