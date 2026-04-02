@@ -33,11 +33,21 @@ function initLogin() {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-pass').value;
     const errEl = document.getElementById('login-error');
+    errEl.classList.remove('show');
     try {
       await signInWithEmailAndPassword(auth, email, pass);
     } catch(err) {
       errEl.classList.add('show');
-      errEl.textContent = '❌ Email o contraseña incorrectos';
+      const msgs = {
+        'auth/user-not-found': '❌ Usuario no encontrado. Créalo en Firebase Console.',
+        'auth/wrong-password': '❌ Contraseña incorrecta.',
+        'auth/invalid-credential': '❌ Credenciales inválidas. Verifica email y contraseña.',
+        'auth/invalid-email': '❌ Email inválido.',
+        'auth/too-many-requests': '❌ Demasiados intentos. Espera unos minutos.',
+        'auth/operation-not-allowed': '❌ Email/Password no habilitado en Firebase Console.',
+        'auth/network-request-failed': '❌ Error de red. Verifica tu conexión.',
+      };
+      errEl.textContent = msgs[err.code] || '❌ Error: ' + err.code;
     }
   });
 }

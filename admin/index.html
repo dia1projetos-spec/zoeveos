@@ -19,16 +19,17 @@
     <div class="login-logo">ZOE VEOS</div>
     <div class="login-sub">Panel Administrativo</div>
     <form class="login-form" id="login-form">
-      <input type="email" id="login-email" class="login-input" placeholder="Email" required>
-      <input type="password" id="login-pass" class="login-input" placeholder="Contraseña" required>
+      <input type="email" id="login-email" class="login-input" placeholder="Email" required
+        value="zoeveos@protonmail.com" autocomplete="email">
+      <input type="password" id="login-pass" class="login-input" placeholder="Contraseña" required
+        autocomplete="current-password">
       <div class="login-error" id="login-error"></div>
       <button type="submit" class="login-btn">
         <i class="fa-solid fa-lock"></i> Ingresar
       </button>
     </form>
     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:20px;">
-      Default: admin@zoeveos.com / ZoeVeos2024!<br>
-      ⚠️ Cambia esto en producción
+      🔐 Acceso con tu cuenta de Firebase Auth
     </p>
   </div>
 </div>
@@ -859,6 +860,6 @@
 <!-- TOAST -->
 <div id="admin-toast"></div>
 
-<script src="../js/admin.js"></script>
+<script type="module" src="../js/admin.js"></script>
 </body>
 </html>
