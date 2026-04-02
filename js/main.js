@@ -21,45 +21,16 @@ let currentPage = 0;
 const PRODUCTS_PER_PAGE = 12;
 
 // ============================================================
-// LOADER — vídeo responsivo (desktop / mobile)
+// LOADER — animação texto elegante sem vídeo
 // ============================================================
 function initLoader() {
   const loader = document.getElementById('loader');
-  const videoEl = document.getElementById('loader-video');
-  const bar = document.querySelector('.loader-bar');
   if (!loader) return;
-
-  // Troca source conforme o tamanho da tela
-  if (videoEl) {
-    const isMobile = window.innerWidth <= 768;
-    const src = isMobile ? 'assets/video/intro-mobile.mp4' : 'assets/video/intro.mp4';
-    videoEl.src = src;
-    videoEl.load();
-  }
-
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += Math.random() * 3 + 1;
-    if (progress >= 100) { progress = 100; clearInterval(interval); }
-    if (bar) bar.style.width = progress + '%';
-  }, 80);
-
-  function finishLoader() {
-    clearInterval(interval);
-    if (bar) bar.style.width = '100%';
-    setTimeout(() => {
-      loader.classList.add('fade-out');
-      setTimeout(() => { loader.style.display = 'none'; }, 800);
-    }, 400);
-  }
-
-  if (videoEl) {
-    videoEl.addEventListener('ended', finishLoader);
-    videoEl.addEventListener('error', finishLoader);
-    setTimeout(finishLoader, 9000);
-  } else {
-    setTimeout(finishLoader, 2500);
-  }
+  // Tempo mínimo para ver a animação linda
+  setTimeout(() => {
+    loader.classList.add('fade-out');
+    setTimeout(() => { loader.style.display = 'none'; }, 900);
+  }, 2800);
 }
 
 // ============================================================
@@ -709,3 +680,167 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   window.addEventListener('scroll', initReveal, { passive: true });
 });
+
+// ============================================================
+// CUPONES & PROMOS AUTO-DISPLAY NO CARRINHO
+// ============================================================
+let appliedPromo = null;
+
+async function refreshCartBenefits() {
+  await Promise.all([loadAvailableCupones(), loadAvailablePromos()]);
+}
+
+async function loadAvailableCupones() {
+  const section = document.getElementById('cart-cupones-section');
+  const list = document.getElementById('cart-cupones-list');
+  if (!section || !list) return;
+
+  try {
+    const snap = await getDocs(collection(db, 'cupones'));
+    const now = Date.now();
+    const active = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(c => c.expiry > now);
+
+    if (active.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    list.innerHTML = active.map(c => {
+      const isApplied = appliedCoupon?.id === c.id;
+      return `
+        <div class="cart-cupon-item">
+          <div class="cart-cupon-info">
+            <div class="cart-cupon-code">🎟 ${c.code}</div>
+            <div class="cart-cupon-desc">${c.discount}% de descuento</div>
+          </div>
+          ${isApplied
+            ? '<span class="cart-cupon-applied">✅ Aplicado</span>'
+            : `<button class="cart-cupon-apply" onclick="applyCuponDirect('${c.id}','${c.code}',${c.discount})">Aplicar</button>`
+          }
+        </div>`;
+    }).join('');
+
+    // Toggle
+    const toggle = document.getElementById('cart-cupones-toggle');
+    toggle?.addEventListener('click', () => {
+      list.classList.toggle('open');
+      document.getElementById('cupones-arrow').textContent = list.classList.contains('open') ? '▴' : '▾';
+    });
+  } catch(e) { console.error(e); }
+}
+
+async function loadAvailablePromos() {
+  const section = document.getElementById('cart-promos-section');
+  const list = document.getElementById('cart-promos-list');
+  if (!section || !list) return;
+
+  const subtotal = getSubtotal();
+  const cartItems = cart;
+
+  try {
+    const snap = await getDocs(collection(db, 'promotions'));
+    const eligible = [];
+
+    snap.docs.forEach(d => {
+      const p = { id: d.id, ...d.data() };
+      if (!p.active) return;
+
+      if (p.type === 'valor_minimo' && subtotal >= p.minValue) {
+        const disc = p.discountType === 'percent'
+          ? `${p.discountValue}% de descuento`
+          : `$${fmt(p.discountValue)} de descuento`;
+        eligible.push({ ...p, label: `💰 Compraste $${fmt(subtotal)}`, desc: `¡Obtené ${disc}!` });
+      }
+
+      if (p.type === 'leve_n') {
+        const relevant = p.limitCategory
+          ? cartItems.filter(i => i.category === p.limitCategory)
+          : cartItems;
+        const totalQty = relevant.reduce((s, i) => s + i.qty, 0);
+        if (totalQty >= p.minQty) {
+          const disc = p.discountType === 'percent'
+            ? `${p.discountValue}% de descuento`
+            : `$${fmt(p.discountValue)} de descuento`;
+          const catLabel = p.limitCategory ? ` en ${p.limitCategory}` : '';
+          eligible.push({ ...p, label: `🛍️ Llevás ${totalQty} productos${catLabel}`, desc: `¡Obtené ${disc}!` });
+        }
+      }
+
+      if (p.type === 'frete_gratis' && subtotal >= p.minValue) {
+        eligible.push({ ...p, label: '🚚 Envío Gratis', desc: `Por compras mayores a $${fmt(p.minValue)}` });
+      }
+    });
+
+    if (eligible.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    list.innerHTML = eligible.map(p => {
+      const isApplied = appliedPromo?.id === p.id;
+      return `
+        <div class="cart-promo-item">
+          <div class="cart-promo-info">
+            <div class="cart-promo-name">${p.label}</div>
+            <div class="cart-promo-desc">${p.desc}</div>
+          </div>
+          ${isApplied
+            ? '<span class="cart-promo-applied">✅ Aplicado</span>'
+            : `<button class="cart-promo-apply" onclick="applyPromoDirect('${p.id}')">Aplicar</button>`
+          }
+        </div>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+window.applyCuponDirect = function(id, code, discount) {
+  appliedCoupon = { id, code, discount };
+  const msgEl = document.getElementById('coupon-msg');
+  if (msgEl) { msgEl.className = 'cart-coupon-msg success'; msgEl.textContent = `✅ Cupón ${code} aplicado: ${discount}% de descuento`; }
+  updateCartTotals();
+  loadAvailableCupones();
+  showToast(`✅ Cupón ${code} aplicado!`);
+};
+
+window.applyPromoDirect = async function(promoId) {
+  try {
+    const snap = await getDocs(collection(db, 'promotions'));
+    const promo = snap.docs.map(d => ({ id: d.id, ...d.data() })).find(p => p.id === promoId);
+    if (!promo) return;
+    appliedPromo = promo;
+    updateCartTotals();
+    loadAvailablePromos();
+    showToast('✅ ¡Promoción aplicada!');
+  } catch(e) {}
+};
+
+// Override updateCartTotals to include promo
+const _origUpdateTotals = updateCartTotals;
+function updateCartTotals() {
+  const sub = getSubtotal();
+  let disc = getDiscount();
+
+  // Add promo discount
+  if (appliedPromo) {
+    if (appliedPromo.type === 'valor_minimo' || appliedPromo.type === 'leve_n') {
+      if (appliedPromo.discountType === 'percent') disc += Math.round(sub * appliedPromo.discountValue / 100);
+      else disc += appliedPromo.discountValue;
+    }
+  }
+
+  const total = Math.max(0, sub - disc);
+  const subEl = document.getElementById('cart-subtotal'); if (subEl) subEl.textContent = `$${fmt(sub)}`;
+  const discEl = document.getElementById('cart-discount');
+  if (discEl) { discEl.textContent = `-$${fmt(disc)}`; discEl.parentElement.style.display = disc > 0 ? 'flex' : 'none'; }
+  const totEl = document.getElementById('cart-total'); if (totEl) totEl.textContent = `$${fmt(total)}`;
+}
+
+// ============================================================
+// FRETE FIXO POR PROVÍNCIA
+// ============================================================
+async function getProvincialShipping(provinceCode) {
+  try {
+    const d = await getDoc(doc(db, 'config', 'provincial_shipping'));
+    if (!d.exists()) return null;
+    const data = d.data();
+    return data[provinceCode] || null;
+  } catch { return null; }
+}

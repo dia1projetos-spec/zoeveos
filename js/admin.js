@@ -339,6 +339,7 @@ window.openCategoryModal = function(cat=null) {
   document.getElementById('cat-name').value = cat?.name||'';
   document.getElementById('cat-icon').value = cat?.icon||'';
   document.getElementById('cat-description').value = cat?.description||'';
+  document.getElementById('cat-subcategories').value = (cat?.subcategories||[]).join(', ');
   document.getElementById('category-modal-title').textContent = cat?'Editar Categoría':'Nueva Categoría';
   openModal('category-modal');
 };
@@ -712,3 +713,74 @@ function initAdmin() {
 }
 
 document.addEventListener('DOMContentLoaded', initLogin);
+
+// ============================================================
+// SUBCATEGORIAS
+// ============================================================
+window.saveCategory = async function() {
+  const id = document.getElementById('cat-id').value;
+  const name = document.getElementById('cat-name').value.trim();
+  if (!name) { adminToast('El nombre es obligatorio','err'); return; }
+  const subInput = document.getElementById('cat-subcategories').value.trim();
+  const subcategories = subInput ? subInput.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const data = {
+    name,
+    icon: document.getElementById('cat-icon').value.trim(),
+    description: document.getElementById('cat-description').value.trim(),
+    subcategories
+  };
+  try {
+    if (id) { await updateDoc(doc(db,'categories',id), data); adminToast('Categoría actualizada ✅','ok'); }
+    else { await addDoc(collection(db,'categories'), data); adminToast('Categoría creada ✅','ok'); }
+    closeModal('category-modal'); loadCategories();
+  } catch(e) { adminToast('Error al guardar','err'); }
+};
+
+// ============================================================
+// FLETE POR PROVINCIA
+// ============================================================
+const PROVINCES = [
+  {code:'B',name:'Buenos Aires'},{code:'C',name:'CABA'},{code:'X',name:'Córdoba'},
+  {code:'S',name:'Santa Fe'},{code:'M',name:'Mendoza'},{code:'T',name:'Tucumán'},
+  {code:'A',name:'Salta'},{code:'Q',name:'Neuquén'},{code:'R',name:'Río Negro'},
+  {code:'G',name:'Santiago del Estero'},{code:'E',name:'Entre Ríos'},{code:'H',name:'Chaco'},
+  {code:'N',name:'Misiones'},{code:'W',name:'Corrientes'},{code:'J',name:'San Juan'},
+  {code:'D',name:'San Luis'},{code:'K',name:'Catamarca'},{code:'F',name:'La Rioja'},
+  {code:'L',name:'La Pampa'},{code:'U',name:'Chubut'},{code:'Z',name:'Santa Cruz'},
+  {code:'V',name:'Tierra del Fuego'},{code:'P',name:'Formosa'},{code:'Y',name:'Jujuy'},
+];
+
+async function loadProvincialShipping() {
+  const grid = document.getElementById('provincial-grid');
+  if (!grid) return;
+  let current = {};
+  try {
+    const d = await getDoc(doc(db,'config','provincial_shipping'));
+    if (d.exists()) current = d.data();
+  } catch(e) {}
+
+  grid.innerHTML = PROVINCES.map(p => `
+    <div class="field-group">
+      <label class="field-label">${p.name} (${p.code})</label>
+      <input type="number" class="field-input provincial-input" data-code="${p.code}"
+        placeholder="Ej: 2500 (0 = auto)" value="${current[p.code]||''}">
+      <p class="field-hint">Dejar vacío = usa API Correo</p>
+    </div>`).join('');
+}
+
+window.saveProvincialShipping = async function() {
+  const data = {};
+  document.querySelectorAll('.provincial-input').forEach(input => {
+    const val = parseFloat(input.value);
+    if (val > 0) data[input.dataset.code] = val;
+  });
+  await setDoc(doc(db,'config','provincial_shipping'), data);
+  adminToast(`✅ Fletes guardados para ${Object.keys(data).length} provincias`,'ok');
+};
+
+// Override loadSection to add provincial_shipping
+const _origLoadSection = loadSection;
+function loadSection(section) {
+  if (section === 'provincial_shipping') { loadProvincialShipping(); return; }
+  _origLoadSection(section);
+}

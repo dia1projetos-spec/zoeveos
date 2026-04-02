@@ -27,14 +27,14 @@
      LOADER
      ============================================================ -->
 <div id="loader">
-  <video id="loader-video" autoplay muted playsinline>
-    <source src="assets/video/intro.mp4" type="video/mp4">
-  </video>
-  <div class="loader-overlay">
+  <div class="loader-inner">
+    <div class="loader-petal-top">🌸</div>
     <div class="loader-brand">ZOE VEOS</div>
-    <div class="loader-tagline">Artículos de maternidad con amor</div>
-    <div class="loader-bar-wrap">
-      <div class="loader-bar"></div>
+    <div class="loader-sub">Artículos de Maternidad</div>
+    <div class="loader-dots">
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
     </div>
   </div>
 </div>
@@ -272,10 +272,22 @@
   <div id="cart-items" class="cart-items"></div>
 
   <div class="cart-footer">
-    <div class="cart-coupon-row">
-      <input type="text" id="coupon-input" class="cart-coupon-input" placeholder="Código de cupón">
-      <button id="coupon-apply-btn" class="cart-coupon-btn">Aplicar</button>
+
+    <!-- Promociones automáticas -->
+    <div class="cart-promos-section" id="cart-promos-section" style="display:none;">
+      <div class="cart-promos-title">🎁 Promociones disponibles</div>
+      <div id="cart-promos-list"></div>
     </div>
+
+    <!-- Cupones disponibles -->
+    <div class="cart-cupones-section" id="cart-cupones-section" style="display:none;">
+      <button class="cart-cupones-toggle" id="cart-cupones-toggle">
+        <span>🎟️ Tengo un cupón de descuento</span>
+        <span id="cupones-arrow">▾</span>
+      </button>
+      <div class="cart-cupones-list" id="cart-cupones-list"></div>
+    </div>
+
     <div id="coupon-msg" class="cart-coupon-msg"></div>
 
     <div class="cart-summary">
