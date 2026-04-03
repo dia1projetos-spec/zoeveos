@@ -129,7 +129,7 @@
         </div>
       </div>
 
-      <!-- Sistema -->
+      <!-- Configuración -->
       <div class="nav-group">
         <div class="nav-group-label">Sistema</div>
 
@@ -147,7 +147,7 @@
           </div>
         </div>
 
-        <!-- HERRAMIENTAS — dropdown expandible. Agrega links aquí según necesites -->
+        <!-- HERRAMIENTAS: agrega links aquí según necesites -->
         <div class="nav-item" data-dropdown>
           <div class="nav-link">
             <div class="nav-link-left">
@@ -156,14 +156,11 @@
             </div>
             <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
           </div>
-          <div class="nav-dropdown" id="herramientas-dropdown">
-            <!-- AGREGA AQUÍ TUS LINKS: -->
-            <!-- <a href="https://analytics.google.com" target="_blank">Google Analytics</a> -->
-            <!-- <a href="https://search.google.com/search-console" target="_blank">Search Console</a> -->
-            <!-- <a href="https://cloudinary.com/console" target="_blank">Cloudinary</a> -->
-            <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a>
+          <div class="nav-dropdown">
+            <a href="https://console.firebase.google.com" target="_blank">Firebase</a>
             <a href="https://cloudinary.com/console" target="_blank">Cloudinary</a>
             <a href="https://vercel.com/dashboard" target="_blank">Vercel</a>
+            <!-- <a href="TU_LINK" target="_blank">Tu herramienta</a> -->
           </div>
         </div>
 
@@ -458,18 +455,16 @@
     <section class="admin-section" id="section-provincial_shipping">
       <div class="config-card">
         <div class="config-card-title">
-          <span class="icon"><i class="fa-solid fa-map-marked-alt"></i></span>
+          <span class="icon"><i class="fa-solid fa-map"></i></span>
           Flete Fijo por Provincia (Opcional)
         </div>
         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">
-          Si dejas un campo vacío o en 0, se usará el cálculo automático de Correo Argentino.<br>
+          Si dejas vacío o en 0, se usa el cálculo automático del Correo Argentino.<br>
           Solo se aplica si guardas un valor mayor a 0.
         </p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;" id="provincial-grid">
-          <!-- Generado por JS -->
-        </div>
-        <button class="topbar-btn btn-main" style="margin-top:24px;" onclick="saveProvincialShipping()">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar Fletes por Provincia
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;" id="provincial-grid"></div>
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="saveProvincialShipping()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
         </button>
       </div>
     </section>
@@ -657,8 +652,8 @@
         <div class="field-group" style="grid-column:1/-1;">
           <label class="field-label">Subcategorías (opcional)</label>
           <input type="text" id="cat-subcategories" class="field-input"
-            placeholder="Ej: Bodys, Ranitas, Conjuntos (separadas por coma)">
-          <p class="field-hint">Separá cada subcategoría con una coma.</p>
+            placeholder="Ej: Bodys, Ranitas, Conjuntos (separar con coma)">
+          <p class="field-hint">Opcional. Cada subcategoría separada por coma.</p>
         </div>
       </div>
     </div>

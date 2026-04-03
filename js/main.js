@@ -21,11 +21,10 @@ let currentPage = 0;
 const PRODUCTS_PER_PAGE = 12;
 
 // ============================================================
-// LOADER — handled by inline script in HTML (fallback here)
+// LOADER — vídeo responsivo (desktop / mobile)
 // ============================================================
 function initLoader() {
-  // O loader já é controlado pelo script inline no HTML
-  // para garantir que funcione mesmo se o Firebase falhar
+  // Loader controlado pelo script inline no HTML — nada a fazer aqui
 }
 
 // ============================================================
@@ -322,7 +321,7 @@ function updateCartTotals() {
   const totEl = document.getElementById('cart-total'); if (totEl) totEl.textContent = `$${fmt(total)}`;
 }
 
-function openCart() { document.getElementById('cart-overlay')?.classList.add('open'); document.getElementById('cart-drawer')?.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function openCart() { document.getElementById('cart-overlay')?.classList.add('open'); document.getElementById('cart-drawer')?.classList.add('open'); document.body.style.overflow = 'hidden'; refreshCartBenefits?.(); }
 function closeCart() { document.getElementById('cart-overlay')?.classList.remove('open'); document.getElementById('cart-drawer')?.classList.remove('open'); document.body.style.overflow = ''; }
 
 async function applyCoupon(code) {
@@ -677,122 +676,108 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// CUPONES & PROMOS AUTO-DISPLAY NO CARRINHO
+// CARRINHO — Cupons e Promos automáticos
 // ============================================================
 let appliedPromo = null;
 
 async function refreshCartBenefits() {
-  await Promise.all([loadAvailableCupones(), loadAvailablePromos()]);
+  if (cart.length === 0) {
+    document.getElementById('cart-promos-section').style.display = 'none';
+    document.getElementById('cart-cupones-section').style.display = 'none';
+    return;
+  }
+  await Promise.all([ loadAvailableCupones(), loadAvailablePromos() ]);
 }
 
 async function loadAvailableCupones() {
   const section = document.getElementById('cart-cupones-section');
   const list = document.getElementById('cart-cupones-list');
   if (!section || !list) return;
-
   try {
     const snap = await getDocs(collection(db, 'cupones'));
     const now = Date.now();
-    const active = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .filter(c => c.expiry > now);
-
+    const active = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(c => c.expiry > now);
     if (active.length === 0) { section.style.display = 'none'; return; }
     section.style.display = 'block';
 
     list.innerHTML = active.map(c => {
       const isApplied = appliedCoupon?.id === c.id;
-      return `
-        <div class="cart-cupon-item">
-          <div class="cart-cupon-info">
-            <div class="cart-cupon-code">🎟 ${c.code}</div>
-            <div class="cart-cupon-desc">${c.discount}% de descuento</div>
-          </div>
-          ${isApplied
-            ? '<span class="cart-cupon-applied">✅ Aplicado</span>'
-            : `<button class="cart-cupon-apply" onclick="applyCuponDirect('${c.id}','${c.code}',${c.discount})">Aplicar</button>`
-          }
-        </div>`;
+      return `<div class="cart-benefit-item cart-cupon-item">
+        <div class="cart-benefit-info">
+          <div class="cart-benefit-name">🎟 ${c.code}</div>
+          <div class="cart-benefit-desc">${c.discount}% de descuento</div>
+        </div>
+        ${isApplied
+          ? '<span class="benefit-applied">✅ Aplicado</span>'
+          : `<button class="cart-benefit-apply apply-cupon" onclick="applyCuponDirect('${c.id}','${c.code}',${c.discount})">Aplicar</button>`}
+      </div>`;
     }).join('');
 
-    // Toggle
+    // toggle
     const toggle = document.getElementById('cart-cupones-toggle');
-    toggle?.addEventListener('click', () => {
-      list.classList.toggle('open');
-      document.getElementById('cupones-arrow').textContent = list.classList.contains('open') ? '▴' : '▾';
-    });
-  } catch(e) { console.error(e); }
+    const listEl = document.getElementById('cart-cupones-list');
+    if (toggle && !toggle._bound) {
+      toggle._bound = true;
+      toggle.addEventListener('click', () => {
+        listEl.classList.toggle('open');
+        document.getElementById('cupones-arrow').textContent = listEl.classList.contains('open') ? '▴' : '▾';
+      });
+    }
+  } catch(e) {}
 }
 
 async function loadAvailablePromos() {
   const section = document.getElementById('cart-promos-section');
   const list = document.getElementById('cart-promos-list');
   if (!section || !list) return;
-
   const subtotal = getSubtotal();
-  const cartItems = cart;
-
   try {
     const snap = await getDocs(collection(db, 'promotions'));
     const eligible = [];
-
     snap.docs.forEach(d => {
       const p = { id: d.id, ...d.data() };
       if (!p.active) return;
-
       if (p.type === 'valor_minimo' && subtotal >= p.minValue) {
-        const disc = p.discountType === 'percent'
-          ? `${p.discountValue}% de descuento`
-          : `$${fmt(p.discountValue)} de descuento`;
-        eligible.push({ ...p, label: `💰 Compraste $${fmt(subtotal)}`, desc: `¡Obtené ${disc}!` });
+        const disc = p.discountType === 'percent' ? p.discountValue+'%' : '$'+fmt(p.discountValue);
+        eligible.push({ ...p, label: `💰 Compraste $${fmt(subtotal)}`, desc: `Obtené ${disc} de descuento` });
       }
-
       if (p.type === 'leve_n') {
-        const relevant = p.limitCategory
-          ? cartItems.filter(i => i.category === p.limitCategory)
-          : cartItems;
-        const totalQty = relevant.reduce((s, i) => s + i.qty, 0);
-        if (totalQty >= p.minQty) {
-          const disc = p.discountType === 'percent'
-            ? `${p.discountValue}% de descuento`
-            : `$${fmt(p.discountValue)} de descuento`;
-          const catLabel = p.limitCategory ? ` en ${p.limitCategory}` : '';
-          eligible.push({ ...p, label: `🛍️ Llevás ${totalQty} productos${catLabel}`, desc: `¡Obtené ${disc}!` });
+        const relevant = p.limitCategory ? cart.filter(i => i.category === p.limitCategory) : cart;
+        const qty = relevant.reduce((s,i) => s + i.qty, 0);
+        if (qty >= p.minQty) {
+          const disc = p.discountType === 'percent' ? p.discountValue+'%' : '$'+fmt(p.discountValue);
+          const cat = p.limitCategory ? ` en ${p.limitCategory}` : '';
+          eligible.push({ ...p, label: `🛍️ ${qty} productos${cat}`, desc: `Obtené ${disc} de descuento` });
         }
       }
-
       if (p.type === 'frete_gratis' && subtotal >= p.minValue) {
-        eligible.push({ ...p, label: '🚚 Envío Gratis', desc: `Por compras mayores a $${fmt(p.minValue)}` });
+        eligible.push({ ...p, label: '🚚 Envío GRATIS', desc: `Por compras mayores a $${fmt(p.minValue)}` });
       }
     });
-
     if (eligible.length === 0) { section.style.display = 'none'; return; }
     section.style.display = 'block';
-
     list.innerHTML = eligible.map(p => {
       const isApplied = appliedPromo?.id === p.id;
-      return `
-        <div class="cart-promo-item">
-          <div class="cart-promo-info">
-            <div class="cart-promo-name">${p.label}</div>
-            <div class="cart-promo-desc">${p.desc}</div>
-          </div>
-          ${isApplied
-            ? '<span class="cart-promo-applied">✅ Aplicado</span>'
-            : `<button class="cart-promo-apply" onclick="applyPromoDirect('${p.id}')">Aplicar</button>`
-          }
-        </div>`;
+      return `<div class="cart-benefit-item cart-promo-item">
+        <div class="cart-benefit-info">
+          <div class="cart-benefit-name">${p.label}</div>
+          <div class="cart-benefit-desc">${p.desc}</div>
+        </div>
+        ${isApplied
+          ? '<span class="benefit-applied">✅ Aplicado</span>'
+          : `<button class="cart-benefit-apply apply-promo" onclick="applyPromoDirect('${p.id}')">Aplicar</button>`}
+      </div>`;
     }).join('');
-  } catch(e) { console.error(e); }
+  } catch(e) {}
 }
 
 window.applyCuponDirect = function(id, code, discount) {
   appliedCoupon = { id, code, discount };
-  const msgEl = document.getElementById('coupon-msg');
-  if (msgEl) { msgEl.className = 'cart-coupon-msg success'; msgEl.textContent = `✅ Cupón ${code} aplicado: ${discount}% de descuento`; }
   updateCartTotals();
   loadAvailableCupones();
-  showToast(`✅ Cupón ${code} aplicado!`);
+  const msg = document.getElementById('coupon-msg');
+  if (msg) { msg.className = 'cart-coupon-msg success'; msg.textContent = `✅ Cupón ${code} aplicado: ${discount}% de descuento`; }
+  showToast(`✅ Cupón ${code} aplicado`);
 };
 
 window.applyPromoDirect = async function(promoId) {
@@ -806,36 +791,3 @@ window.applyPromoDirect = async function(promoId) {
     showToast('✅ ¡Promoción aplicada!');
   } catch(e) {}
 };
-
-// Override updateCartTotals to include promo
-const _origUpdateTotals = updateCartTotals;
-function updateCartTotals() {
-  const sub = getSubtotal();
-  let disc = getDiscount();
-
-  // Add promo discount
-  if (appliedPromo) {
-    if (appliedPromo.type === 'valor_minimo' || appliedPromo.type === 'leve_n') {
-      if (appliedPromo.discountType === 'percent') disc += Math.round(sub * appliedPromo.discountValue / 100);
-      else disc += appliedPromo.discountValue;
-    }
-  }
-
-  const total = Math.max(0, sub - disc);
-  const subEl = document.getElementById('cart-subtotal'); if (subEl) subEl.textContent = `$${fmt(sub)}`;
-  const discEl = document.getElementById('cart-discount');
-  if (discEl) { discEl.textContent = `-$${fmt(disc)}`; discEl.parentElement.style.display = disc > 0 ? 'flex' : 'none'; }
-  const totEl = document.getElementById('cart-total'); if (totEl) totEl.textContent = `$${fmt(total)}`;
-}
-
-// ============================================================
-// FRETE FIXO POR PROVÍNCIA
-// ============================================================
-async function getProvincialShipping(provinceCode) {
-  try {
-    const d = await getDoc(doc(db, 'config', 'provincial_shipping'));
-    if (!d.exists()) return null;
-    const data = d.data();
-    return data[provinceCode] || null;
-  } catch { return null; }
-}

@@ -359,7 +359,9 @@ window.saveCategory = async function() {
   const id = document.getElementById('cat-id').value;
   const name = document.getElementById('cat-name').value.trim();
   if (!name) { adminToast('El nombre es obligatorio','err'); return; }
-  const data = { name, icon: document.getElementById('cat-icon').value.trim(), description: document.getElementById('cat-description').value.trim() };
+  const subRaw = document.getElementById('cat-subcategories')?.value?.trim() || '';
+  const subcategories = subRaw ? subRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const data = { name, icon: document.getElementById('cat-icon').value.trim(), description: document.getElementById('cat-description').value.trim(), subcategories };
   try {
     if (id) { await updateDoc(doc(db,'categories',id), data); adminToast('Categoría actualizada ✅','ok'); }
     else { await addDoc(collection(db,'categories'), data); adminToast('Categoría creada ✅','ok'); }
@@ -715,29 +717,7 @@ function initAdmin() {
 document.addEventListener('DOMContentLoaded', initLogin);
 
 // ============================================================
-// SUBCATEGORIAS
-// ============================================================
-window.saveCategory = async function() {
-  const id = document.getElementById('cat-id').value;
-  const name = document.getElementById('cat-name').value.trim();
-  if (!name) { adminToast('El nombre es obligatorio','err'); return; }
-  const subInput = document.getElementById('cat-subcategories').value.trim();
-  const subcategories = subInput ? subInput.split(',').map(s => s.trim()).filter(Boolean) : [];
-  const data = {
-    name,
-    icon: document.getElementById('cat-icon').value.trim(),
-    description: document.getElementById('cat-description').value.trim(),
-    subcategories
-  };
-  try {
-    if (id) { await updateDoc(doc(db,'categories',id), data); adminToast('Categoría actualizada ✅','ok'); }
-    else { await addDoc(collection(db,'categories'), data); adminToast('Categoría creada ✅','ok'); }
-    closeModal('category-modal'); loadCategories();
-  } catch(e) { adminToast('Error al guardar','err'); }
-};
-
-// ============================================================
-// FLETE POR PROVINCIA
+// FLETE FIJO POR PROVINCIA
 // ============================================================
 const PROVINCES = [
   {code:'B',name:'Buenos Aires'},{code:'C',name:'CABA'},{code:'X',name:'Córdoba'},
@@ -758,13 +738,11 @@ async function loadProvincialShipping() {
     const d = await getDoc(doc(db,'config','provincial_shipping'));
     if (d.exists()) current = d.data();
   } catch(e) {}
-
   grid.innerHTML = PROVINCES.map(p => `
     <div class="field-group">
       <label class="field-label">${p.name} (${p.code})</label>
       <input type="number" class="field-input provincial-input" data-code="${p.code}"
-        placeholder="Ej: 2500 (0 = auto)" value="${current[p.code]||''}">
-      <p class="field-hint">Dejar vacío = usa API Correo</p>
+        placeholder="0 = usa API Correo" value="${current[p.code]||''}">
     </div>`).join('');
 }
 
@@ -775,10 +753,10 @@ window.saveProvincialShipping = async function() {
     if (val > 0) data[input.dataset.code] = val;
   });
   await setDoc(doc(db,'config','provincial_shipping'), data);
-  adminToast(`✅ Fletes guardados para ${Object.keys(data).length} provincias`,'ok');
+  adminToast('Fletes por provincia guardados ✅','ok');
 };
 
-// Override loadSection to add provincial_shipping
+// Override loadSection para incluir provincial_shipping
 const _origLoadSection = loadSection;
 function loadSection(section) {
   if (section === 'provincial_shipping') { loadProvincialShipping(); return; }
