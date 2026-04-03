@@ -127,30 +127,78 @@ window.filterByCategory = function(cat) {
 // ============================================================
 // PRODUCTOS
 // ============================================================
-window.renderProducts = function(products, append = false) {
-  const grid = document.getElementById('products-grid');
-  if (!grid) return;
-  if (!append) {
-    grid.innerHTML = '';
-    if (!products || products.length === 0) {
-      grid.innerHTML = `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:60px 0;font-family:var(--font-display);font-size:1.2rem;">Aún no hay productos. Añáde los desde el Panel Administrativo.</p>`;
-      return;
-    }
+window.renderProducts = function(products) {
+  const container = document.getElementById('products-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (!products || products.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:60px 0;font-family:var(--font-display);font-size:1.2rem;width:100%;">Aún no hay productos. Añáde los desde el Panel Administrativo.</p>`;
+    return;
   }
-  const start = append ? currentPage * PRODUCTS_PER_PAGE : 0;
-  const items = products.slice(start, start + PRODUCTS_PER_PAGE);
-  items.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card reveal';
-    card.innerHTML = buildProductCard(p);
-    card.querySelector('.product-add-btn')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
-    card.querySelector('.product-quick-add')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
-    card.addEventListener('click', () => openProductModal(p));
-    grid.appendChild(card);
+
+  // Agrupar por categoria, mantendo orden de último produto adicionado
+  const catOrder = [];
+  const byCat = {};
+  [...products].sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).forEach(p => {
+    const cat = p.category || 'Sin categoría';
+    if (!byCat[cat]) { byCat[cat] = []; catOrder.push(cat); }
+    byCat[cat].push(p);
   });
-  initReveal();
+
+  // Reordenar categorias: a do produto mais recente vai primeiro
+  const orderedCats = catOrder.filter((c,i) => catOrder.indexOf(c) === i);
+
+  orderedCats.forEach(cat => {
+    const items = byCat[cat];
+    const section = document.createElement('div');
+    section.className = 'product-category-section';
+
+    section.innerHTML = `
+      <div class="product-cat-header">
+        <h3 class="product-cat-title">${cat}</h3>
+        <div class="carousel-arrows">
+          <button class="car-arr car-prev" aria-label="Anterior">‹</button>
+          <button class="car-arr car-next" aria-label="Siguiente">›</button>
+        </div>
+      </div>
+      <div class="product-carousel">
+        <div class="product-carousel-track"></div>
+      </div>`;
+
+    const track = section.querySelector('.product-carousel-track');
+    items.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = buildProductCard(p);
+      card.querySelector('.product-add-btn')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
+      card.querySelector('.product-quick-add')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
+      card.addEventListener('click', () => openProductModal(p));
+      track.appendChild(card);
+    });
+
+    // Arrows carrossel
+    const prev = section.querySelector('.car-prev');
+    const next = section.querySelector('.car-next');
+    const carousel = section.querySelector('.product-carousel');
+    const scrollAmount = () => carousel.clientWidth * 0.8;
+    prev.addEventListener('click', () => carousel.scrollBy({ left: -scrollAmount(), behavior: 'smooth' }));
+    next.addEventListener('click', () => carousel.scrollBy({ left: scrollAmount(), behavior: 'smooth' }));
+
+    // Swipe touch
+    let startX = 0;
+    carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    carousel.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) carousel.scrollBy({ left: diff > 0 ? scrollAmount() : -scrollAmount(), behavior: 'smooth' });
+    }, { passive: true });
+
+    container.appendChild(section);
+  });
+
+  // Esconder load-more (não precisamos mais de paginação)
   const btn = document.getElementById('load-more-btn');
-  if (btn) btn.style.display = (currentPage + 1) * PRODUCTS_PER_PAGE >= products.length ? 'none' : 'block';
+  if (btn) btn.style.display = 'none';
 };
 
 function buildProductCard(p) {
@@ -254,9 +302,41 @@ function fmtDate(ts) {
 // ============================================================
 function saveCart() {
   localStorage.setItem('zoeveos_cart', JSON.stringify(cart));
+  validateAppliedBenefits(); // verifica se ainda cumpre requisitos
   updateCartUI();
-  // Atualiza promos/cupons em tempo real a cada mudança no carrinho
   if (typeof refreshCartBenefits === 'function') refreshCartBenefits();
+}
+
+function validateAppliedBenefits() {
+  if (cart.length === 0) {
+    // Carrinho vazio — remove tudo
+    appliedCoupon = null;
+    appliedPromo = null;
+    return;
+  }
+
+  // Valida promoção aplicada
+  if (appliedPromo) {
+    const sub = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    let stillValid = false;
+
+    if (appliedPromo.type === 'valor_minimo') {
+      stillValid = sub >= appliedPromo.minValue;
+    } else if (appliedPromo.type === 'leve_n') {
+      const relevant = appliedPromo.limitCategory
+        ? cart.filter(i => i.category === appliedPromo.limitCategory)
+        : cart;
+      const qty = relevant.reduce((s,i) => s + i.qty, 0);
+      stillValid = qty >= appliedPromo.minQty;
+    } else if (appliedPromo.type === 'frete_gratis') {
+      stillValid = sub >= appliedPromo.minValue;
+    }
+
+    if (!stillValid) {
+      appliedPromo = null;
+      showToast('⚠️ Promoción removida: ya no cumple los requisitos');
+    }
+  }
 }
 
 function addToCart(product) {
@@ -569,12 +649,45 @@ ${items}${discLine}${shipLine}${couponLine}
 function openProductModal(product) {
   const modal = document.getElementById('product-modal');
   if (!modal) return;
-  modal.querySelector('#pm-img').src = product.image || '';
+
+  // Suporte a múltiplas fotos
+  const images = Array.isArray(product.images) && product.images.length
+    ? product.images
+    : product.image ? [product.image] : [];
+  let currentImg = 0;
+
+  function renderGallery() {
+    const mainImg = modal.querySelector('#pm-img');
+    const thumbsWrap = modal.querySelector('#pm-thumbs');
+    const prevBtn = modal.querySelector('#pm-prev');
+    const nextBtn = modal.querySelector('#pm-next');
+    if (mainImg) { mainImg.src = images[currentImg] || ''; mainImg.style.display = images.length ? 'block' : 'none'; }
+    if (thumbsWrap) {
+      thumbsWrap.innerHTML = images.length > 1 ? images.map((img, i) => `
+        <div class="pm-thumb${i === currentImg ? ' active' : ''}" data-i="${i}">
+          <img src="${img}" alt="Foto ${i+1}">
+        </div>`).join('') : '';
+      thumbsWrap.style.display = images.length > 1 ? 'flex' : 'none';
+      thumbsWrap.querySelectorAll('.pm-thumb').forEach(t => {
+        t.addEventListener('click', () => { currentImg = parseInt(t.dataset.i); renderGallery(); });
+      });
+    }
+    if (prevBtn) prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
+  }
+
+  const prevBtn = modal.querySelector('#pm-prev');
+  const nextBtn = modal.querySelector('#pm-next');
+  if (prevBtn) prevBtn.onclick = () => { currentImg = (currentImg - 1 + images.length) % images.length; renderGallery(); };
+  if (nextBtn) nextBtn.onclick = () => { currentImg = (currentImg + 1) % images.length; renderGallery(); };
+
   modal.querySelector('#pm-cat').textContent = product.category || '';
   modal.querySelector('#pm-name').textContent = product.name;
   modal.querySelector('#pm-price').textContent = `$${fmt(product.price)}`;
   modal.querySelector('#pm-desc').textContent = product.description || '';
   modal.querySelector('#pm-add').onclick = () => { addToCart(product); closeProductModal(); };
+
+  renderGallery();
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }

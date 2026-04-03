@@ -578,17 +578,17 @@
         </div>
       </div>
 
-      <!-- Imagen -->
+      <!-- Imágenes múltiples -->
       <div class="field-group">
-        <label class="field-label">Imagen del Producto</label>
-        <div class="img-upload-zone" onclick="document.getElementById('p-img-file').click()">
-          <input type="file" id="p-img-file" accept="image/*" style="display:none;"
-            onchange="uploadToCloudinary(this.files[0], document.getElementById('p-image-url'), document.getElementById('p-image-preview'))">
+        <label class="field-label">Fotos del Producto (podés subir varias)</label>
+        <div class="img-upload-zone" id="p-img-drop-zone">
+          <input type="file" id="p-img-file" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;"
+            onchange="handleMultipleImgUpload(this.files)">
           <div class="img-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-          <div class="img-upload-text">Haz clic para subir o pega la URL abajo</div>
+          <div class="img-upload-text">Haz clic o arrastrá para subir <strong>una o más fotos</strong></div>
         </div>
-        <input type="text" id="p-image-url" class="field-input" placeholder="URL de la imagen (Cloudinary)" style="margin-top:8px;">
-        <div id="p-image-preview" class="img-preview-grid" style="margin-top:8px;"></div>
+        <div id="p-images-preview" class="img-preview-grid" style="margin-top:10px;"></div>
+        <input type="hidden" id="p-images-json" value="[]">
       </div>
 
       <!-- Dimensiones para Correo -->

@@ -301,7 +301,8 @@ window.saveProduct = async function() {
     description: document.getElementById('p-description').value.trim(),
     stock: parseInt(document.getElementById('p-stock').value)||-1,
     badge: document.getElementById('p-badge').value,
-    image: document.getElementById('p-image-url').value.trim(),
+    images: window._productImages || [],
+    image: window._productImages?.[0] || '', // compatibilidade
     weight: parseInt(document.getElementById('p-weight').value)||null,
     height: parseInt(document.getElementById('p-height').value)||null,
     width: parseInt(document.getElementById('p-width').value)||null,
@@ -758,3 +759,43 @@ window.saveProvincialShipping = async function() {
 };
 
 
+
+// ============================================================
+// MÚLTIPLAS FOTOS POR PRODUTO
+// ============================================================
+window._productImages = []; // array de URLs do produto atual
+
+window.handleMultipleImgUpload = async function(files) {
+  for (const file of Array.from(files)) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY.uploadPreset);
+    adminToast('⬆️ Subiendo foto...');
+    try {
+      const res = await fetch(CLOUDINARY.uploadUrl, { method:'POST', body: formData });
+      const data = await res.json();
+      if (data.secure_url) {
+        window._productImages.push(data.secure_url);
+        renderImagesPreview();
+        adminToast('✅ Foto subida','ok');
+      }
+    } catch(e) { adminToast('❌ Error al subir foto','err'); }
+  }
+};
+
+function renderImagesPreview() {
+  const preview = document.getElementById('p-images-preview');
+  const json = document.getElementById('p-images-json');
+  if (!preview) return;
+  preview.innerHTML = window._productImages.map((url, i) => `
+    <div class="img-preview-item">
+      <img src="${url}">
+      <button class="img-preview-remove" onclick="removeProductImg(${i})">✕</button>
+    </div>`).join('');
+  if (json) json.value = JSON.stringify(window._productImages);
+}
+
+window.removeProductImg = function(i) {
+  window._productImages.splice(i, 1);
+  renderImagesPreview();
+};

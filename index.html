@@ -94,12 +94,6 @@
   <div id="hero-slides"></div>
 
   <div class="hero-content">
-    <div class="hero-badge">✨ Nueva Colección Disponible</div>
-    <h1 class="hero-title">
-      Para mamás<br>
-      <em>con amor</em>
-    </h1>
-    <p class="hero-sub">Artículos de maternidad seleccionados con cariño, para que cada momento sea especial.</p>
     <a href="#products" class="hero-cta">
       <i class="fa-solid fa-heart"></i>
       Ver Colección
@@ -150,7 +144,7 @@
     </select>
   </div>
 
-  <div id="products-grid" class="products-grid"></div>
+  <div id="products-grid" class="products-carousel-container"></div>
   <button id="load-more-btn" class="load-more-btn" style="display:none;">
     Ver más productos <i class="fa-solid fa-arrow-down"></i>
   </button>
@@ -272,7 +266,12 @@
 <aside id="cart-drawer">
   <div class="cart-header">
     <h2 class="cart-title">Tu Carrito</h2>
-    <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button id="cart-keep-shopping" onclick="closeCart()" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;cursor:pointer;background:none;border:none;">
+        ← Seguir comprando
+      </button>
+      <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+    </div>
   </div>
 
   <div id="cart-empty" class="cart-empty" style="display:flex;">
@@ -429,9 +428,14 @@
      ============================================================ -->
 <div id="product-modal">
   <div class="product-modal-box">
-    <div class="product-modal-img">
-      <img id="pm-img" src="" alt="">
+    <!-- Galería de fotos -->
+    <div class="product-modal-gallery">
+      <button id="pm-prev" class="pm-nav-btn pm-prev-btn" aria-label="Anterior" style="display:none;">‹</button>
+      <img id="pm-img" src="" alt="" class="pm-main-img">
+      <button id="pm-next" class="pm-nav-btn pm-next-btn" aria-label="Siguiente" style="display:none;">›</button>
+      <div id="pm-thumbs" class="pm-thumbs-wrap"></div>
     </div>
+    <!-- Info -->
     <div class="product-modal-info">
       <button id="product-modal-close" class="product-modal-close" aria-label="Cerrar">✕</button>
       <div class="product-modal-cat" id="pm-cat"></div>
