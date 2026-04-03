@@ -317,7 +317,29 @@ function renderCartItems() {
 }
 
 function getSubtotal() { return cart.reduce((s,i) => s + i.price * i.qty, 0); }
-function getDiscount() { return appliedCoupon ? Math.round(getSubtotal() * appliedCoupon.discount / 100) : 0; }
+function getDiscount() {
+  const sub = getSubtotal();
+  let disc = 0;
+
+  // Desconto do cupom
+  if (appliedCoupon) {
+    disc += Math.round(sub * appliedCoupon.discount / 100);
+  }
+
+  // Desconto da promoção
+  if (appliedPromo) {
+    if (appliedPromo.type === 'valor_minimo' || appliedPromo.type === 'leve_n') {
+      if (appliedPromo.discountType === 'percent') {
+        disc += Math.round(sub * appliedPromo.discountValue / 100);
+      } else {
+        disc += Number(appliedPromo.discountValue);
+      }
+    }
+    // frete_gratis é tratado separadamente no cálculo de frete
+  }
+
+  return Math.min(disc, sub); // nunca desconta mais que o subtotal
+}
 
 function updateCartTotals() {
   const sub = getSubtotal(), disc = getDiscount(), total = sub - disc;
@@ -365,8 +387,12 @@ function openCheckout() {
 function closeCheckout() { document.getElementById('checkout-modal')?.classList.remove('open'); document.body.style.overflow = ''; }
 
 function updateCheckoutSummary() {
+  const sub = getSubtotal();
+  const disc = getDiscount();
   const el = document.getElementById('checkout-subtotal');
-  if (el) el.textContent = `$${fmt(getSubtotal() - getDiscount())}`;
+  if (el) el.textContent = `$${fmt(sub - disc)}`;
+  // Atualiza total também
+  updateCheckoutTotal();
 }
 
 async function calculateShipping(postalCode) {
@@ -476,14 +502,21 @@ async function checkFreeShipping() {
 
 function updateCheckoutTotal() {
   const sel = document.querySelector('input[name="shipping"]:checked');
-  const ship = sel ? parseFloat(sel.value) : 0;
+  const ship = sel ? parseFloat(sel.value) || 0 : 0;
+  const sub = getSubtotal();
+  const disc = getDiscount();
+
+  // Mostrar total imediatamente sem esperar frete
+  const totEl = document.getElementById('checkout-total');
+  if (totEl) totEl.textContent = `$${fmt(sub - disc + ship)}`;
+
+  // Depois verifica frete grátis
   checkFreeShipping().then(free => {
     const shippingCost = free ? 0 : ship;
-    const total = getSubtotal() - getDiscount() + shippingCost;
+    const total = sub - disc + shippingCost;
     const sc = document.getElementById('checkout-shipping-cost');
     if (sc) sc.textContent = shippingCost === 0 ? '¡GRATIS!' : `$${fmt(shippingCost)}`;
-    const tot = document.getElementById('checkout-total');
-    if (tot) tot.textContent = `$${fmt(total)}`;
+    if (totEl) totEl.textContent = `$${fmt(total)}`;
   });
 }
 
@@ -504,7 +537,9 @@ async function submitCheckout() {
   const shipName = sel?.dataset?.name || 'Correo Argentino';
   const free = await checkFreeShipping();
   const shipCost = free ? 0 : (sel ? parseFloat(sel.value) : 0);
-  const subtotal = getSubtotal(), disc = getDiscount(), total = subtotal - disc + shipCost;
+  const subtotal = getSubtotal();
+  const disc = getDiscount(); // já inclui cupom + promoção
+  const total = Math.max(0, subtotal - disc + shipCost);
 
   const items = cart.map(i => `• ${i.name} x${i.qty} = $${fmt(i.price * i.qty)}`).join('\n');
   const discLine = disc > 0 ? `\n🎟 Descuento: -$${fmt(disc)}` : '';
@@ -783,6 +818,7 @@ async function loadAvailablePromos() {
 window.applyCuponDirect = function(id, code, discount) {
   appliedCoupon = { id, code, discount };
   updateCartTotals();
+  updateCheckoutTotal();
   loadAvailableCupones();
   const msg = document.getElementById('coupon-msg');
   if (msg) { msg.className = 'cart-coupon-msg success'; msg.textContent = `✅ Cupón ${code} aplicado: ${discount}% de descuento`; }
@@ -796,7 +832,8 @@ window.applyPromoDirect = async function(promoId) {
     if (!promo) return;
     appliedPromo = promo;
     updateCartTotals();
+    updateCheckoutTotal();
     loadAvailablePromos();
     showToast('✅ ¡Promoción aplicada!');
-  } catch(e) {}
+  } catch(e) { console.error('applyPromoDirect error:', e); }
 };
