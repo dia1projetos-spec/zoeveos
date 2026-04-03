@@ -413,14 +413,30 @@ window.deleteCupon = async function(id) {
 };
 
 window.saveCupon = async function() {
+  const btn = document.querySelector('#cupon-modal .btn-main');
+  if (btn && btn.disabled) return;
+  if (btn) btn.disabled = true;
+
   const code = document.getElementById('cupon-code').value.trim().toUpperCase();
   const discount = parseFloat(document.getElementById('cupon-discount').value);
   const expiryStr = document.getElementById('cupon-expiry').value;
-  if (!code||!discount||!expiryStr) { adminToast('Todos los campos son obligatorios','err'); return; }
+  if (!code||!discount||!expiryStr) { adminToast('Todos los campos son obligatorios','err'); if (btn) btn.disabled = false; return; }
   const expiry = new Date(expiryStr).getTime();
-  if (expiry <= Date.now()) { adminToast('La fecha debe ser futura','err'); return; }
-  await addDoc(collection(db,'cupones'), { code, discount, expiry, createdAt: Date.now() });
-  closeModal('cupon-modal'); loadCupones(); adminToast(`Cupón ${code} creado ✅`,'ok');
+  if (expiry <= Date.now()) { adminToast('La fecha debe ser futura','err'); if (btn) btn.disabled = false; return; }
+
+  // Verificar se já existe cupom com esse código
+  const snap = await getDocs(collection(db,'cupones'));
+  const exists = snap.docs.some(d => d.data().code?.toUpperCase() === code);
+  if (exists) { adminToast(`❌ Ya existe un cupón con el código ${code}`,'err'); if (btn) btn.disabled = false; return; }
+
+  try {
+    await addDoc(collection(db,'cupones'), { code, discount, expiry, createdAt: Date.now() });
+    closeModal('cupon-modal'); loadCupones(); adminToast(`Cupón ${code} creado ✅`,'ok');
+  } catch(e) {
+    adminToast('❌ Error al guardar','err');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 };
 
 // ============================================================
@@ -470,37 +486,64 @@ window.deletePromo = async function(id) {
 };
 
 window.openPromoModal = async function(type) {
+  // Limpar campos antes de abrir
+  ['promo-min-value','promo-discount-value','promo-min-qty',
+   'promo-leve-discount-value','promo-frete-min'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
   document.getElementById('promo-type').value = type;
   document.getElementById('promo-modal-title').textContent = getPromoLabel({type});
   document.getElementById('promo-fields-valor').style.display = type==='valor_minimo'?'block':'none';
   document.getElementById('promo-fields-leve').style.display = type==='leve_n'?'block':'none';
   document.getElementById('promo-fields-frete').style.display = type==='frete_gratis'?'block':'none';
+
   const snap = await getDocs(collection(db,'categories'));
   const sel = document.getElementById('promo-category');
   if (sel) sel.innerHTML = '<option value="">Todas las categorías</option>'+snap.docs.map(d=>`<option value="${d.data().name}">${d.data().name}</option>`).join('');
+
+  // Reativar botão caso tenha ficado desabilitado
+  const btn = document.querySelector('#promo-modal .btn-main');
+  if (btn) btn.disabled = false;
+
   openModal('promo-modal');
 };
 
 window.savePromo = async function() {
+  // Proteção contra duplo clique
+  const btn = document.querySelector('#promo-modal .btn-main');
+  if (btn && btn.disabled) return;
+  if (btn) btn.disabled = true;
+
   const type = document.getElementById('promo-type').value;
   let data = { type, active: true, createdAt: Date.now() };
   if (type==='valor_minimo') {
     data.minValue = parseFloat(document.getElementById('promo-min-value').value);
     data.discountType = document.getElementById('promo-discount-type').value;
     data.discountValue = parseFloat(document.getElementById('promo-discount-value').value);
-    if (!data.minValue||!data.discountValue) { adminToast('Completa todos los campos','err'); return; }
+    if (!data.minValue||!data.discountValue) { adminToast('Completa todos los campos','err'); if (btn) btn.disabled = false; return; }
   } else if (type==='leve_n') {
     data.minQty = parseInt(document.getElementById('promo-min-qty').value);
     data.limitCategory = document.getElementById('promo-category').value;
     data.discountType = document.getElementById('promo-leve-discount-type').value;
     data.discountValue = parseFloat(document.getElementById('promo-leve-discount-value').value);
-    if (!data.minQty||!data.discountValue) { adminToast('Completa todos los campos','err'); return; }
+    if (!data.minQty||!data.discountValue) { adminToast('Completa todos los campos','err'); if (btn) btn.disabled = false; return; }
   } else if (type==='frete_gratis') {
     data.minValue = parseFloat(document.getElementById('promo-frete-min').value);
-    if (!data.minValue) { adminToast('Ingresa el monto mínimo','err'); return; }
+    if (!data.minValue) { adminToast('Ingresa el monto mínimo','err'); if (btn) btn.disabled = false; return; }
   }
-  await addDoc(collection(db,'promotions'), data);
-  closeModal('promo-modal'); loadPromotions(); adminToast('Promoción creada ✅','ok');
+
+  try {
+    await addDoc(collection(db,'promotions'), data);
+    closeModal('promo-modal');
+    loadPromotions();
+    adminToast('Promoción creada ✅','ok');
+  } catch(e) {
+    adminToast('❌ Error al guardar','err');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 };
 
 // ============================================================

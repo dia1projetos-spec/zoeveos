@@ -164,6 +164,12 @@ window.renderProducts = function(products) {
       </div>
       <div class="product-carousel">
         <div class="product-carousel-track"></div>
+      </div>
+      <div class="carousel-swipe-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+        <span>Deslizá para ver más</span>
       </div>`;
 
     const track = section.querySelector('.product-carousel-track');
@@ -190,8 +196,16 @@ window.renderProducts = function(products) {
     carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
     carousel.addEventListener('touchend', e => {
       const diff = startX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) carousel.scrollBy({ left: diff > 0 ? scrollAmount() : -scrollAmount(), behavior: 'smooth' });
+      if (Math.abs(diff) > 40) {
+        carousel.scrollBy({ left: diff > 0 ? scrollAmount() : -scrollAmount(), behavior: 'smooth' });
+        carousel.classList.add('scrolled'); // esconde fade após primeiro swipe
+      }
     }, { passive: true });
+
+    // Esconder hint após scroll
+    carousel.addEventListener('scroll', () => {
+      carousel.classList.add('scrolled');
+    }, { passive: true, once: true });
 
     container.appendChild(section);
   });
@@ -728,13 +742,7 @@ async function loadFromFirebase() {
     const slides = slidesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     initHeroSlider(slides);
 
-    // Categories
-    const catsSnap = await getDocs(collection(db, 'categories'));
-    const categories = catsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderCategories(categories);
-    initProductFilters(categories);
-
-    // Products
+    // Products — carrega ANTES das categorias pra calcular count correto
     const prodsSnap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
     allProducts = prodsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     window.allProducts = allProducts;
@@ -742,6 +750,17 @@ async function loadFromFirebase() {
     window.filteredProducts = filteredProducts;
     window.currentPage = 0;
     window.renderProducts(allProducts);
+
+    // Categories — agora conta produtos reais por categoria
+    const catsSnap = await getDocs(collection(db, 'categories'));
+    const categories = catsSnap.docs.map(d => {
+      const cat = { id: d.id, ...d.data() };
+      // Contar quantos produtos existem nessa categoria
+      cat.count = allProducts.filter(p => p.category === cat.name).length;
+      return cat;
+    });
+    renderCategories(categories);
+    initProductFilters(categories);
 
     // Destaque
     const destDoc = await getDoc(doc(db, 'config', 'destaque'));
