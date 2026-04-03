@@ -252,7 +252,12 @@ function fmtDate(ts) {
 // ============================================================
 // CARRITO
 // ============================================================
-function saveCart() { localStorage.setItem('zoeveos_cart', JSON.stringify(cart)); updateCartUI(); }
+function saveCart() {
+  localStorage.setItem('zoeveos_cart', JSON.stringify(cart));
+  updateCartUI();
+  // Atualiza promos/cupons em tempo real a cada mudança no carrinho
+  if (typeof refreshCartBenefits === 'function') refreshCartBenefits();
+}
 
 function addToCart(product) {
   const existing = cart.find(i => i.id === product.id);
@@ -321,7 +326,7 @@ function updateCartTotals() {
   const totEl = document.getElementById('cart-total'); if (totEl) totEl.textContent = `$${fmt(total)}`;
 }
 
-function openCart() { document.getElementById('cart-overlay')?.classList.add('open'); document.getElementById('cart-drawer')?.classList.add('open'); document.body.style.overflow = 'hidden'; refreshCartBenefits?.(); }
+function openCart() { document.getElementById('cart-overlay')?.classList.add('open'); document.getElementById('cart-drawer')?.classList.add('open'); document.body.style.overflow = 'hidden'; if (typeof refreshCartBenefits === 'function') refreshCartBenefits(); }
 function closeCart() { document.getElementById('cart-overlay')?.classList.remove('open'); document.getElementById('cart-drawer')?.classList.remove('open'); document.body.style.overflow = ''; }
 
 async function applyCoupon(code) {
@@ -681,12 +686,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 let appliedPromo = null;
 
 async function refreshCartBenefits() {
+  const promoSection = document.getElementById('cart-promos-section');
+  const cuponSection = document.getElementById('cart-cupones-section');
   if (cart.length === 0) {
-    document.getElementById('cart-promos-section').style.display = 'none';
-    document.getElementById('cart-cupones-section').style.display = 'none';
+    if (promoSection) promoSection.style.display = 'none';
+    if (cuponSection) cuponSection.style.display = 'none';
     return;
   }
-  await Promise.all([ loadAvailableCupones(), loadAvailablePromos() ]);
+  // Rodar em paralelo sem bloquear a UI
+  loadAvailablePromos();
+  loadAvailableCupones();
 }
 
 async function loadAvailableCupones() {
