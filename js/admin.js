@@ -121,7 +121,8 @@ function loadSection(section) {
     slides: loadSlides, blog: loadBlog, cupones: loadCupones,
     promotions: loadPromotions, pricing: loadPricing,
     shipping: loadShipping, orders: loadOrders,
-    destaque: loadDestaque, promo_section: loadPromoSection
+    destaque: loadDestaque, promo_section: loadPromoSection,
+    provincial_shipping: loadProvincialShipping
   };
   loaders[section]?.();
 }
@@ -756,9 +757,4 @@ window.saveProvincialShipping = async function() {
   adminToast('Fletes por provincia guardados ✅','ok');
 };
 
-// Override loadSection para incluir provincial_shipping
-const _origLoadSection = loadSection;
-function loadSection(section) {
-  if (section === 'provincial_shipping') { loadProvincialShipping(); return; }
-  _origLoadSection(section);
-}
+
