@@ -20,6 +20,18 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- LOADER: desaparece siempre, independiente del módulo Firebase -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      var loader = document.getElementById('loader');
+      if (!loader) return;
+      setTimeout(function() {
+        loader.classList.add('fade-out');
+        setTimeout(function() { loader.style.display = 'none'; }, 900);
+      }, 2800);
+    });
+  </script>
 </head>
 <body>
 

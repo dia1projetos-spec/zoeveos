@@ -21,16 +21,11 @@ let currentPage = 0;
 const PRODUCTS_PER_PAGE = 12;
 
 // ============================================================
-// LOADER — animação texto elegante sem vídeo
+// LOADER — handled by inline script in HTML (fallback here)
 // ============================================================
 function initLoader() {
-  const loader = document.getElementById('loader');
-  if (!loader) return;
-  // Tempo mínimo para ver a animação linda
-  setTimeout(() => {
-    loader.classList.add('fade-out');
-    setTimeout(() => { loader.style.display = 'none'; }, 900);
-  }, 2800);
+  // O loader já é controlado pelo script inline no HTML
+  // para garantir que funcione mesmo se o Firebase falhar
 }
 
 // ============================================================
