@@ -262,12 +262,15 @@ window.openProductModal = async function(product=null) {
   document.getElementById('p-description').value = product?.description||'';
   document.getElementById('p-stock').value = product?.stock??'';
   document.getElementById('p-badge').value = product?.badge||'';
-  document.getElementById('p-image-url').value = product?.image||'';
+  // Carregar imagens múltiplas (p-images-preview é o ID correto no HTML)
+  window._productImages = product?.images?.length ? [...product.images] : (product?.image ? [product.image] : []);
+  setTimeout(() => {
+    if (typeof renderImagesPreview === 'function') renderImagesPreview();
+  }, 50);
   document.getElementById('p-weight').value = product?.weight||'';
   document.getElementById('p-height').value = product?.height||'';
   document.getElementById('p-width').value = product?.width||'';
   document.getElementById('p-depth').value = product?.depth||'';
-  document.getElementById('p-image-preview').innerHTML = product?.image?`<div class="img-preview-item"><img src="${product.image}"></div>`:'';
 
   // Load categories
   const snap = await getDocs(collection(db,'categories'));

@@ -852,17 +852,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 let appliedPromo = null;
 
+let _refreshing = false;
 async function refreshCartBenefits() {
-  const promoSection = document.getElementById('cart-promos-section');
-  const cuponSection = document.getElementById('cart-cupones-section');
-  if (cart.length === 0) {
-    if (promoSection) promoSection.style.display = 'none';
-    if (cuponSection) cuponSection.style.display = 'none';
-    return;
+  if (_refreshing) return; // evita chamadas simultâneas
+  _refreshing = true;
+  try {
+    const promoSection = document.getElementById('cart-promos-section');
+    const cuponSection = document.getElementById('cart-cupones-section');
+    if (cart.length === 0) {
+      if (promoSection) promoSection.style.display = 'none';
+      if (cuponSection) cuponSection.style.display = 'none';
+      _refreshing = false;
+      return;
+    }
+    await loadAvailablePromos();
+    await loadAvailableCupones();
+  } finally {
+    _refreshing = false;
   }
-  // Rodar em paralelo sem bloquear a UI
-  loadAvailablePromos();
-  loadAvailableCupones();
 }
 
 async function loadAvailableCupones() {
@@ -910,28 +917,61 @@ async function loadAvailablePromos() {
   try {
     const snap = await getDocs(collection(db, 'promotions'));
     const eligible = [];
+
     snap.docs.forEach(d => {
       const p = { id: d.id, ...d.data() };
       if (!p.active) return;
+
       if (p.type === 'valor_minimo' && subtotal >= p.minValue) {
+        const discVal = p.discountType === 'percent'
+          ? Math.round(subtotal * p.discountValue / 100)
+          : p.discountValue;
         const disc = p.discountType === 'percent' ? p.discountValue+'%' : '$'+fmt(p.discountValue);
-        eligible.push({ ...p, label: `💰 Compraste $${fmt(subtotal)}`, desc: `Obtené ${disc} de descuento` });
+        eligible.push({ ...p, discVal, label: `💰 Compraste $${fmt(subtotal)}`, desc: `Obtené ${disc} de descuento` });
       }
+
       if (p.type === 'leve_n') {
         const relevant = p.limitCategory ? cart.filter(i => i.category === p.limitCategory) : cart;
         const qty = relevant.reduce((s,i) => s + i.qty, 0);
         if (qty >= p.minQty) {
+          const discVal = p.discountType === 'percent'
+            ? Math.round(subtotal * p.discountValue / 100)
+            : p.discountValue;
           const disc = p.discountType === 'percent' ? p.discountValue+'%' : '$'+fmt(p.discountValue);
           const cat = p.limitCategory ? ` en ${p.limitCategory}` : '';
-          eligible.push({ ...p, label: `🛍️ ${qty} productos${cat}`, desc: `Obtené ${disc} de descuento` });
+          eligible.push({ ...p, discVal, label: `🛍️ ${qty} productos${cat}`, desc: `Obtené ${disc} de descuento` });
         }
       }
+
       if (p.type === 'frete_gratis' && subtotal >= p.minValue) {
-        eligible.push({ ...p, label: '🚚 Envío GRATIS', desc: `Por compras mayores a $${fmt(p.minValue)}` });
+        eligible.push({ ...p, discVal: 0, label: '🚚 Envío GRATIS', desc: `Por compras mayores a $${fmt(p.minValue)}` });
       }
     });
+
+    // Auto-aplicar MELHOR promoção (maior desconto) — substitui a anterior
+    if (eligible.length > 0) {
+      const best = eligible.reduce((a, b) => (b.discVal || 0) > (a.discVal || 0) ? b : a);
+      if (!appliedPromo || appliedPromo.discVal !== best.discVal) {
+        if (appliedPromo && appliedPromo.id !== best.id) {
+          // Há promoção melhor — substitui silenciosamente
+          appliedPromo = best;
+          updateCartTotals();
+        } else if (!appliedPromo) {
+          // Nenhuma aplicada ainda — não aplica automaticamente, deixa o cliente escolher
+        }
+      }
+    } else {
+      // Não cumpre mais nenhum requisito
+      if (appliedPromo && appliedPromo.type !== 'frete_gratis') {
+        appliedPromo = null;
+        updateCartTotals();
+      }
+    }
+
     if (eligible.length === 0) { section.style.display = 'none'; return; }
     section.style.display = 'block';
+
+    // Renderizar UMA VEZ — limpar antes
     list.innerHTML = eligible.map(p => {
       const isApplied = appliedPromo?.id === p.id;
       return `<div class="cart-benefit-item cart-promo-item">
@@ -944,7 +984,8 @@ async function loadAvailablePromos() {
           : `<button class="cart-benefit-apply apply-promo" onclick="applyPromoDirect('${p.id}')">Aplicar</button>`}
       </div>`;
     }).join('');
-  } catch(e) {}
+
+  } catch(e) { console.error('loadAvailablePromos:', e); }
 }
 
 window.applyCuponDirect = function(id, code, discount) {
