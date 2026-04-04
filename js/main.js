@@ -969,21 +969,20 @@ async function loadAvailablePromos() {
     }
 
     if (eligible.length === 0) { section.style.display = 'none'; return; }
-    section.style.display = 'block';
 
-    // Renderizar UMA VEZ — limpar antes
-    list.innerHTML = eligible.map(p => {
-      const isApplied = appliedPromo?.id === p.id;
-      return `<div class="cart-benefit-item cart-promo-item">
-        <div class="cart-benefit-info">
-          <div class="cart-benefit-name">${p.label}</div>
-          <div class="cart-benefit-desc">${p.desc}</div>
-        </div>
-        ${isApplied
-          ? '<span class="benefit-applied">✅ Aplicado</span>'
-          : `<button class="cart-benefit-apply apply-promo" onclick="applyPromoDirect('${p.id}')">Aplicar</button>`}
-      </div>`;
-    }).join('');
+    // Mostrar SOMENTE a melhor promoção disponível
+    const bestToShow = eligible.reduce((a, b) => (b.discVal || 0) > (a.discVal || 0) ? b : a);
+    section.style.display = 'block';
+    const isApplied = appliedPromo?.id === bestToShow.id;
+    list.innerHTML = `<div class="cart-benefit-item cart-promo-item">
+      <div class="cart-benefit-info">
+        <div class="cart-benefit-name">${bestToShow.label}</div>
+        <div class="cart-benefit-desc">${bestToShow.desc}</div>
+      </div>
+      ${isApplied
+        ? '<span class="benefit-applied">✅ Aplicado</span>'
+        : `<button class="cart-benefit-apply apply-promo" onclick="applyPromoDirect('${bestToShow.id}')">Aplicar</button>`}
+    </div>`;
 
   } catch(e) { console.error('loadAvailablePromos:', e); }
 }
