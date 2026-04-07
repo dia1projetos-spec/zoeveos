@@ -177,8 +177,12 @@ window.renderProducts = function(products) {
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = buildProductCard(p);
-      card.querySelector('.product-add-btn')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
-      card.querySelector('.product-quick-add')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
+      // Só adiciona listener se tiver estoque (sem estoque vira link WhatsApp)
+      const sinStock = typeof p.stock === 'number' && p.stock === 0;
+      if (!sinStock) {
+        card.querySelector('.product-add-btn')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
+        card.querySelector('.product-quick-add')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
+      }
       card.addEventListener('click', () => openProductModal(p));
       track.appendChild(card);
     });
@@ -218,11 +222,32 @@ window.renderProducts = function(products) {
 function buildProductCard(p) {
   const badgeHTML = p.badge ? `<div class="product-badge badge-${p.badge}">${{promo:'🔥 Promo',destaque:'⭐ Destaque',nuevo:'Nuevo'}[p.badge]||p.badge}</div>` : '';
   const oldPriceHTML = p.oldPrice ? `<span class="product-price-old">$${fmt(p.oldPrice)}</span>` : '';
+
+  const sinStock = typeof p.stock === 'number' && p.stock === 0;
+  const stockNum  = typeof p.stock === 'number' && p.stock > 0;
+
+  const stockHTML = stockNum
+    ? `<div class="product-stock"><span class="stock-dot"></span>${p.stock === 1 ? '¡Último disponible!' : p.stock + ' disponibles'}</div>`
+    : sinStock
+      ? `<div class="product-stock sin-stock"><span class="stock-dot"></span>Sin stock</div>`
+      : '';
+
+  const waMsg = encodeURIComponent('¡Hola! Quiero encargar: ' + p.name);
+  const btnHTML = sinStock
+    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Encargar por WhatsApp</a>`
+    : `<button class="product-add-btn">Agregar al carrito</button>`;
+
+  const imgHTML = p.image
+    ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
+    : '<div style="width:100%;height:100%;background:var(--beige-dark)"></div>';
+
+  const quickAdd = sinStock ? '' : '<button class="product-quick-add" title="Agregar">🛒</button>';
+
   return `
     <div class="product-img-wrap">
-      ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--cream-dark)"></div>'}
+      ${imgHTML}
       ${badgeHTML}
-      <button class="product-quick-add" title="Agregar">🛒</button>
+      ${quickAdd}
     </div>
     <div class="product-info">
       <div class="product-category-tag">${p.category||''}</div>
@@ -230,10 +255,10 @@ function buildProductCard(p) {
       <div class="product-price-wrap">
         <span class="product-price">$${fmt(p.price)}</span>${oldPriceHTML}
       </div>
-      <button class="product-add-btn">Agregar al carrito</button>
+      ${stockHTML}
+      ${btnHTML}
     </div>`;
 }
-
 function fmt(n) { return Number(n).toLocaleString('es-AR'); }
 
 function setActiveFilter(cat) {
