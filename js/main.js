@@ -639,25 +639,39 @@ function updateCheckoutTotal() {
   });
 }
 
-async function submitCheckout() {
-  const name = document.getElementById('co-name')?.value?.trim();
-  const whatsapp = document.getElementById('co-whatsapp')?.value?.trim();
-  const street = document.getElementById('co-street')?.value?.trim();
-  const number = document.getElementById('co-number')?.value?.trim();
-  const barrio = document.getElementById('co-barrio')?.value?.trim();
-  const city = document.getElementById('co-city')?.value?.trim();
-  const postal = document.getElementById('co-postal')?.value?.trim();
+// ============================================================
+// CHECKOUT — Datos del formulario
+// ============================================================
+function getCheckoutData() {
+  return {
+    name:     document.getElementById('co-name')?.value?.trim(),
+    whatsapp: document.getElementById('co-whatsapp')?.value?.trim(),
+    street:   document.getElementById('co-street')?.value?.trim(),
+    number:   document.getElementById('co-number')?.value?.trim(),
+    barrio:   document.getElementById('co-barrio')?.value?.trim(),
+    city:     document.getElementById('co-city')?.value?.trim(),
+    postal:   document.getElementById('co-postal')?.value?.trim(),
+  };
+}
 
-  if (!name || !whatsapp || !street || !number || !city || !postal) {
-    showToast('❌ Por favor completa todos los campos obligatorios', 'error'); return;
+function validateCheckout() {
+  const d = getCheckoutData();
+  if (!d.name || !d.whatsapp || !d.street || !d.number || !d.city || !d.postal) {
+    showToast('❌ Por favor completa todos los campos obligatorios', 'error');
+    return false;
   }
+  return true;
+}
 
+// OPCIÓN 1 — WhatsApp (transferencia)
+async function submitCheckoutWhatsApp() {
+  if (!validateCheckout()) return;
+  const d = getCheckoutData();
   const sel = document.querySelector('input[name="shipping"]:checked');
   const shipName = sel?.dataset?.name || 'Correo Argentino';
   const free = await checkFreeShipping();
   const shipCost = free ? 0 : (sel ? parseFloat(sel.value) : 0);
-  const subtotal = getSubtotal();
-  const disc = getDiscount(); // já inclui cupom + promoção
+  const subtotal = getSubtotal(), disc = getDiscount();
   const total = Math.max(0, subtotal - disc + shipCost);
 
   const items = cart.map(i => `• ${i.name} x${i.qty} = $${fmt(i.price * i.qty)}`).join('\n');
@@ -667,9 +681,9 @@ async function submitCheckout() {
 
   const message = `¡Hola! ¡Vengo a finalizar una compra del sitio ZOE VEOS! 🛍️
 
-👤 *Nombre:* ${name}
-📱 *WhatsApp:* ${whatsapp}
-📍 *Dirección:* ${street} ${number}${barrio?', '+barrio:''}, ${city} (CP: ${postal})
+👤 *Nombre:* ${d.name}
+📱 *WhatsApp:* ${d.whatsapp}
+📍 *Dirección:* ${d.street} ${d.number}${d.barrio?', '+d.barrio:''}, ${d.city} (CP: ${d.postal})
 
 🛒 *Productos:*
 ${items}${discLine}${shipLine}${couponLine}
@@ -678,9 +692,56 @@ ${items}${discLine}${shipLine}${couponLine}
 
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   closeCheckout();
-  cart = []; appliedCoupon = null; saveCart();
+  cart = []; appliedCoupon = null; appliedPromo = null; saveCart();
   showToast('✅ ¡Gracias! Redirigiendo a WhatsApp...');
 }
+
+// OPCIÓN 2 — Mercado Pago (tarjeta)
+async function submitCheckoutMP() {
+  if (!validateCheckout()) return;
+  const btn = document.getElementById('checkout-submit-mp');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Procesando...'; }
+
+  const d = getCheckoutData();
+  const sel = document.querySelector('input[name="shipping"]:checked');
+  const free = await checkFreeShipping();
+  const shipCost = free ? 0 : (sel ? parseFloat(sel.value) : 0);
+  const disc = getDiscount();
+
+  try {
+    const response = await fetch('/api/create-preference', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, image: i.image||'' })),
+        payer: { name: d.name, phone: d.whatsapp },
+        shipment_cost: shipCost,
+        discount: disc,
+        coupon_code: appliedCoupon?.code || null,
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error MP');
+
+    // TEST: usar sandbox_init_point / Producción: init_point
+    const mpUrl = data.sandbox_init_point || data.init_point;
+    window.open(mpUrl, '_blank');
+    closeCheckout();
+    cart = []; appliedCoupon = null; appliedPromo = null; saveCart();
+    showToast('✅ Redirigiendo a Mercado Pago...');
+
+  } catch (err) {
+    showToast('❌ Error al conectar con Mercado Pago. Intentá por WhatsApp.', 'error');
+    console.error('MP Error:', err);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0z" fill="#009EE3"/><path d="M24.5 13.5c0 2.485-1.567 4.5-3.5 4.5h-3l-1 5h-3l2.5-12h5c1.933 0 3 .896 3 2.5z" fill="#fff"/></svg> Pagar con tarjeta'; }
+  }
+}
+
+// Compatibilidade
+async function submitCheckout() { await submitCheckoutWhatsApp(); }
+
 
 // ============================================================
 // MODAL PRODUCTO
@@ -855,7 +916,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Checkout
   document.getElementById('checkout-btn')?.addEventListener('click', openCheckout);
   document.getElementById('checkout-close')?.addEventListener('click', closeCheckout);
-  document.getElementById('checkout-submit')?.addEventListener('click', submitCheckout);
+  document.getElementById('checkout-submit-mp')?.addEventListener('click', submitCheckoutMP);
+  document.getElementById('checkout-submit-wa')?.addEventListener('click', submitCheckoutWhatsApp);
   document.getElementById('co-postal')?.addEventListener('blur', e => calculateShipping(e.target.value));
 
   // Product modal
@@ -870,6 +932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   window.addEventListener('scroll', initReveal, { passive: true });
+  handleMPReturn();
 });
 
 // ============================================================
@@ -1034,3 +1097,24 @@ window.applyPromoDirect = async function(promoId) {
     showToast('✅ ¡Promoción aplicada!');
   } catch(e) { console.error('applyPromoDirect error:', e); }
 };
+
+// ============================================================
+// RETORNO DO MERCADO PAGO
+// ============================================================
+function handleMPReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const mp = params.get('mp');
+  if (!mp) return;
+
+  if (mp === 'success') {
+    showToast('✅ ¡Pago aprobado! Gracias por tu compra en ZOE VEOS 🌸');
+    // Limpiar URL
+    history.replaceState({}, '', '/');
+  } else if (mp === 'failure') {
+    showToast('❌ El pago no fue aprobado. Podés intentar de nuevo o pagar por transferencia.', 'error');
+    history.replaceState({}, '', '/');
+  } else if (mp === 'pending') {
+    showToast('⏳ Pago pendiente. Te avisaremos cuando se acredite.', 'default');
+    history.replaceState({}, '', '/');
+  }
+}

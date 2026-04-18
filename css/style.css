@@ -2024,3 +2024,41 @@ input, textarea, select {
 .product-add-btn.out-of-stock:hover {
   background: #128c7e;
 }
+
+/* ============================================================
+   MERCADO PAGO — Dois botões de pagamento
+   ============================================================ */
+.checkout-payment-options {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.checkout-payment-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.checkout-mp-btn {
+  background: #009EE3 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.checkout-mp-btn:hover {
+  background: #0077b6 !important;
+}
+.checkout-mp-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.checkout-wa-btn {
+  background: #25D366 !important;
+}
+.checkout-wa-btn:hover {
+  background: #128c7e !important;
+}
