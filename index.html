@@ -356,7 +356,7 @@
     </div>
 
     <button id="checkout-btn" class="cart-checkout-btn">
-      <i class="fa-brands fa-whatsapp"></i>
+      <i class="fa-solid fa-bag-shopping"></i>
       Finalizar Compra
     </button>
   </div>
@@ -456,20 +456,38 @@
       </div>
     </div>
 
-    <!-- Dos opciones de pago -->
+    <!-- Opciones de pago -->
     <div class="checkout-payment-options">
       <p class="checkout-payment-label">Elegí cómo querés pagar:</p>
+
+      <!-- ALIAS / Transferencia — sin costo adicional -->
+      <button id="checkout-submit-wa" class="checkout-submit-btn checkout-wa-btn">
+        <i class="fa-solid fa-money-bill-wave"></i>
+        Pagar por ALIAS / Transferencia
+      </button>
+      <div class="alias-notice">
+        <i class="fa-solid fa-circle-check"></i>
+        Sin costo adicional · Total: <strong id="alias-total">$0</strong>
+      </div>
+
+      <!-- Separador -->
+      <div class="payment-separator"><span>o</span></div>
+
+      <!-- Tarjeta — con comisión + IVA -->
       <button id="checkout-submit-mp" class="checkout-submit-btn checkout-mp-btn">
         <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0z" fill="#009EE3"/>
           <path d="M24.5 13.5c0 2.485-1.567 4.5-3.5 4.5h-3l-1 5h-3l2.5-12h5c1.933 0 3 .896 3 2.5z" fill="#fff"/>
         </svg>
-        Pagar con tarjeta
+        Pagar con débito / crédito
       </button>
-      <button id="checkout-submit-wa" class="checkout-submit-btn checkout-wa-btn">
-        <i class="fa-brands fa-whatsapp"></i>
-        Pagar por transferencia
-      </button>
+      <div class="mp-surcharge-notice">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>
+          Comisión Mercado Pago 6,60% + IVA 21% sobre la comisión.<br>
+          <strong>Total con tarjeta: <span id="mp-total-with-surcharge">$0</span></strong>
+        </span>
+      </div>
     </div>
   </div>
 </div>

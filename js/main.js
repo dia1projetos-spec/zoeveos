@@ -508,9 +508,18 @@ function closeCheckout() { document.getElementById('checkout-modal')?.classList.
 function updateCheckoutSummary() {
   const sub = getSubtotal();
   const disc = getDiscount();
+  const base = Math.max(0, sub - disc);
+
   const el = document.getElementById('checkout-subtotal');
-  if (el) el.textContent = `$${fmt(sub - disc)}`;
-  // Atualiza total também
+  if (el) el.textContent = `$${fmt(base)}`;
+
+  // Mostrar imediatamente totais
+  const mpTotalEl = document.getElementById('mp-total-with-surcharge');
+  if (mpTotalEl) mpTotalEl.textContent = `$${fmt(Math.round(base * MP_FACTOR))}`;
+
+  const aliasEl = document.getElementById('alias-total');
+  if (aliasEl) aliasEl.textContent = `$${fmt(base)}`;
+
   updateCheckoutTotal();
 }
 
@@ -619,23 +628,42 @@ async function checkFreeShipping() {
   } catch { return false; }
 }
 
+// Comissão MP 6,60% + IVA 21% sobre a comissão
+// Fórmula: preco_cobrar = preco / (1 - 0.066 * 1.21)
+const MP_FACTOR = 1 / (1 - 0.066 * 1.21); // ≈ 1.08679
+const MP_SURCHARGE = MP_FACTOR - 1;        // ≈ 0.08679 (8,679%)
+
 function updateCheckoutTotal() {
   const sel = document.querySelector('input[name="shipping"]:checked');
   const ship = sel ? parseFloat(sel.value) || 0 : 0;
   const sub = getSubtotal();
   const disc = getDiscount();
 
-  // Mostrar total imediatamente sem esperar frete
   const totEl = document.getElementById('checkout-total');
-  if (totEl) totEl.textContent = `$${fmt(sub - disc + ship)}`;
+  if (totEl) totEl.textContent = `$${fmt(Math.max(0, sub - disc + ship))}`;
 
-  // Depois verifica frete grátis
   checkFreeShipping().then(free => {
     const shippingCost = free ? 0 : ship;
-    const total = sub - disc + shippingCost;
+    const baseTotal = Math.max(0, sub - disc + shippingCost);
+
+    // Total con comisión MP + IVA sobre la comisión
+    const mpTotal = Math.round(baseTotal * MP_FACTOR);
+
+    // Desglose para mostrar al cliente
+    const comision = Math.round(baseTotal * 0.066);
+    const ivaComision = Math.round(comision * 0.21);
+
     const sc = document.getElementById('checkout-shipping-cost');
     if (sc) sc.textContent = shippingCost === 0 ? '¡GRATIS!' : `$${fmt(shippingCost)}`;
-    if (totEl) totEl.textContent = `$${fmt(total)}`;
+    if (totEl) totEl.textContent = `$${fmt(baseTotal)}`;
+
+    // Total con tarjeta (MP)
+    const mpTotalEl = document.getElementById('mp-total-with-surcharge');
+    if (mpTotalEl) mpTotalEl.textContent = `$${fmt(mpTotal)}`;
+
+    // Total sin costo (alias)
+    const aliasEl = document.getElementById('alias-total');
+    if (aliasEl) aliasEl.textContent = `$${fmt(baseTotal)}`;
   });
 }
 
@@ -713,7 +741,14 @@ async function submitCheckoutMP() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, image: i.image||'' })),
+        // Preços originais — a API aplica o fator de comissão+IVA
+        items: cart.map(i => ({
+          id: i.id,
+          name: i.name,
+          price: i.price,
+          qty: i.qty,
+          image: i.image||''
+        })),
         payer: { name: d.name, phone: d.whatsapp },
         shipment_cost: shipCost,
         discount: disc,
@@ -725,7 +760,7 @@ async function submitCheckoutMP() {
     if (!response.ok) throw new Error(data.error || 'Error MP');
 
     // TEST: usar sandbox_init_point / Producción: init_point
-    const mpUrl = data.sandbox_init_point || data.init_point;
+    const mpUrl = data.init_point; // produção
     window.open(mpUrl, '_blank');
     closeCheckout();
     cart = []; appliedCoupon = null; appliedPromo = null; saveCart();

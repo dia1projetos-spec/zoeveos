@@ -2062,3 +2062,94 @@ input, textarea, select {
 .checkout-wa-btn:hover {
   background: #128c7e !important;
 }
+
+/* ============================================================
+   MP — Aviso de 7% recargo tarjeta
+   ============================================================ */
+.mp-option-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mp-surcharge-notice {
+  font-size: 0.78rem;
+  color: #666;
+  background: #f0f7ff;
+  border: 1px solid #c8e0f4;
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+.mp-surcharge-notice i {
+  color: #009EE3;
+  flex-shrink: 0;
+}
+.mp-surcharge-notice strong {
+  color: #009EE3;
+  font-weight: 700;
+}
+
+/* ============================================================
+   CHECKOUT — Opções de pagamento atualizadas
+   ============================================================ */
+.alias-notice {
+  font-size: 0.78rem;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: var(--radius-md);
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: -4px;
+  margin-bottom: 6px;
+}
+.alias-notice i { color: #2e7d32; flex-shrink: 0; }
+.alias-notice strong { color: #1b5e20; }
+
+.payment-separator {
+  text-align: center;
+  position: relative;
+  margin: 6px 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+.payment-separator::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: var(--border);
+}
+.payment-separator span {
+  position: relative;
+  background: var(--warm-white);
+  padding: 0 12px;
+}
+
+.mp-surcharge-notice {
+  font-size: 0.78rem;
+  color: #555;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: -4px;
+  line-height: 1.6;
+}
+.mp-surcharge-notice i { color: #009EE3; flex-shrink: 0; margin-top: 2px; }
+.mp-surcharge-notice strong { color: #0077b6; }
+
+.checkout-mp-btn { background: #009EE3 !important; }
+.checkout-mp-btn:hover { background: #0077b6 !important; }
+.checkout-mp-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.checkout-wa-btn { background: var(--brown) !important; }
+.checkout-wa-btn:hover { background: var(--rose-dark) !important; }
