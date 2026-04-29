@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZOE VEOS — Panel Administrativo</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN
+     ============================================================ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">ZOE VEOS</div>
+    <div class="login-sub">Panel Administrativo</div>
+    <form class="login-form" id="login-form">
+      <input type="email" id="login-email" class="login-input" placeholder="Email" required
+        value="zoeveos@protonmail.com" autocomplete="email">
+      <input type="password" id="login-pass" class="login-input" placeholder="Contraseña" required
+        autocomplete="current-password">
+      <div class="login-error" id="login-error"></div>
+      <button type="submit" class="login-btn">
+        <i class="fa-solid fa-lock"></i> Ingresar
+      </button>
+    </form>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:20px;">
+      🔐 Acceso con tu cuenta de Firebase Auth
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN APP
+     ============================================================ -->
+<div id="admin-app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-text">ZOE VEOS</span>
+      <span class="sidebar-logo-sub">Panel Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <!-- Dashboard -->
+      <div class="nav-group">
+        <div class="nav-group-label">General</div>
+        <div class="nav-item">
+          <a class="nav-link" data-section="dashboard">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+              Dashboard
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tienda -->
+      <div class="nav-group">
+        <div class="nav-group-label">Tienda</div>
+
+        <div class="nav-item" data-dropdown>
+          <div class="nav-link">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-store"></i></span>
+              Catálogo
+            </div>
+            <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+          <div class="nav-dropdown">
+            <a data-section="products">Productos</a>
+            <a data-section="categories">Categorías</a>
+            <a data-section="destaque">Sección Destaque</a>
+            <a data-section="promo_section">Sección Promoción</a>
+          </div>
+        </div>
+
+        <div class="nav-item" data-dropdown>
+          <div class="nav-link">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-tags"></i></span>
+              Descuentos
+            </div>
+            <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+          <div class="nav-dropdown">
+            <a data-section="cupones">Cupones</a>
+            <a data-section="promotions">Promociones</a>
+            <a data-section="pricing">Precios en Masa</a>
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <a class="nav-link" data-section="orders">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
+              Pedidos
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="nav-group">
+        <div class="nav-group-label">Contenido</div>
+
+        <div class="nav-item">
+          <a class="nav-link" data-section="slides">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-images"></i></span>
+              Slides Hero
+            </div>
+          </a>
+        </div>
+
+        <div class="nav-item">
+          <a class="nav-link" data-section="blog">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-pen-nib"></i></span>
+              Blog
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Configuración -->
+      <div class="nav-group">
+        <div class="nav-group-label">Sistema</div>
+
+        <div class="nav-item" data-dropdown>
+          <div class="nav-link">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+              Configuración
+            </div>
+            <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+          <div class="nav-dropdown">
+            <a data-section="shipping">Flete & Correo</a>
+            <a data-section="provincial_shipping">Flete por Provincia</a>
+          </div>
+        </div>
+
+        <!-- HERRAMIENTAS: agrega links aquí según necesites -->
+        <div class="nav-item" data-dropdown>
+          <div class="nav-link">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-toolbox"></i></span>
+              Herramientas
+            </div>
+            <span class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </div>
+          <div class="nav-dropdown">
+            <a href="https://console.firebase.google.com" target="_blank">Firebase</a>
+            <a href="https://cloudinary.com/console" target="_blank">Cloudinary</a>
+            <a href="https://vercel.com/dashboard" target="_blank">Vercel</a>
+            <!-- <a href="TU_LINK" target="_blank">Tu herramienta</a> -->
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <a class="nav-link" href="/" target="_blank">
+            <div class="nav-link-left">
+              <span class="nav-icon"><i class="fa-solid fa-eye"></i></span>
+              Ver Sitio
+            </div>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">A</div>
+      <span class="sidebar-user-name">Admin</span>
+      <button class="sidebar-logout" id="sidebar-logout" title="Cerrar sesión">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button id="sidebar-toggle" style="display:none;padding:8px;color:var(--brown);">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
+      </div>
+      <div class="topbar-actions">
+        <a href="/" target="_blank" class="topbar-btn btn-outline">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Sitio
+        </a>
+      </div>
+    </div>
+
+    <!-- ========== DASHBOARD ========== -->
+    <section class="admin-section active" id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">📦</span> Productos</div>
+          <div class="stat-value" id="stat-products">0</div>
+          <div class="stat-trend">En tienda</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">🖼️</span> Slides</div>
+          <div class="stat-value" id="stat-slides">0</div>
+          <div class="stat-trend">En hero</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">📝</span> Artículos</div>
+          <div class="stat-value" id="stat-articles">0</div>
+          <div class="stat-trend">En blog</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label"><span class="stat-icon">🎟️</span> Cupones</div>
+          <div class="stat-value" id="stat-cupones">0</div>
+          <div class="stat-trend up">Activos</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Accesos rápidos</h3>
+        </div>
+        <div style="padding:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+          <button class="topbar-btn btn-main" data-section="products" onclick="navigateTo('products')">
+            <i class="fa-solid fa-plus"></i> Nuevo Producto
+          </button>
+          <button class="topbar-btn btn-outline" data-section="slides" onclick="navigateTo('slides')">
+            <i class="fa-solid fa-image"></i> Gestionar Slides
+          </button>
+          <button class="topbar-btn btn-outline" data-section="blog" onclick="navigateTo('blog')">
+            <i class="fa-solid fa-pen"></i> Nuevo Artículo
+          </button>
+          <button class="topbar-btn btn-outline" data-section="cupones" onclick="navigateTo('cupones')">
+            <i class="fa-solid fa-ticket"></i> Nuevo Cupón
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PRODUCTOS ========== -->
+    <section class="admin-section" id="section-products">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Productos</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-search search-icon"></i>
+              <input type="text" id="products-search" class="table-search" placeholder="Buscar producto...">
+            </div>
+            <button class="topbar-btn btn-main" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i> Nuevo
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Foto</th><th>Nombre</th><th>Categoría</th>
+                <th>Precio</th><th>Etiqueta</th><th>Stock</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CATEGORÍAS ========== -->
+    <section class="admin-section" id="section-categories">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Categorías</h3>
+          <button class="topbar-btn btn-main" onclick="openCategoryModal()">
+            <i class="fa-solid fa-plus"></i> Nueva Categoría
+          </button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Ícono</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
+          <tbody id="categories-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">Sin categorías</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== SLIDES ========== -->
+    <section class="admin-section" id="section-slides">
+      <div class="table-card" style="margin-bottom:24px;">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Slides del Hero</h3>
+          <button class="topbar-btn btn-main" onclick="openSlideModal()">
+            <i class="fa-solid fa-plus"></i> Nuevo Slide
+          </button>
+        </div>
+        <div id="slides-list" class="slides-list" style="padding:20px;"></div>
+      </div>
+    </section>
+
+    <!-- ========== BLOG ========== -->
+    <section class="admin-section" id="section-blog">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Artículos del Blog</h3>
+          <button class="topbar-btn btn-main" onclick="openArticleModal()">
+            <i class="fa-solid fa-plus"></i> Nuevo Artículo
+          </button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Imagen</th><th>Título</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="blog-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== CUPONES ========== -->
+    <section class="admin-section" id="section-cupones">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Cupones de Descuento</h3>
+          <button class="topbar-btn btn-main" onclick="openCuponModal()">
+            <i class="fa-solid fa-plus"></i> Nuevo Cupón
+          </button>
+        </div>
+        <div style="padding:20px;">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">
+            <i class="fa-solid fa-info-circle"></i>
+            Los cupones se eliminan automáticamente al vencer.
+          </p>
+          <div id="cupones-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PROMOCIONES ========== -->
+    <section class="admin-section" id="section-promotions">
+      <div class="table-card" style="margin-bottom:20px;">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Crear Promoción</h3>
+        </div>
+        <div style="padding:20px;display:flex;flex-wrap:wrap;gap:10px;">
+          <button class="topbar-btn btn-main" onclick="openPromoModal('valor_minimo')">
+            <i class="fa-solid fa-coins"></i> Descuento por monto mínimo
+          </button>
+          <button class="topbar-btn btn-main" onclick="openPromoModal('leve_n')">
+            <i class="fa-solid fa-layer-group"></i> Llevá N productos
+          </button>
+          <button class="topbar-btn btn-main" onclick="openPromoModal('frete_gratis')">
+            <i class="fa-solid fa-truck"></i> Envío Gratis
+          </button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Promociones Activas</h3>
+        </div>
+        <div style="padding:20px;" id="promos-list"></div>
+      </div>
+    </section>
+
+    <!-- ========== PRECIOS EN MASA ========== -->
+    <section class="admin-section" id="section-pricing">
+      <div class="config-card">
+        <div class="config-card-title">
+          <span class="icon"><i class="fa-solid fa-dollar-sign"></i></span>
+          Actualización de Precios en Masa
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:24px;" id="pricing-count"></p>
+
+        <div class="field-row" style="max-width:600px;">
+          <div class="field-group">
+            <label class="field-label">Tipo de ajuste</label>
+            <select id="mass-type" class="field-select">
+              <option value="add">Sumar monto fijo</option>
+              <option value="subtract">Restar monto fijo</option>
+              <option value="percent_add">Aumentar %</option>
+              <option value="percent_sub">Reducir %</option>
+              <option value="set">Fijar precio exacto</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Valor</label>
+            <input type="number" id="mass-value" class="field-input" placeholder="Ej: 1000">
+          </div>
+        </div>
+
+        <div class="field-group" style="max-width:300px;margin-top:14px;">
+          <label class="field-label">Aplicar a categoría (opcional)</label>
+          <select id="mass-category" class="field-select"></select>
+        </div>
+
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="applyMassPrice()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Aplicar Cambio de Precios
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== SHIPPING CONFIG ========== -->
+    <section class="admin-section" id="section-shipping">
+      <div class="config-card">
+        <div class="config-card-title">
+          <span class="icon"><i class="fa-solid fa-truck"></i></span>
+          Configuración de Correo Argentino (MiCorreo API)
+        </div>
+
+        <div class="field-row" style="max-width:600px;">
+          <div class="field-group">
+            <label class="field-label">Usuario MiCorreo</label>
+            <input type="text" id="sh-correo-user" class="field-input" placeholder="tu@email.com">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Contraseña MiCorreo</label>
+            <input type="password" id="sh-correo-pass" class="field-input" placeholder="••••••••">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Customer ID</label>
+            <input type="text" id="sh-customer-id" class="field-input" placeholder="0090000025">
+          </div>
+          <div class="field-group">
+            <label class="field-label">CP Origen (remitente)</label>
+            <input type="text" id="sh-origin-postal" class="field-input" placeholder="2434">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Ciudad Origen</label>
+            <input type="text" id="sh-origin-city" class="field-input" placeholder="Córdoba">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Flete por defecto ($)</label>
+            <input type="number" id="sh-default" class="field-input" placeholder="1500">
+            <p class="field-hint">Se usa si la API no responde</p>
+          </div>
+        </div>
+
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="saveShippingConfig()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Configuración
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== FLETE POR PROVINCIA ========== -->
+    <section class="admin-section" id="section-provincial_shipping">
+      <div class="config-card">
+        <div class="config-card-title">
+          <span class="icon"><i class="fa-solid fa-map"></i></span>
+          Flete Fijo por Provincia (Opcional)
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">
+          Si dejas vacío o en 0, se usa el cálculo automático del Correo Argentino.<br>
+          Solo se aplica si guardas un valor mayor a 0.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;" id="provincial-grid"></div>
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="saveProvincialShipping()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== PEDIDOS ========== -->
+    <section class="admin-section" id="section-orders">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3 class="table-card-title">Pedidos</h3>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="orders-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">
+              Los pedidos llegarán aquí cuando los clientes finalicen sus compras por WhatsApp.
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== DESTAQUE ========== -->
+    <section class="admin-section" id="section-destaque">
+      <div class="config-card">
+        <div class="config-card-title">
+          <span class="icon">⭐</span>
+          Sección Producto Destacado
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:20px;">
+          Elige el producto que aparecerá en la sección destacada de la página principal.
+        </p>
+        <div class="field-group" style="max-width:400px;">
+          <label class="field-label">Producto Destacado</label>
+          <select id="destaque-product-select" class="field-select"></select>
+        </div>
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="saveDestaque()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== PROMO SECTION ========== -->
+    <section class="admin-section" id="section-promo_section">
+      <div class="config-card">
+        <div class="config-card-title">
+          <span class="icon">🔥</span>
+          Sección Promoción
+        </div>
+        <div class="field-group" style="max-width:400px;">
+          <label class="field-label">Texto de la sección</label>
+          <input type="text" id="promo-section-text" class="field-input" placeholder="¡Oferta especial!">
+        </div>
+        <div class="field-group" style="max-width:400px;margin-top:14px;">
+          <label class="field-label">Producto en Promoción</label>
+          <select id="promo-section-select" class="field-select"></select>
+        </div>
+        <button class="topbar-btn btn-main" style="margin-top:20px;" onclick="savePromoSection()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     MODALES
+     ============================================================ -->
+
+<!-- Modal Producto -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal-box" style="max-width:720px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="product-modal-title">Nuevo Producto</h3>
+      <button class="modal-close" onclick="closeModal('product-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field-group" style="grid-column:1/-1;">
+          <label class="field-label">Nombre del Producto *</label>
+          <input type="text" id="p-name" class="field-input" placeholder="Ej: Conjunto de lactancia premium">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Categoría</label>
+          <select id="p-category" class="field-select"></select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Etiqueta</label>
+          <select id="p-badge" class="field-select">
+            <option value="">Sin etiqueta</option>
+            <option value="nuevo">✨ Nuevo</option>
+            <option value="destaque">⭐ Destaque</option>
+            <option value="promo">🔥 Promo</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Precio ($) *</label>
+          <input type="number" id="p-price" class="field-input" placeholder="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Precio Original (tachado)</label>
+          <input type="number" id="p-old-price" class="field-input" placeholder="0 (opcional)">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Stock (-1 = sin límite)</label>
+          <input type="number" id="p-stock" class="field-input" placeholder="-1">
+        </div>
+        <div class="field-group" style="grid-column:1/-1;">
+          <label class="field-label">Descripción</label>
+          <textarea id="p-description" class="field-textarea" placeholder="Descripción del producto..."></textarea>
+        </div>
+      </div>
+
+      <!-- Imágenes múltiples -->
+      <div class="field-group">
+        <label class="field-label">Fotos del Producto (podés subir varias)</label>
+        <div class="img-upload-zone" id="p-img-drop-zone">
+          <input type="file" id="p-img-file" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;"
+            onchange="handleMultipleImgUpload(this.files)">
+          <div class="img-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="img-upload-text">Haz clic o arrastrá para subir <strong>una o más fotos</strong></div>
+        </div>
+        <div id="p-images-preview" class="img-preview-grid" style="margin-top:10px;"></div>
+        <input type="hidden" id="p-images-json" value="[]">
+      </div>
+
+      <!-- Dimensiones para Correo -->
+      <div style="background:var(--cream);border-radius:var(--radius-md);padding:16px;margin-top:8px;">
+        <p style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">
+          📦 Dimensiones para cálculo de flete (opcional)
+        </p>
+        <div class="field-row thirds">
+          <div class="field-group">
+            <label class="field-label">Peso (gramos)</label>
+            <input type="number" id="p-weight" class="field-input" placeholder="500">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Alto (cm)</label>
+            <input type="number" id="p-height" class="field-input" placeholder="20">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Ancho (cm)</label>
+            <input type="number" id="p-width" class="field-input" placeholder="30">
+          </div>
+        </div>
+        <div class="field-row" style="max-width:200px;">
+          <div class="field-group">
+            <label class="field-label">Largo (cm)</label>
+            <input type="number" id="p-depth" class="field-input" placeholder="10">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('product-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="saveProduct()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Categoría -->
+<div class="modal-overlay" id="category-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="category-modal-title">Nueva Categoría</h3>
+      <button class="modal-close" onclick="closeModal('category-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cat-id">
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre *</label>
+          <input type="text" id="cat-name" class="field-input" placeholder="Ej: Ropa Bebé">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Ícono (emoji)</label>
+          <input type="text" id="cat-icon" class="field-input" placeholder="👶">
+        </div>
+        <div class="field-group" style="grid-column:1/-1;">
+          <label class="field-label">Descripción</label>
+          <input type="text" id="cat-description" class="field-input" placeholder="Descripción breve">
+        </div>
+        <div class="field-group" style="grid-column:1/-1;">
+          <label class="field-label">Subcategorías (opcional)</label>
+          <input type="text" id="cat-subcategories" class="field-input"
+            placeholder="Ej: Bodys, Ranitas, Conjuntos (separar con coma)">
+          <p class="field-hint">Opcional. Cada subcategoría separada por coma.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('category-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="saveCategory()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Slide -->
+<div class="modal-overlay" id="slide-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="slide-modal-title">Nuevo Slide</h3>
+      <button class="modal-close" onclick="closeModal('slide-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Título *</label>
+        <input type="text" id="slide-title" class="field-input" placeholder="Ej: Nueva Colección">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Subtítulo</label>
+        <input type="text" id="slide-subtitle" class="field-input" placeholder="Descripción del slide">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Texto del botón CTA</label>
+        <input type="text" id="slide-cta" class="field-input" placeholder="Ver Productos">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Imagen</label>
+        <div class="img-upload-zone" onclick="document.getElementById('slide-img-file').click()">
+          <input type="file" id="slide-img-file" accept="image/*" style="display:none;"
+            onchange="uploadToCloudinary(this.files[0], document.getElementById('slide-image-url'), document.getElementById('slide-image-preview'))">
+          <div class="img-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="img-upload-text">Haz clic para subir</div>
+        </div>
+        <input type="text" id="slide-image-url" class="field-input" placeholder="URL de la imagen" style="margin-top:8px;"
+          oninput="document.getElementById('slide-image-preview').innerHTML = this.value ? '<img src=\''+this.value+'\' style=\'max-height:100px;border-radius:8px;\'>' : ''">
+        <div id="slide-image-preview" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('slide-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="saveSlide()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cupón -->
+<div class="modal-overlay" id="cupon-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Nuevo Cupón</h3>
+      <button class="modal-close" onclick="closeModal('cupon-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Código del Cupón *</label>
+        <input type="text" id="cupon-code" class="field-input" placeholder="Ej: MAMA20" style="text-transform:uppercase">
+        <p class="field-hint">El cliente ingresará este código al finalizar la compra</p>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Descuento (%) *</label>
+          <input type="number" id="cupon-discount" class="field-input" placeholder="20" min="1" max="100">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Fecha de vencimiento *</label>
+          <input type="date" id="cupon-expiry" class="field-input">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('cupon-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="saveCupon()">Crear Cupón</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Promoción -->
+<div class="modal-overlay" id="promo-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="promo-modal-title">Nueva Promoción</h3>
+      <button class="modal-close" onclick="closeModal('promo-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="promo-type">
+
+      <!-- Valor mínimo -->
+      <div id="promo-fields-valor" style="display:none;">
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Monto mínimo de compra ($) *</label>
+            <input type="number" id="promo-min-value" class="field-input" placeholder="5000">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tipo de descuento</label>
+            <select id="promo-discount-type" class="field-select">
+              <option value="percent">Porcentaje (%)</option>
+              <option value="fixed">Monto fijo ($)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Valor del descuento *</label>
+            <input type="number" id="promo-discount-value" class="field-input" placeholder="15">
+          </div>
+        </div>
+      </div>
+
+      <!-- Llevá N -->
+      <div id="promo-fields-leve" style="display:none;">
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Cantidad mínima *</label>
+            <input type="number" id="promo-min-qty" class="field-input" placeholder="2" min="2">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Categoría (opcional)</label>
+            <select id="promo-category" class="field-select"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tipo de descuento</label>
+            <select id="promo-leve-discount-type" class="field-select">
+              <option value="percent">Porcentaje (%)</option>
+              <option value="fixed">Monto fijo ($)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Valor del descuento *</label>
+            <input type="number" id="promo-leve-discount-value" class="field-input" placeholder="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- Frete gratis -->
+      <div id="promo-fields-frete" style="display:none;">
+        <div class="field-group">
+          <label class="field-label">Monto mínimo para envío gratis ($) *</label>
+          <input type="number" id="promo-frete-min" class="field-input" placeholder="8000">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('promo-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="savePromo()">Crear Promoción</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Artículo -->
+<div class="modal-overlay" id="article-modal" style="align-items:flex-start;padding-top:20px;">
+  <div class="modal-box" style="max-width:780px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="article-modal-title">Nuevo Artículo</h3>
+      <button class="modal-close" onclick="closeModal('article-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Título *</label>
+        <input type="text" id="art-title" class="field-input" placeholder="Título del artículo">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Extracto (resumen breve)</label>
+        <input type="text" id="art-excerpt" class="field-input" placeholder="Resumen para la lista del blog">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Imagen de portada</label>
+        <div class="img-upload-zone" onclick="document.getElementById('art-img-file').click()">
+          <input type="file" id="art-img-file" accept="image/*" style="display:none;"
+            onchange="uploadToCloudinary(this.files[0], document.getElementById('art-image-url'), document.getElementById('art-image-preview'))">
+          <div class="img-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="img-upload-text">Haz clic para subir</div>
+        </div>
+        <input type="text" id="art-image-url" class="field-input" placeholder="URL de imagen" style="margin-top:8px;">
+        <div id="art-image-preview" class="img-preview-grid" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Contenido del artículo</label>
+        <div class="blog-editor-toolbar">
+          <button class="editor-btn" onclick="execCmd('bold')" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+          <button class="editor-btn" onclick="execCmd('italic')" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
+          <button class="editor-btn" onclick="execCmd('underline')" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
+          <button class="editor-btn" onclick="execCmd('strikeThrough')" title="Tachado"><i class="fa-solid fa-strikethrough"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="execCmd('formatBlock','h2')" title="Título H2"><b>H2</b></button>
+          <button class="editor-btn" onclick="execCmd('formatBlock','h3')" title="Título H3"><b>H3</b></button>
+          <button class="editor-btn" onclick="execCmd('formatBlock','p')" title="Párrafo"><i class="fa-solid fa-paragraph"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="execCmd('insertUnorderedList')" title="Lista"><i class="fa-solid fa-list-ul"></i></button>
+          <button class="editor-btn" onclick="execCmd('insertOrderedList')" title="Lista numerada"><i class="fa-solid fa-list-ol"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="execCmd('justifyLeft')" title="Izquierda"><i class="fa-solid fa-align-left"></i></button>
+          <button class="editor-btn" onclick="execCmd('justifyCenter')" title="Centro"><i class="fa-solid fa-align-center"></i></button>
+          <button class="editor-btn" onclick="execCmd('justifyRight')" title="Derecha"><i class="fa-solid fa-align-right"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="const url=prompt('URL:');if(url)execCmd('createLink',url)" title="Enlace"><i class="fa-solid fa-link"></i></button>
+          <button class="editor-btn" onclick="execCmd('removeFormat')" title="Quitar formato"><i class="fa-solid fa-eraser"></i></button>
+        </div>
+        <div id="art-content" class="blog-editor-content" contenteditable="true"></div>
+      </div>
+
+      <!-- SEO -->
+      <div class="seo-fields">
+        <div class="seo-fields-title">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          SEO — Optimización para buscadores
+        </div>
+        <div class="field-group">
+          <label class="field-label">Título SEO (meta title)</label>
+          <input type="text" id="art-seo-title" class="field-input" placeholder="Título que aparece en Google">
+          <p class="field-hint">Recomendado: 50-60 caracteres</p>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Descripción SEO (meta description)</label>
+          <textarea id="art-seo-desc" class="field-textarea" style="min-height:70px;" placeholder="Descripción breve para Google..."></textarea>
+          <p class="field-hint">Recomendado: 150-160 caracteres</p>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Palabras clave (keywords)</label>
+          <input type="text" id="art-seo-keywords" class="field-input" placeholder="maternidad, lactancia, bebé, Argentina">
+        </div>
+      </div>
+
+      <div class="toggle-wrap" style="margin-top:16px;">
+        <label class="toggle">
+          <input type="checkbox" id="art-published" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Publicar artículo</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn btn-outline" onclick="closeModal('article-modal')">Cancelar</button>
+      <button class="topbar-btn btn-main" onclick="saveArticle()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Artículo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="admin-toast"></div>
+
+<script type="module" src="../js/admin.js"></script>
+</body>
+</html>
