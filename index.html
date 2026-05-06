@@ -4,15 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZOE VEOS — Artículos de Maternidad | Argentina</title>
-  <meta name="description" content="ZOE VEOS — Los mejores artículos de maternidad para mamás y bebés en Argentina. Ropa de bebé, accesorios, lactancia, almohadas y mucho más. Enviamos a todo el país.">
-  <meta name="keywords" content="artículos de maternidad Argentina, ropa bebé, lactancia, almohadón de lactancia, maternidad Córdoba, ZOE VEOS, accesorios bebé">
+  <!-- SEO Principal -->
+  <meta name="description" content="ZOE VEOS — Tienda de artículos de maternidad en Córdoba, Argentina. Almohadones de lactancia, ropa de bebé, accesorios y más. Envíos a todo el país. Pagá con tarjeta o transferencia.">
+  <meta name="keywords" content="artículos maternidad Argentina, almohadón lactancia Córdoba, ropa bebé Argentina, tienda maternidad online, ZOE VEOS, accesorios bebé, maternidad Córdoba">
   <meta name="author" content="ZOE VEOS">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="googlebot" content="index, follow">
+  <meta name="language" content="Spanish">
+  <meta name="geo.region" content="AR-X">
+  <meta name="geo.placename" content="Córdoba, Argentina">
+
+  <!-- Canonical — dominio propio siempre -->
+  <link rel="canonical" href="https://www.zoeveos.com/">
 
   <!-- Open Graph -->
-  <meta property="og:title"       content="ZOE VEOS — Artículos de Maternidad | Argentina">
-  <meta property="og:description" content="Los mejores artículos de maternidad para mamás y bebés en Argentina. Enviamos a todo el país.">
+  <meta property="og:title"       content="ZOE VEOS — Artículos de Maternidad | Córdoba, Argentina">
+  <meta property="og:description" content="Tienda online de artículos de maternidad. Almohadones de lactancia, ropa de bebé y accesorios. Enviamos a todo Argentina.">
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://www.zoeveos.com/">
   <meta property="og:locale"      content="es_AR">
@@ -20,35 +27,115 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="ZOE VEOS — Artículos de Maternidad">
-  <meta name="twitter:description" content="Los mejores artículos de maternidad para mamás y bebés en Argentina.">
+  <meta name="twitter:title"       content="ZOE VEOS — Artículos de Maternidad Argentina">
+  <meta name="twitter:description" content="Tienda de maternidad en Córdoba. Almohadones, ropa bebé y más. Envíos a todo el país.">
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://www.zoeveos.com/">
-
-  <!-- Schema.org JSON-LD -->
+  <!-- Schema.org — SEO Clásico + IA -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Store",
-    "name": "ZOE VEOS",
-    "description": "Artículos de maternidad para mamás y bebés en Argentina",
-    "url": "https://www.zoeveos.com",
-    "telephone": "+5493576466145",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Bernardino Rivadavia 505",
-      "addressLocality": "Córdoba",
-      "addressCountry": "AR",
-      "postalCode": "2434"
-    },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+5493576466145",
-      "contactType": "customer service",
-      "availableLanguage": "Spanish"
-    },
-    "sameAs": []
+    "@graph": [
+      {
+        "@type": "OnlineStore",
+        "@id": "https://www.zoeveos.com/#store",
+        "name": "ZOE VEOS",
+        "alternateName": "Zoe Veos Maternidad",
+        "description": "Tienda online especializada en artículos de maternidad para mamás y bebés en Argentina. Ofrecemos almohadones de lactancia, ropa de bebé, accesorios y más, con envíos a todo el país.",
+        "url": "https://www.zoeveos.com",
+        "logo": "https://www.zoeveos.com/assets/logo.png",
+        "telephone": "+5493576466145",
+        "priceRange": "$$",
+        "currenciesAccepted": "ARS",
+        "paymentAccepted": "Transferencia bancaria, Tarjeta de crédito, Tarjeta de débito, Mercado Pago",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Bernardino Rivadavia 505",
+          "addressLocality": "Córdoba",
+          "addressRegion": "Córdoba",
+          "addressCountry": "AR",
+          "postalCode": "2434"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "-31.4201",
+          "longitude": "-64.1888"
+        },
+        "areaServed": {
+          "@type": "Country",
+          "name": "Argentina"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+5493576466145",
+          "contactType": "customer service",
+          "availableLanguage": "Spanish",
+          "contactOption": "TollFree"
+        },
+        "sameAs": [
+          "https://www.instagram.com/zoe__veos"
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Artículos de Maternidad",
+          "itemListElement": [
+            { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Almohadón de lactancia" } },
+            { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Ropa de bebé" } },
+            { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Accesorios de maternidad" } }
+          ]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.zoeveos.com/#website",
+        "url": "https://www.zoeveos.com",
+        "name": "ZOE VEOS",
+        "description": "Tienda de artículos de maternidad en Argentina",
+        "publisher": { "@id": "https://www.zoeveos.com/#store" },
+        "inLanguage": "es-AR",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://www.zoeveos.com/?buscar={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿ZOE VEOS hace envíos a todo Argentina?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí, ZOE VEOS realiza envíos a todo el país a través del Correo Argentino. El costo se calcula automáticamente según tu código postal."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo puedo pagar en ZOE VEOS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Podés pagar por transferencia bancaria o alias sin costo adicional, o con tarjeta de débito y crédito a través de Mercado Pago."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Dónde está ubicada ZOE VEOS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ZOE VEOS está ubicada en Córdoba, Argentina, y vende online con envíos a todo el país."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué productos vende ZOE VEOS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ZOE VEOS vende artículos de maternidad como almohadones de lactancia, ropa de bebé, accesorios para mamás y mucho más."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 
