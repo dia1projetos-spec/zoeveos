@@ -819,7 +819,18 @@ function openProductModal(product) {
   modal.querySelector('#pm-cat').textContent = product.category || '';
   modal.querySelector('#pm-name').textContent = product.name;
   modal.querySelector('#pm-price').textContent = `$${fmt(product.price)}`;
-  modal.querySelector('#pm-desc').textContent = product.description || '';
+  // Usar innerHTML para preservar formatação do editor rico
+  const descEl = modal.querySelector('#pm-desc');
+  if (descEl) {
+    const desc = product.description || '';
+    // Se veio do editor rico (tem tags HTML), usar innerHTML
+    // Se for texto puro, converter quebras de linha em <br>
+    if (desc.includes('<') && desc.includes('>')) {
+      descEl.innerHTML = desc;
+    } else {
+      descEl.innerHTML = desc.replace(/\n/g, '<br>');
+    }
+  }
   modal.querySelector('#pm-add').onclick = () => { addToCart(product); closeProductModal(); };
 
   renderGallery();
