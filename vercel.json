@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/create-preference.js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     { "source": "/admin", "destination": "/admin/index.html" },
     { "source": "/blog",  "destination": "/blog.html" }
