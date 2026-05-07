@@ -122,7 +122,8 @@ function loadSection(section) {
     promotions: loadPromotions, pricing: loadPricing,
     shipping: loadShipping, orders: loadOrders,
     destaque: loadDestaque, promo_section: loadPromoSection,
-    provincial_shipping: loadProvincialShipping
+    provincial_shipping: loadProvincialShipping,
+    catalogo: loadCatalogo
   };
   loaders[section]?.();
 }
@@ -845,3 +846,17 @@ window.removeProductImg = function(i) {
   window._productImages.splice(i, 1);
   renderImagesPreview();
 };
+
+// ============================================================
+// CATÁLOGO PDF — carregar categorias no select
+// ============================================================
+async function loadCatalogo() {
+  try {
+    const snap = await getDocs(collection(db, 'categories'));
+    const sel = document.getElementById('cat-pdf-category');
+    if (!sel) return;
+    const cats = snap.docs.map(d => d.data().name);
+    sel.innerHTML = '<option value="">Todas las categorías</option>' +
+      cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  } catch(e) { console.error(e); }
+}
