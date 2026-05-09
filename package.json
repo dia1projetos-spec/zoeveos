@@ -1,1 +1,8 @@
-{"name":"catalogo","type":"module","dependencies":{"cheerio":"^1.0.0-rc.12","cloudinary":"^2.5.1","@sparticuz/chromium":"^126.0.0","playwright-core":"^1.44.0"}}
+{
+  "name": "zoeveos",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  }
+}
