@@ -1238,13 +1238,4 @@ async function urlToBase64(url) {
   });
 }
 
-// Expor adminToast para uso neste módulo
-function adminToast(msg, type = '') {
-  const container = document.getElementById('admin-toast');
-  if (!container) return;
-  const t = document.createElement('div');
-  t.className = `a-toast ${type}`;
-  t.innerHTML = msg;
-  container.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3500);
-}
+// adminToast já definido acima
