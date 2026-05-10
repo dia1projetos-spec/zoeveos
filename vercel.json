@@ -8,8 +8,9 @@
     }
   },
   "rewrites": [
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/blog",  "destination": "/blog.html" }
+    { "source": "/admin",   "destination": "/admin/index.html" },
+    { "source": "/blog",    "destination": "/blog.html" },
+    { "source": "/product", "destination": "/product.html" }
   ],
   "redirects": [
     {

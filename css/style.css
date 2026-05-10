@@ -1008,8 +1008,8 @@ input, textarea, select {
    FOOTER
    ============================================================ */
 #footer {
-  background: #1A1A1A;
-  color: rgba(255,255,255,0.65);
+  background: #3A3535;
+  color: rgba(255,255,255,0.72);
   padding: 64px 40px 32px;
   position: relative;
 }
@@ -1017,9 +1017,9 @@ input, textarea, select {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--rose), var(--gold), var(--rose));
-  opacity: 0.6;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rose-light), var(--gold-light), var(--rose-light), transparent);
+  opacity: 0.5;
 }
 .footer-inner {
   max-width: 1200px;
@@ -1042,7 +1042,7 @@ input, textarea, select {
 .footer-tagline {
   font-size: 0.87rem;
   line-height: 1.75;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.65);
   margin-bottom: 24px;
 }
 .footer-social {
@@ -1052,24 +1052,24 @@ input, textarea, select {
 .footer-social a {
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
   display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.75);
   font-size: 0.95rem;
   transition: var(--transition);
 }
 .footer-social a:hover {
-  background: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.2);
   color: white;
-  border-color: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.35);
   transform: translateY(-2px);
 }
 .footer-col h4 {
   font-size: 0.68rem;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.55);
   margin-bottom: 18px;
   font-weight: 600;
 }
@@ -1080,23 +1080,23 @@ input, textarea, select {
 }
 .footer-col ul li a {
   font-size: 0.87rem;
-  color: rgba(255,255,255,0.58);
+  color: rgba(255,255,255,0.68);
   transition: var(--transition);
   position: relative;
   padding-left: 0;
 }
 .footer-col ul li a:hover {
-  color: rgba(255,255,255,0.95);
+  color: rgba(255,255,255,0.98);
   padding-left: 6px;
 }
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255,255,255,0.12);
   padding-top: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.45);
   flex-wrap: wrap;
   gap: 10px;
 }

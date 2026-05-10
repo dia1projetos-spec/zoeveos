@@ -268,6 +268,16 @@ window.openProductModal = async function(product=null) {
   setTimeout(() => {
     if (typeof renderImagesPreview === 'function') renderImagesPreview();
   }, 50);
+  document.getElementById('p-seo-title').value = product?.seoTitle||'';
+  document.getElementById('p-seo-desc').value = product?.seoDescription||'';
+  document.getElementById('p-seo-keywords').value = product?.seoKeywords||'';
+  // Mostrar link da landpage se produto já existe
+  const linkEl = document.getElementById('p-landpage-link');
+  if (linkEl && product?.id) {
+    linkEl.innerHTML = `<a href="https://www.zoeveos.com/product.html?id=${product.id}" target="_blank" style="color:#0077b6;">https://www.zoeveos.com/product.html?id=${product.id}</a>`;
+  } else if (linkEl) {
+    linkEl.textContent = 'Guardá el producto para ver el link';
+  }
   document.getElementById('p-weight').value = product?.weight||'';
   document.getElementById('p-height').value = product?.height||'';
   document.getElementById('p-width').value = product?.width||'';
@@ -311,11 +321,22 @@ window.saveProduct = async function() {
     height: parseInt(document.getElementById('p-height').value)||null,
     width: parseInt(document.getElementById('p-width').value)||null,
     depth: parseInt(document.getElementById('p-depth').value)||null,
+    seoTitle: document.getElementById('p-seo-title').value.trim(),
+    seoDescription: document.getElementById('p-seo-desc').value.trim(),
+    seoKeywords: document.getElementById('p-seo-keywords').value.trim(),
     createdAt: editingProduct?.createdAt||Date.now()
   };
   try {
     if (editingProduct) { await updateDoc(doc(db,'products',editingProduct.id), data); adminToast('Producto actualizado ✅','ok'); }
-    else { await addDoc(collection(db,'products'), data); adminToast('Producto creado ✅','ok'); }
+    else {
+      const newDoc = await addDoc(collection(db,'products'), data);
+      adminToast(`Producto creado ✅ — Link: /product.html?id=${newDoc.id}`,'ok');
+      // Mostrar link no modal antes de fechar
+      setTimeout(() => {
+        const linkEl = document.getElementById('p-landpage-link');
+        if (linkEl) linkEl.innerHTML = `<a href="https://www.zoeveos.com/product.html?id=${newDoc.id}" target="_blank" style="color:#0077b6;">https://www.zoeveos.com/product.html?id=${newDoc.id}</a>`;
+      }, 100);
+    }
     closeModal('product-modal'); loadProducts();
   } catch(e) { adminToast('Error al guardar','err'); }
 };
@@ -925,6 +946,9 @@ window.generateCatalogPDF = async function() {
 
     // Capa
     await drawCover(doc, title, subtitle, products.length);
+
+    // Sempre adicionar nova página após a capa
+    doc.addPage();
 
     // Páginas de produtos por categoria
     let firstCat = true;
