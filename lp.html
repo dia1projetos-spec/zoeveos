@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">ZOE VEOS</title>
+  <meta name="description" id="meta-desc" content="">
+  <meta name="keywords" id="meta-kw" content="">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="author" content="ZOE VEOS">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ZOE VEOS">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:title" id="og-title" content="">
+  <meta property="og:description" id="og-desc" content="">
+  <meta property="og:image" id="og-img" content="">
+  <meta property="og:url" id="og-url" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="tw-title" content="">
+  <meta name="twitter:description" id="tw-desc" content="">
+  <link rel="canonical" id="canonical" href="https://www.zoeveos.com/lp">
+  <script id="schema-lp" type="application/ld+json">{}</script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ============================================================
+       LANDPAGE CUSTOMIZADA — Premium Design
+       ============================================================ */
+
+    /* HERO SLIDER */
+    #lp-hero {
+      position: relative; width: 100%;
+      height: 100vh; min-height: 520px;
+      overflow: hidden; background: var(--beige);
+    }
+    .lp-slide {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 1.2s ease;
+    }
+    .lp-slide.active { opacity: 1; z-index: 1; }
+    .lp-slide::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(40,20,10,0.45) 0%, rgba(80,30,10,0.15) 60%, transparent 100%);
+    }
+    .lp-hero-no-slides {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--beige-dark), var(--rose-light));
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Hero content */
+    .lp-hero-content {
+      position: absolute; z-index: 2;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center; width: 90%; max-width: 860px;
+    }
+    .lp-hero-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 22px; border-radius: 99px;
+      margin-bottom: 22px;
+      backdrop-filter: blur(6px);
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    .lp-hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      font-weight: 300; color: white;
+      line-height: 1.08; margin-bottom: 20px;
+      text-shadow: 0 2px 40px rgba(40,15,5,0.35);
+      animation: fadeInUp 0.8s ease 0.4s both;
+    }
+    .lp-hero-title em { font-style: italic; color: var(--gold-light); }
+    .lp-hero-dots {
+      position: absolute; bottom: 32px; left: 50%;
+      transform: translateX(-50%); z-index: 2;
+      display: flex; gap: 10px;
+    }
+    .lp-hero-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer; border: none; transition: var(--transition);
+    }
+    .lp-hero-dot.active { width: 28px; border-radius: 4px; background: white; }
+
+    /* PRODUCTO DESTACADO */
+    #lp-featured {
+      padding: 80px 40px;
+      background: linear-gradient(135deg, var(--beige-dark), var(--rose-light));
+    }
+    .lp-featured-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    .lp-featured-img {
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 30px 80px var(--shadow-lg);
+      aspect-ratio: 1/1;
+    }
+    .lp-featured-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lp-featured-label {
+      font-size: 0.72rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--rose-dark);
+      margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .lp-featured-label::before { content: ''; width: 36px; height: 1.5px; background: var(--rose); }
+    .lp-featured-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 400; color: var(--brown); line-height: 1.2; margin-bottom: 14px;
+    }
+    .lp-featured-desc {
+      font-size: 0.95rem; color: var(--text-light);
+      line-height: 1.8; margin-bottom: 24px;
+    }
+    .lp-featured-price {
+      font-family: var(--font-display);
+      font-size: 2rem; font-weight: 500; color: var(--terra); margin-bottom: 24px;
+    }
+
+    /* ARTÍCULOS */
+    #lp-articles { padding: 80px 40px; background: var(--warm-white); }
+    .lp-articles-inner { max-width: 900px; margin: 0 auto; }
+
+    .lp-article-item {
+      margin-bottom: 72px;
+      padding-bottom: 72px;
+      border-bottom: 1px solid var(--border);
+    }
+    .lp-article-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .lp-art-number {
+      font-size: 0.68rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--rose-dark);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+    }
+    .lp-art-number::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .lp-art-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+      font-weight: 400; color: var(--brown);
+      line-height: 1.2; margin-bottom: 24px;
+    }
+    .lp-art-img {
+      width: 100%; border-radius: 18px;
+      margin-bottom: 28px; display: block;
+      box-shadow: 0 12px 40px var(--shadow-md);
+    }
+    .lp-art-body {
+      font-size: 1.02rem; color: var(--text-light); line-height: 1.9;
+    }
+    .lp-art-body h2 { font-family: var(--font-display); font-size: 1.6rem; color: var(--brown); margin: 28px 0 12px; }
+    .lp-art-body h3 { font-family: var(--font-display); font-size: 1.3rem; color: var(--brown); margin: 22px 0 10px; }
+    .lp-art-body p { margin-bottom: 18px; }
+    .lp-art-body ul, .lp-art-body ol { padding-left: 22px; margin-bottom: 18px; }
+    .lp-art-body li { margin-bottom: 7px; }
+    .lp-art-body img { width: 100%; border-radius: 12px; margin: 20px 0; }
+    .lp-art-body blockquote {
+      border-left: 3px solid var(--rose); padding: 14px 20px; margin: 20px 0;
+      background: var(--beige); border-radius: 0 12px 12px 0;
+      font-style: italic; color: var(--text-light);
+    }
+    .lp-art-body strong { color: var(--brown); }
+
+    /* CTA final */
+    .lp-cta-section {
+      padding: 80px 40px;
+      background: var(--beige);
+      text-align: center;
+    }
+    .lp-cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400; color: var(--brown); margin-bottom: 14px;
+    }
+    .lp-cta-sub { font-size: 1rem; color: var(--text-light); margin-bottom: 32px; }
+    .lp-cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--brown); color: white;
+      font-size: 0.88rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 16px 44px; border-radius: 99px;
+      transition: var(--transition); border: none; cursor: pointer;
+      box-shadow: 0 8px 24px var(--shadow-md); text-decoration: none;
+    }
+    .lp-cta-btn:hover { background: var(--rose-dark); transform: translateY(-2px); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #lp-hero { height: auto; min-height: unset; }
+      .lp-slide { position: relative; display: none; min-height: 60vw; background-size: contain; background-repeat: no-repeat; background-position: center top; background-color: var(--beige); }
+      .lp-slide.active { display: block; opacity: 1; }
+      .lp-hero-content { top: auto; bottom: 28px; transform: translateX(-50%); }
+      #lp-featured { padding: 56px 20px; }
+      .lp-featured-inner { grid-template-columns: 1fr; gap: 32px; }
+      #lp-articles { padding: 56px 20px; }
+      .lp-cta-section { padding: 56px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header id="header">
+  <nav class="nav-inner">
+    <a href="/" class="nav-logo">ZOE VEOS</a>
+    <ul class="nav-links">
+      <li><a href="/#categories">Categorías</a></li>
+      <li><a href="/#products">Productos</a></li>
+      <li><a href="/blog.html">Blog</a></li>
+      <li><a href="/#footer">Contacto</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button id="cart-btn" class="cart-btn" aria-label="Carrito">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span id="cart-count" class="cart-count">0</span>
+      </button>
+      <button id="hamburger" class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<nav id="mobile-nav" class="mobile-nav">
+  <button id="mobile-nav-close" class="mobile-nav-close">✕</button>
+  <a href="/">Inicio</a><a href="/#products">Productos</a>
+  <a href="/blog.html">Blog</a><a href="/#footer">Contacto</a>
+</nav>
+
+<!-- HERO SLIDER -->
+<section id="lp-hero">
+  <div id="lp-slides-container"></div>
+  <div class="lp-hero-content">
+    <div class="lp-hero-eyebrow" id="lp-eyebrow">ZOE VEOS</div>
+    <h1 class="lp-hero-title" id="lp-hero-title">Cargando...</h1>
+  </div>
+  <div class="lp-hero-dots" id="lp-hero-dots"></div>
+</section>
+
+<!-- PRODUCTO DESTACADO -->
+<section id="lp-featured" style="display:none">
+  <div class="lp-featured-inner">
+    <div class="lp-featured-img">
+      <img id="lp-feat-img" src="" alt="">
+    </div>
+    <div>
+      <div class="lp-featured-label">Producto Destacado</div>
+      <h2 class="lp-featured-name" id="lp-feat-name"></h2>
+      <p class="lp-featured-desc" id="lp-feat-desc"></p>
+      <div class="lp-featured-price" id="lp-feat-price"></div>
+      <button class="lp-cta-btn" id="lp-feat-btn">
+        <i class="fa-solid fa-bag-shopping"></i> Agregar al carrito
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ARTÍCULOS -->
+<section id="lp-articles" style="display:none">
+  <div class="lp-articles-inner" id="lp-articles-list"></div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="lp-cta-section">
+  <h2 class="lp-cta-title">¿Lista para comenzar?</h2>
+  <p class="lp-cta-sub">Explorá todos nuestros productos de maternidad con envíos a todo Argentina.</p>
+  <a href="/#products" class="lp-cta-btn">
+    <i class="fa-solid fa-heart"></i> Ver todos los productos
+  </a>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ZOE VEOS</div>
+        <p class="footer-tagline">Artículos de maternidad con amor.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://wa.me/5493576466145" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Tienda</h4><ul>
+        <li><a href="/">Inicio</a></li><li><a href="/#products">Productos</a></li><li><a href="/blog.html">Blog</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Contacto</h4><ul>
+        <li><a href="https://wa.me/5493576466145" target="_blank">WhatsApp</a></li>
+        <li><a href="#">Córdoba, Argentina</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ZOE VEOS</span><span>Hecho con 🌸 en Argentina</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CARRINHO COMPLETO (mesmo do index) -->
+<div id="cart-overlay"></div>
+<aside id="cart-drawer">
+  <div class="cart-header">
+    <h2 class="cart-title">Tu Carrito</h2>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="closeCart()" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;cursor:pointer;background:none;border:none;">← Seguir comprando</button>
+      <button id="cart-close" class="cart-close">✕</button>
+    </div>
+  </div>
+  <div id="cart-empty" class="cart-empty"><div class="cart-empty-icon">🛍️</div><p>Tu carrito está vacío</p></div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-footer">
+    <div id="cart-promos-section" class="cart-promos-section" style="display:none;">
+      <div class="cart-section-label">🎁 Promociones disponibles</div>
+      <div id="cart-promos-list"></div>
+    </div>
+    <div id="cart-cupones-section" class="cart-cupones-section" style="display:none;">
+      <button class="cart-cupones-toggle" id="cart-cupones-toggle">
+        <span>🎟️ Tengo un cupón</span><span id="cupones-arrow">▾</span>
+      </button>
+      <div class="cart-cupones-list" id="cart-cupones-list"></div>
+    </div>
+    <div id="coupon-msg" class="cart-coupon-msg"></div>
+    <div class="cart-summary">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+      <div class="cart-summary-row" id="discount-row" style="display:none;"><span>Descuento</span><span id="cart-discount" style="color:var(--terra)">-$0</span></div>
+      <div class="cart-summary-row total"><span>Total</span><span id="cart-total">$0</span></div>
+    </div>
+    <button id="checkout-btn" class="cart-checkout-btn">
+      <i class="fa-solid fa-bag-shopping"></i> Finalizar Compra
+    </button>
+  </div>
+</aside>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-modal">
+  <div class="checkout-box">
+    <button class="checkout-close" id="checkout-close">✕</button>
+    <h2 class="checkout-title">Finalizar Compra</h2>
+    <p class="checkout-subtitle">Completá tus datos para continuar.</p>
+    <div class="form-section-title">Tus datos</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre *</label><input type="text" id="co-name" placeholder="Tu nombre"></div>
+      <div class="form-group"><label>WhatsApp *</label><input type="tel" id="co-whatsapp" placeholder="+549 351 000 0000"></div>
+      <div class="form-group"><label>Calle *</label><input type="text" id="co-street"></div>
+      <div class="form-group"><label>Número *</label><input type="text" id="co-number"></div>
+      <div class="form-group"><label>Barrio</label><input type="text" id="co-barrio"></div>
+      <div class="form-group"><label>Ciudad *</label><input type="text" id="co-city"></div>
+      <div class="form-group"><label>CP *</label><input type="text" id="co-postal"></div>
+      <div class="form-group"><label>Provincia</label>
+        <select id="co-province">
+          <option value="X">Córdoba</option><option value="B">Buenos Aires</option>
+          <option value="C">CABA</option><option value="S">Santa Fe</option>
+          <option value="M">Mendoza</option><option value="T">Tucumán</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-section-title">Opciones de envío</div>
+    <div id="shipping-options" class="shipping-options">
+      <div class="shipping-loading">Ingresá tu CP para calcular el flete</div>
+    </div>
+    <div class="checkout-payment-options">
+      <p class="checkout-payment-label">Elegí cómo querés pagar:</p>
+      <button id="checkout-submit-wa" class="checkout-submit-btn checkout-wa-btn">
+        <i class="fa-solid fa-money-bill-wave"></i> Pagar por ALIAS / Transferencia
+      </button>
+      <div class="alias-notice">
+        <i class="fa-solid fa-circle-check"></i>
+        Sin costo adicional · Total: <strong id="alias-total">$0</strong>
+      </div>
+      <div class="payment-separator"><span>o</span></div>
+      <button id="checkout-submit-mp" class="checkout-submit-btn checkout-mp-btn">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0z" fill="#009EE3"/><path d="M24.5 13.5c0 2.485-1.567 4.5-3.5 4.5h-3l-1 5h-3l2.5-12h5c1.933 0 3 .896 3 2.5z" fill="#fff"/></svg>
+        Pagar con débito / crédito
+      </button>
+      <div class="mp-surcharge-notice">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Comisión Mercado Pago 6,60% + IVA 21%.<br>
+        <strong>Total con tarjeta: <span id="mp-total-with-surcharge">$0</span></strong></span>
+      </div>
+    </div>
+    <div class="cart-summary" style="margin-top:16px;">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="checkout-subtotal">$0</span></div>
+      <div class="cart-summary-row"><span>Envío</span><span id="checkout-shipping-cost">-</span></div>
+      <div class="cart-summary-row total"><span>TOTAL</span><span id="checkout-total">$0</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="product-modal" style="display:none"></div>
+<div id="toast-container"></div>
+<a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+
+<!-- main.js — carrega TODO o carrinho funcional -->
+<script type="module" src="js/main.js"></script>
+
+<!-- Lógica específica da landpage -->
+<script type="module">
+import { db, collection, getDocs, doc, query, where } from './js/firebase-config.js';
+
+const slug = location.pathname.replace('/lp/','').replace('/lp','').split('?')[0] || new URLSearchParams(location.search).get('slug');
+let slideIdx = 0;
+let slides = [];
+let slideTimer = null;
+
+async function loadLP() {
+  if (!slug) { document.getElementById('lp-hero-title').textContent = 'Página no encontrada'; return; }
+  try {
+    const snap = await getDocs(query(collection(db,'landpages'), where('slug','==',slug)));
+    if (snap.empty) { document.getElementById('lp-hero-title').textContent = 'Página no encontrada'; return; }
+    const lp = { id: snap.docs[0].id, ...snap.docs[0].data() };
+    renderLP(lp);
+    updateSEO(lp);
+  } catch(e) { console.error('loadLP error:', e); }
+}
+
+function renderLP(lp) {
+  // Hero title
+  document.getElementById('lp-hero-title').textContent = lp.title;
+  document.getElementById('lp-eyebrow').textContent = 'ZOE VEOS';
+
+  // Slides
+  slides = lp.slides || [];
+  const container = document.getElementById('lp-slides-container');
+  const dotsEl = document.getElementById('lp-hero-dots');
+  if (slides.length > 0) {
+    container.innerHTML = slides.map((src,i) =>
+      `<div class="lp-slide${i===0?' active':''}" style="background-image:url('${src}')"></div>`
+    ).join('');
+    dotsEl.innerHTML = slides.map((_,i) =>
+      `<button class="lp-hero-dot${i===0?' active':''}" onclick="goSlide(${i})"></button>`
+    ).join('');
+    if (slides.length > 1) {
+      slideTimer = setInterval(() => goSlide((slideIdx+1) % slides.length), 5000);
+    }
+  } else {
+    container.innerHTML = `<div class="lp-hero-no-slides"></div>`;
+    dotsEl.style.display = 'none';
+  }
+
+  // Produto destacado
+  if (lp.featuredProduct) {
+    const fp = lp.featuredProduct;
+    const sec = document.getElementById('lp-featured');
+    sec.style.display = 'block';
+    document.getElementById('lp-feat-img').src = fp.image || '';
+    document.getElementById('lp-feat-img').alt = fp.name;
+    document.getElementById('lp-feat-name').textContent = fp.name;
+    const desc = fp.description ? fp.description.replace(/<[^>]*>/g,'').slice(0,200) : '';
+    document.getElementById('lp-feat-desc').textContent = desc;
+    document.getElementById('lp-feat-price').textContent = `$${Number(fp.price).toLocaleString('es-AR')}`;
+    document.getElementById('lp-feat-btn').addEventListener('click', () => {
+      if (window.addToCart) window.addToCart(fp);
+    });
+  }
+
+  // Artigos
+  const arts = lp.articles || [];
+  if (arts.length > 0) {
+    const sec = document.getElementById('lp-articles');
+    sec.style.display = 'block';
+    const list = document.getElementById('lp-articles-list');
+    list.innerHTML = arts.map((art, i) => `
+      <div class="lp-article-item">
+        <div class="lp-art-number">Artículo ${i+1}</div>
+        ${art.title ? `<h2 class="lp-art-title">${art.title}</h2>` : ''}
+        ${art.image ? `<img src="${art.image}" alt="${art.title||''}" class="lp-art-img" loading="lazy">` : ''}
+        <div class="lp-art-body">${art.content||''}</div>
+      </div>`).join('');
+  }
+}
+
+window.goSlide = function(n) {
+  clearInterval(slideTimer);
+  const allSlides = document.querySelectorAll('.lp-slide');
+  const allDots   = document.querySelectorAll('.lp-hero-dot');
+  allSlides[slideIdx]?.classList.remove('active');
+  allDots[slideIdx]?.classList.remove('active');
+  slideIdx = n;
+  allSlides[slideIdx]?.classList.add('active');
+  allDots[slideIdx]?.classList.add('active');
+  if (slides.length > 1) slideTimer = setInterval(() => goSlide((slideIdx+1) % slides.length), 5000);
+};
+
+function updateSEO(lp) {
+  const title = lp.seoTitle || lp.title;
+  const desc  = lp.seoDesc || `${lp.title} — ZOE VEOS. Artículos de maternidad en Argentina.`;
+  const img   = lp.slides?.[0] || '';
+  const url   = `https://www.zoeveos.com/lp/${lp.slug}`;
+
+  document.title = `${title} — ZOE VEOS`;
+  document.getElementById('meta-desc').content    = desc;
+  document.getElementById('meta-kw').content      = lp.seoKeywords || `${lp.title}, maternidad, ZOE VEOS, Argentina`;
+  document.getElementById('og-title').content     = `${title} — ZOE VEOS`;
+  document.getElementById('og-desc').content      = desc;
+  document.getElementById('og-img').content       = img;
+  document.getElementById('og-url').content       = url;
+  document.getElementById('tw-title').content     = `${title} — ZOE VEOS`;
+  document.getElementById('tw-desc').content      = desc;
+  document.getElementById('canonical').href       = url;
+
+  // Schema.org
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "name": title,
+        "description": desc,
+        "url": url,
+        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" }
+      },
+      ...(lp.articles||[]).filter(a=>a.title&&a.content).map(a => ({
+        "@type": "Article",
+        "headline": a.title,
+        "image": a.image || img,
+        "author": { "@type": "Organization", "name": "ZOE VEOS" },
+        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" },
+        "mainEntityOfPage": url
+      }))
+    ]
+  };
+  document.getElementById('schema-lp').textContent = JSON.stringify(schema, null, 2);
+}
+
+document.addEventListener('DOMContentLoaded', loadLP);
+</script>
+</body>
+</html>

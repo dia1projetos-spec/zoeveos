@@ -8,20 +8,47 @@
     }
   },
   "rewrites": [
-    { "source": "/admin",   "destination": "/admin/index.html" },
-    { "source": "/blog",    "destination": "/blog.html" },
-    { "source": "/product", "destination": "/product.html" }
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/product",
+      "destination": "/product.html"
+    },
+    {
+      "source": "/lp/:slug",
+      "destination": "/lp.html"
+    },
+    {
+      "source": "/lp",
+      "destination": "/lp.html"
+    }
   ],
   "redirects": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "zoeveos.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "zoeveos.vercel.app"
+        }
+      ],
       "destination": "https://www.zoeveos.com/$1",
       "permanent": true
     },
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": "zoeveos.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "zoeveos.com"
+        }
+      ],
       "destination": "https://www.zoeveos.com/$1",
       "permanent": true
     }
@@ -30,16 +57,31 @@
     {
       "source": "/admin/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options",  "value": "nosniff" },
-        { "key": "X-Frame-Options",          "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy",          "value": "strict-origin-when-cross-origin" },
-        { "key": "Cache-Control",            "value": "public, max-age=3600, must-revalidate" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, must-revalidate"
+        }
       ]
     }
   ]

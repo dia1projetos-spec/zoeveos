@@ -123,7 +123,8 @@ function loadSection(section) {
     shipping: loadShipping, orders: loadOrders,
     destaque: loadDestaque, promo_section: loadPromoSection,
     provincial_shipping: loadProvincialShipping,
-    catalogo: loadCatalogo
+    catalogo: loadCatalogo,
+    landpages: loadLandpages
   };
   loaders[section]?.();
 }
@@ -262,6 +263,8 @@ window.openProductModal = async function(product=null) {
   document.getElementById('p-old-price').value = product?.oldPrice||'';
   document.getElementById('p-description').value = product?.description||'';
   document.getElementById('p-stock').value = product?.stock??'';
+  const pWaEl = document.getElementById('p-frete-wa');
+  if (pWaEl) pWaEl.checked = product?.freteWhatsapp || false;
   document.getElementById('p-badge').value = product?.badge||'';
   // Carregar imagens múltiplas (p-images-preview é o ID correto no HTML)
   window._productImages = product?.images?.length ? [...product.images] : (product?.image ? [product.image] : []);
@@ -269,6 +272,9 @@ window.openProductModal = async function(product=null) {
     if (typeof renderImagesPreview === 'function') renderImagesPreview();
   }, 50);
   document.getElementById('p-seo-title').value = product?.seoTitle||'';
+  document.getElementById('p-art-title').value = product?.articleTitle||'';
+  document.getElementById('p-art-cover').value = product?.articleCover||'';
+  document.getElementById('p-art-content').innerHTML = product?.articleContent||'';
   document.getElementById('p-seo-desc').value = product?.seoDescription||'';
   document.getElementById('p-seo-keywords').value = product?.seoKeywords||'';
   // Mostrar link da landpage se produto já existe
@@ -314,6 +320,7 @@ window.saveProduct = async function() {
     oldPrice: parseFloat(document.getElementById('p-old-price').value)||null,
     description: document.getElementById('p-description').value.trim(),
     stock: parseInt(document.getElementById('p-stock').value)||-1,
+    freteWhatsapp: document.getElementById('p-frete-wa')?.checked || false,
     badge: document.getElementById('p-badge').value,
     images: window._productImages || [],
     image: window._productImages?.[0] || '', // compatibilidade
@@ -324,6 +331,10 @@ window.saveProduct = async function() {
     seoTitle: document.getElementById('p-seo-title').value.trim(),
     seoDescription: document.getElementById('p-seo-desc').value.trim(),
     seoKeywords: document.getElementById('p-seo-keywords').value.trim(),
+    articleTitle:   document.getElementById('p-art-title').value.trim(),
+    articleCover:   document.getElementById('p-art-cover').value.trim(),
+    articleContent: document.getElementById('p-art-content').innerHTML,
+    updatedAt: Date.now(),
     createdAt: editingProduct?.createdAt||Date.now()
   };
   try {
@@ -617,17 +628,31 @@ async function loadShipping() {
     document.getElementById('sh-origin-postal').value = cfg.originPostal||'2434';
     document.getElementById('sh-origin-city').value = cfg.originCity||'Córdoba';
     document.getElementById('sh-default').value = cfg.defaultShipping||'';
+    const toggleWa = document.getElementById('sh-frete-wa');
+    if (toggleWa) {
+      toggleWa.checked = cfg.freteWhatsapp || false;
+      updateFreteWaUI(cfg.freteWhatsapp || false);
+    }
   }
 }
 
+window.updateFreteWaUI = function(active) {
+  const correoFields = document.getElementById('sh-correo-fields');
+  const waInfo = document.getElementById('sh-wa-info');
+  if (correoFields) correoFields.style.opacity = active ? '0.4' : '1';
+  if (waInfo) waInfo.style.display = active ? 'block' : 'none';
+};
+
 window.saveShippingConfig = async function() {
+  const freteWa = document.getElementById('sh-frete-wa')?.checked || false;
   const data = {
     correoUser: document.getElementById('sh-correo-user').value,
     correoPass: document.getElementById('sh-correo-pass').value,
     correoCustomerId: document.getElementById('sh-customer-id').value,
     originPostal: document.getElementById('sh-origin-postal').value,
     originCity: document.getElementById('sh-origin-city').value,
-    defaultShipping: parseFloat(document.getElementById('sh-default').value)||0
+    defaultShipping: parseFloat(document.getElementById('sh-default').value)||0,
+    freteWhatsapp: freteWa
   };
   await setDoc(doc(db,'config','shipping'), data);
   adminToast('Configuración guardada ✅','ok');
@@ -1263,3 +1288,225 @@ async function urlToBase64(url) {
 }
 
 // adminToast já definido acima
+
+window.execArticleCmd = function(cmd, value=null) {
+  document.getElementById('p-art-content').focus();
+  document.execCommand(cmd, false, value);
+};
+
+// ============================================================
+// LANDPAGES CUSTOMIZADAS
+// ============================================================
+let editingLandpage = null;
+let lpArticles = [];
+
+async function loadLandpages() {
+  const container = document.getElementById('landpages-list');
+  if (!container) return;
+  try {
+    const snap = await getDocs(query(collection(db,'landpages'), orderBy('createdAt','desc')));
+    const lps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (lps.length === 0) {
+      container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted)">No hay landpages. ¡Creá la primera! 🚀</div>`;
+      return;
+    }
+    container.innerHTML = lps.map(lp => `
+      <div class="promo-card">
+        <div class="promo-card-info">
+          <div class="promo-card-name">🌐 ${lp.title}</div>
+          <div class="promo-card-detail">
+            <a href="https://www.zoeveos.com/lp/${lp.slug}" target="_blank" style="color:var(--rose-dark);">
+              zoeveos.com/lp/${lp.slug}
+            </a>
+            · ${(lp.articles||[]).length} artículo(s)
+          </div>
+        </div>
+        <div class="promo-card-actions">
+          <button class="tbl-btn tbl-edit" onclick="editLandpage('${lp.id}')">✏️ Editar</button>
+          <button class="tbl-btn tbl-view" onclick="window.open('https://www.zoeveos.com/lp/${lp.slug}','_blank')">👁️ Ver</button>
+          <button class="tbl-btn tbl-delete" onclick="deleteLandpage('${lp.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { adminToast('Error al cargar landpages','err'); }
+}
+
+window.openLandpageModal = async function(lp = null) {
+  editingLandpage = lp;
+  lpArticles = lp?.articles ? JSON.parse(JSON.stringify(lp.articles)) : [];
+
+  document.getElementById('lp-modal-title').textContent = lp ? 'Editar Landpage' : 'Nueva Landpage';
+  document.getElementById('lp-edit-id').value = lp?.id || '';
+  document.getElementById('lp-title').value = lp?.title || '';
+  document.getElementById('lp-slug').value = lp?.slug || '';
+  document.getElementById('lp-slug-preview').textContent = lp?.slug || 'slug';
+  document.getElementById('lp-seo-title').value = lp?.seoTitle || '';
+  document.getElementById('lp-seo-desc').value = lp?.seoDesc || '';
+  document.getElementById('lp-seo-keywords').value = lp?.seoKeywords || '';
+  document.getElementById('lp-slides').value = (lp?.slides || []).join('\n');
+
+  // Auto-slug do título
+  document.getElementById('lp-title').oninput = function() {
+    if (!editingLandpage) {
+      const slug = this.value.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').trim();
+      document.getElementById('lp-slug').value = slug;
+      document.getElementById('lp-slug-preview').textContent = slug || 'slug';
+    }
+  };
+  document.getElementById('lp-slug').oninput = function() {
+    document.getElementById('lp-slug-preview').textContent = this.value || 'slug';
+  };
+
+  // Carregar produtos para destaque
+  const prodSnap = await getDocs(collection(db,'products'));
+  const prods = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const sel = document.getElementById('lp-featured-product');
+  sel.innerHTML = '<option value="">Sin producto destacado</option>' +
+    prods.map(p => `<option value="${p.id}" ${lp?.featuredProductId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+
+  renderLPArticles();
+  openModal('landpage-modal');
+};
+
+window.editLandpage = async function(id) {
+  const d = await getDoc(doc(db,'landpages',id));
+  if (d.exists()) window.openLandpageModal({ id: d.id, ...d.data() });
+};
+
+window.deleteLandpage = async function(id) {
+  if (!confirm('¿Eliminar esta landpage?')) return;
+  await deleteDoc(doc(db,'landpages',id));
+  loadLandpages();
+  adminToast('Landpage eliminada','ok');
+};
+
+window.addLPArticle = function() {
+  lpArticles.push({ title:'', image:'', content:'' });
+  renderLPArticles();
+  // Scroll al nuevo artículo
+  setTimeout(() => {
+    const arts = document.querySelectorAll('.lp-article-item');
+    arts[arts.length-1]?.scrollIntoView({ behavior:'smooth' });
+  }, 100);
+};
+
+window.removeLPArticle = function(i) {
+  lpArticles.splice(i, 1);
+  renderLPArticles();
+};
+
+function renderLPArticles() {
+  const container = document.getElementById('lp-articles-container');
+  if (!container) return;
+  if (lpArticles.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);border:2px dashed var(--border);border-radius:var(--radius-md);">
+      Aún no hay artículos. Hacé clic en "Agregar artículo" para comenzar.</div>`;
+    return;
+  }
+  container.innerHTML = lpArticles.map((art, i) => `
+    <div class="lp-article-item" style="background:var(--beige);border-radius:var(--radius-md);padding:18px;margin-bottom:14px;border:1.5px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:0.82rem;font-weight:600;color:var(--brown);">📝 Artículo ${i+1}</span>
+        <button class="tbl-btn tbl-delete" onclick="removeLPArticle(${i})">✕ Eliminar</button>
+      </div>
+      <div class="field-group" style="margin-bottom:10px;">
+        <label class="field-label">Título del artículo</label>
+        <input type="text" class="field-input lp-art-title" data-i="${i}" value="${art.title||''}" placeholder="Título del artículo">
+      </div>
+      <div class="field-group" style="margin-bottom:10px;">
+        <label class="field-label">Imagen del artículo (URL)</label>
+        <input type="text" class="field-input lp-art-image" data-i="${i}" value="${art.image||''}" placeholder="URL de imagen">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contenido</label>
+        <div class="blog-editor-toolbar">
+          <button class="editor-btn" onclick="execLPCmd(${i},'bold')"><i class="fa-solid fa-bold"></i></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'italic')"><i class="fa-solid fa-italic"></i></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'underline')"><i class="fa-solid fa-underline"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="execLPCmd(${i},'formatBlock','h2')"><b>H2</b></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'formatBlock','h3')"><b>H3</b></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'formatBlock','p')"><i class="fa-solid fa-paragraph"></i></button>
+          <span style="width:1px;background:var(--border);margin:0 4px;"></span>
+          <button class="editor-btn" onclick="execLPCmd(${i},'insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
+          <button class="editor-btn" onclick="execLPCmd(${i},'removeFormat')"><i class="fa-solid fa-eraser"></i></button>
+        </div>
+        <div class="blog-editor-content lp-art-content" contenteditable="true" data-i="${i}" style="min-height:140px;">${art.content||''}</div>
+      </div>
+    </div>`).join('');
+
+  // Sync inputs to lpArticles on change
+  container.querySelectorAll('.lp-art-title').forEach(el => {
+    el.addEventListener('input', () => { lpArticles[el.dataset.i].title = el.value; });
+  });
+  container.querySelectorAll('.lp-art-image').forEach(el => {
+    el.addEventListener('input', () => { lpArticles[el.dataset.i].image = el.value; });
+  });
+  container.querySelectorAll('.lp-art-content').forEach(el => {
+    el.addEventListener('input', () => { lpArticles[el.dataset.i].content = el.innerHTML; });
+  });
+}
+
+window.execLPCmd = function(i, cmd, value=null) {
+  const el = document.querySelector(`.lp-art-content[data-i="${i}"]`);
+  if (el) { el.focus(); document.execCommand(cmd, false, value); }
+};
+
+window.saveLandpage = async function() {
+  const btn = document.querySelector('#landpage-modal .btn-main');
+  if (btn && btn.disabled) return;
+  if (btn) btn.disabled = true;
+
+  const title = document.getElementById('lp-title').value.trim();
+  const slug  = document.getElementById('lp-slug').value.trim()
+    .toLowerCase().replace(/[^a-z0-9-]/g,'');
+
+  if (!title || !slug) { adminToast('Título y slug son obligatorios','err'); if (btn) btn.disabled = false; return; }
+
+  // Sync artículos antes de salvar
+  document.querySelectorAll('.lp-art-title').forEach(el => { lpArticles[el.dataset.i].title = el.value; });
+  document.querySelectorAll('.lp-art-image').forEach(el => { lpArticles[el.dataset.i].image = el.value; });
+  document.querySelectorAll('.lp-art-content').forEach(el => { lpArticles[el.dataset.i].content = el.innerHTML; });
+
+  const featuredId = document.getElementById('lp-featured-product').value;
+  let featuredProduct = null;
+  if (featuredId) {
+    const pd = await getDoc(doc(db,'products',featuredId));
+    if (pd.exists()) featuredProduct = { id: pd.id, ...pd.data() };
+  }
+
+  const data = {
+    title,
+    slug,
+    seoTitle:    document.getElementById('lp-seo-title').value.trim(),
+    seoDesc:     document.getElementById('lp-seo-desc').value.trim(),
+    seoKeywords: document.getElementById('lp-seo-keywords').value.trim(),
+    slides: document.getElementById('lp-slides').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    featuredProductId: featuredId || null,
+    featuredProduct,
+    articles: lpArticles,
+    createdAt: editingLandpage?.createdAt || Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  try {
+    const id = document.getElementById('lp-edit-id').value;
+    if (id) {
+      await updateDoc(doc(db,'landpages',id), data);
+      adminToast('Landpage actualizada ✅','ok');
+    } else {
+      const newDoc = await addDoc(collection(db,'landpages'), data);
+      adminToast(`Landpage creada ✅ — zoeveos.com/lp/${slug}`,'ok');
+    }
+    closeModal('landpage-modal');
+    loadLandpages();
+  } catch(e) {
+    adminToast('Error al guardar','err');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+};
+
+

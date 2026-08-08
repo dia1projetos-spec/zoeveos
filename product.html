@@ -3,17 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- SEO — preenchido dinamicamente pelo JS -->
   <title id="page-title">ZOE VEOS</title>
   <meta name="description" id="meta-description" content="">
   <meta name="keywords" id="meta-keywords" content="">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="ZOE VEOS">
   <meta name="geo.region" content="AR-X">
-  <meta name="geo.placename" content="Córdoba, Argentina">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="product">
   <meta property="og:site_name" content="ZOE VEOS">
   <meta property="og:locale" content="es_AR">
@@ -21,288 +16,274 @@
   <meta property="og:description" id="og-description" content="">
   <meta property="og:image" id="og-image" content="">
   <meta property="og:url" id="og-url" content="">
-  <meta property="product:price:amount" id="og-price" content="">
   <meta property="product:price:currency" content="ARS">
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" id="tw-title" content="">
   <meta name="twitter:description" id="tw-description" content="">
   <meta name="twitter:image" id="tw-image" content="">
-
-  <!-- Canonical -->
   <link rel="canonical" id="canonical" href="https://www.zoeveos.com/product.html">
-
-  <!-- Schema.org JSON-LD — preenchido pelo JS -->
   <script id="schema-product" type="application/ld+json">{}</script>
-
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
-
-  <!-- Fonts + FA -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <!-- CSS base do site -->
   <link rel="stylesheet" href="css/style.css">
-
   <style>
     /* ============================================================
-       LANDPAGE PRODUTO — estilos específicos
+       LANDPAGE PREMIUM — Layout: imagem lateral + info direita
        ============================================================ */
-    .lp-hero {
-      padding: 100px 40px 60px;
-      background: var(--warm-white);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .lp-wrap { max-width: 1280px; margin: 0 auto; padding: 100px 40px 0; }
+
+    /* Breadcrumb */
     .lp-breadcrumb {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      font-size: 0.76rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 36px; flex-wrap: wrap;
     }
     .lp-breadcrumb a { color: var(--text-muted); transition: var(--transition); }
     .lp-breadcrumb a:hover { color: var(--rose-dark); }
     .lp-breadcrumb span { color: var(--border); }
 
+    /* Grid principal */
     .lp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 60px;
+      gap: 64px;
       align-items: start;
+      margin-bottom: 80px;
     }
 
-    /* Galeria */
-    .lp-gallery { position: sticky; top: 100px; }
-    .lp-main-img-wrap {
+    /* ---- GALERIA ---- */
+    .lp-gallery { position: sticky; top: 88px; }
+    .lp-main-wrap {
       position: relative;
-      aspect-ratio: 1/1;
-      border-radius: var(--radius-xl);
+      border-radius: 24px;
       overflow: hidden;
       background: var(--beige);
+      aspect-ratio: 1/1;
       margin-bottom: 12px;
+      box-shadow: 0 20px 60px rgba(92,61,46,0.12);
     }
     .lp-main-img {
       width: 100%; height: 100%;
       object-fit: cover;
-      transition: opacity 0.35s ease;
+      display: block;
+      transition: opacity 0.3s ease;
     }
-    .lp-img-nav {
+    .lp-nav-btn {
       position: absolute;
       top: 50%; transform: translateY(-50%);
-      display: flex; justify-content: space-between;
-      width: 100%; padding: 0 14px;
-      pointer-events: none;
-    }
-    .lp-img-btn {
-      pointer-events: all;
-      width: 40px; height: 40px;
+      width: 42px; height: 42px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.92);
       border: none; cursor: pointer;
-      font-size: 1.2rem; color: var(--brown);
-      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: var(--brown);
+      display: none; align-items: center; justify-content: center;
       transition: var(--transition);
-      box-shadow: 0 2px 12px var(--shadow-md);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      z-index: 2;
     }
-    .lp-img-btn:hover { background: white; transform: scale(1.08); }
+    .lp-nav-btn:hover { background: white; transform: translateY(-50%) scale(1.08); }
+    #lp-prev { left: 12px; }
+    #lp-next { right: 12px; }
     .lp-thumbs {
       display: flex; gap: 8px; flex-wrap: wrap;
     }
     .lp-thumb {
-      width: 72px; height: 72px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
+      width: 70px; height: 70px;
+      border-radius: 10px; overflow: hidden;
       border: 2px solid transparent;
-      cursor: pointer;
-      transition: var(--transition);
-      background: var(--beige);
+      cursor: pointer; transition: var(--transition);
+      background: var(--beige-dark); flex-shrink: 0;
     }
-    .lp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .lp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .lp-thumb.active { border-color: var(--rose-dark); }
     .lp-thumb:hover { border-color: var(--rose); }
 
-    /* Info produto */
+    /* ---- INFO ---- */
     .lp-info { padding: 8px 0; }
-    .lp-badge-wrap { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .lp-badges { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
     .lp-badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: var(--radius-full);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 99px;
     }
-    .lp-badge-cat { background: var(--beige-dark); color: var(--text-light); }
-    .lp-badge-promo { background: var(--terra); color: white; }
-    .lp-badge-destaque { background: var(--gold); color: white; }
-    .lp-badge-nuevo { background: var(--rose-dark); color: white; }
+    .badge-cat { background: var(--beige-dark); color: var(--text-light); }
+    .badge-promo { background: var(--terra); color: white; }
+    .badge-destaque { background: var(--gold); color: white; }
+    .badge-nuevo { background: var(--rose-dark); color: white; }
 
     .lp-name {
       font-family: var(--font-display);
-      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-      font-weight: 400;
-      color: var(--brown);
-      line-height: 1.2;
-      margin-bottom: 20px;
+      font-size: clamp(1.9rem, 3.2vw, 3rem);
+      font-weight: 400; color: var(--brown);
+      line-height: 1.15; margin-bottom: 22px;
     }
-    .lp-price-wrap { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
-    .lp-price {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 500;
-      color: var(--terra);
-    }
-    .lp-price-old {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      text-decoration: line-through;
-    }
-    .lp-stock { margin-bottom: 20px; }
+    .lp-price-row { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+    .lp-price { font-family: var(--font-display); font-size: 2.4rem; font-weight: 500; color: var(--terra); }
+    .lp-price-old { font-size: 1.1rem; color: var(--text-muted); text-decoration: line-through; }
+    .lp-stock { margin-bottom: 22px; }
 
-    .lp-desc {
-      font-size: 0.95rem;
-      color: var(--text-light);
-      line-height: 1.85;
-      margin-bottom: 28px;
-      border-top: 1px solid var(--border);
-      padding-top: 24px;
+    /* Divisor elegante */
+    .lp-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 22px 0;
     }
-    .lp-desc h2, .lp-desc h3 { font-family: var(--font-display); color: var(--brown); margin: 16px 0 8px; }
-    .lp-desc ul, .lp-desc ol { padding-left: 20px; }
-    .lp-desc li { margin-bottom: 6px; }
 
-    /* Botões de compra */
-    .lp-actions { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
-    .lp-btn-cart {
-      width: 100%; padding: 18px;
-      border-radius: var(--radius-full);
-      background: var(--brown);
-      color: white;
+    /* Descripción corta */
+    .lp-short-desc {
+      font-size: 0.95rem; color: var(--text-light);
+      line-height: 1.85; margin-bottom: 28px;
+    }
+    .lp-short-desc p { margin-bottom: 10px; }
+    .lp-short-desc ul, .lp-short-desc ol { padding-left: 20px; }
+    .lp-short-desc li { margin-bottom: 6px; }
+    .lp-short-desc h2, .lp-short-desc h3 {
+      font-family: var(--font-display); color: var(--brown);
+      margin: 14px 0 8px;
+    }
+
+    /* Botones */
+    .lp-btn-main {
+      width: 100%; padding: 18px 24px;
+      border-radius: 99px;
+      background: var(--brown); color: white;
       font-size: 0.9rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      transition: var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
       border: none; cursor: pointer;
-      box-shadow: 0 8px 24px var(--shadow-md);
-    }
-    .lp-btn-cart:hover { background: var(--rose-dark); transform: translateY(-2px); }
-    .lp-btn-cart.out-of-stock {
-      background: #25D366;
-      text-transform: none;
-      font-size: 0.88rem;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: var(--transition);
+      box-shadow: 0 8px 24px rgba(92,61,46,0.2);
+      margin-bottom: 12px;
       text-decoration: none;
-      display: flex;
     }
-    .lp-btn-cart.out-of-stock:hover { background: #128c7e; }
+    .lp-btn-main:hover { background: var(--rose-dark); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(92,61,46,0.28); }
+    .lp-btn-main.wa { background: #25D366; text-transform: none; font-size: 0.88rem; }
+    .lp-btn-main.wa:hover { background: #128c7e; }
 
-    /* Garantias */
+    /* Guarantees */
     .lp-guarantees {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      padding: 20px;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 10px; margin: 22px 0;
+    }
+    .lp-g-item {
       background: var(--beige);
-      border-radius: var(--radius-lg);
-      margin-bottom: 24px;
+      border-radius: 14px; padding: 14px 10px;
+      text-align: center; font-size: 0.75rem;
+      color: var(--text-light); line-height: 1.4;
     }
-    .lp-guarantee-item {
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--text-light);
-      line-height: 1.4;
-    }
-    .lp-guarantee-item i {
-      display: block;
-      font-size: 1.3rem;
-      color: var(--rose-dark);
-      margin-bottom: 6px;
-    }
+    .lp-g-item i { display: block; font-size: 1.2rem; color: var(--rose-dark); margin-bottom: 6px; }
 
     /* Share */
-    .lp-share {
-      display: flex; align-items: center; gap: 10px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-    }
-    .lp-share-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+    .lp-share { display: flex; align-items: center; gap: 10px; margin-top: 22px; }
+    .lp-share-label { font-size: 0.76rem; color: var(--text-muted); font-weight: 600; }
     .lp-share-btn {
-      width: 36px; height: 36px;
-      border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem;
-      transition: var(--transition);
-      border: 1.5px solid var(--border);
-      color: var(--text-light);
-      text-decoration: none;
+      font-size: 0.9rem; transition: var(--transition);
+      border: 1.5px solid var(--border); color: var(--text-light);
+      text-decoration: none; background: none; cursor: pointer;
     }
     .lp-share-btn:hover { background: var(--rose-light); border-color: var(--rose); color: var(--rose-dark); }
 
-    /* Sección de detalles extra */
-    .lp-details-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 40px;
-      border-top: 1.5px solid var(--border);
+    /* ============================================================
+       ARTIGO / BLOG DO PRODUTO — seção abaixo
+       ============================================================ */
+    .lp-article-section {
+      max-width: 860px; margin: 0 auto;
+      padding: 0 40px 80px;
     }
-    .lp-details-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
+    .lp-article-section.empty { display: none; }
+
+    .lp-article-divider {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 48px;
     }
-    .lp-detail-block h3 {
+    .lp-article-divider::before,
+    .lp-article-divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border));
+    }
+    .lp-article-divider::after {
+      background: linear-gradient(90deg, var(--border), transparent);
+    }
+    .lp-article-divider span {
       font-family: var(--font-display);
-      font-size: 1.4rem;
-      color: var(--brown);
-      margin-bottom: 16px;
-    }
-    .lp-detail-block p, .lp-detail-block li {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      line-height: 1.8;
+      font-size: 0.75rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+      white-space: nowrap;
     }
 
-    /* Related products */
-    .lp-related {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 40px;
-      background: var(--beige);
+    .lp-article-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 400; color: var(--brown);
+      line-height: 1.2; margin-bottom: 8px;
     }
+    .lp-article-date {
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-bottom: 32px; display: flex; align-items: center; gap: 8px;
+    }
+    .lp-article-cover {
+      width: 100%; border-radius: 20px;
+      margin-bottom: 36px; display: block;
+      box-shadow: 0 12px 40px var(--shadow-md);
+    }
+    .lp-article-body {
+      font-size: 1.05rem; color: var(--text-light);
+      line-height: 1.9;
+    }
+    .lp-article-body h2 {
+      font-family: var(--font-display); font-size: 1.7rem;
+      color: var(--brown); margin: 36px 0 14px;
+    }
+    .lp-article-body h3 {
+      font-family: var(--font-display); font-size: 1.3rem;
+      color: var(--brown); margin: 26px 0 10px;
+    }
+    .lp-article-body p { margin-bottom: 20px; }
+    .lp-article-body ul, .lp-article-body ol { padding-left: 24px; margin-bottom: 20px; }
+    .lp-article-body li { margin-bottom: 8px; }
+    .lp-article-body img { width: 100%; border-radius: 14px; margin: 24px 0; }
+    .lp-article-body blockquote {
+      border-left: 3px solid var(--rose);
+      padding: 14px 20px; margin: 24px 0;
+      background: var(--beige); border-radius: 0 12px 12px 0;
+      font-style: italic; color: var(--text-light);
+    }
+
+    /* Relacionados */
+    .lp-related {
+      background: var(--beige);
+      padding: 60px 40px;
+    }
+    .lp-related-inner { max-width: 1280px; margin: 0 auto; }
     .lp-related-title {
       font-family: var(--font-display);
-      font-size: 1.8rem;
-      color: var(--brown);
-      margin-bottom: 32px;
-      text-align: center;
+      font-size: 1.8rem; color: var(--brown);
+      text-align: center; margin-bottom: 32px;
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-      .lp-hero { padding: 90px 20px 40px; }
-      .lp-grid { grid-template-columns: 1fr; gap: 32px; }
+    @media (max-width: 900px) {
+      .lp-grid { grid-template-columns: 1fr; gap: 36px; }
       .lp-gallery { position: static; }
+      .lp-wrap { padding: 88px 20px 0; }
+      .lp-article-section { padding: 0 20px 60px; }
+      .lp-related { padding: 48px 20px; }
       .lp-guarantees { grid-template-columns: repeat(3,1fr); }
-      .lp-details-section { padding: 40px 20px; }
-      .lp-details-grid { grid-template-columns: 1fr; gap: 28px; }
-      .lp-related { padding: 40px 20px; }
-      .lp-thumbs .lp-thumb { width: 58px; height: 58px; }
     }
     @media (max-width: 480px) {
-      .lp-guarantees { grid-template-columns: 1fr; gap: 8px; }
-      .lp-guarantee-item { display: flex; align-items: center; gap: 12px; text-align: left; }
-      .lp-guarantee-item i { display: inline; font-size: 1rem; margin: 0; }
+      .lp-guarantees { grid-template-columns: 1fr; }
+      .lp-g-item { display: flex; align-items: center; gap: 12px; text-align: left; }
+      .lp-g-item i { display: inline; margin: 0; }
+      .lp-thumb { width: 56px; height: 56px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Header -->
+<!-- Header igual ao site principal -->
 <header id="header">
   <nav class="nav-inner">
     <a href="/" class="nav-logo">ZOE VEOS</a>
@@ -310,7 +291,7 @@
       <li><a href="/#categories">Categorías</a></li>
       <li><a href="/#products">Productos</a></li>
       <li><a href="/#destaque-section">Destacados</a></li>
-      <li><a href="blog.html">Blog</a></li>
+      <li><a href="/blog.html">Blog</a></li>
       <li><a href="/#footer">Contacto</a></li>
     </ul>
     <div class="nav-actions">
@@ -325,104 +306,120 @@
 
 <nav id="mobile-nav" class="mobile-nav">
   <button id="mobile-nav-close" class="mobile-nav-close">✕</button>
-  <a href="/">Inicio</a>
-  <a href="/#products">Productos</a>
-  <a href="blog.html">Blog</a>
-  <a href="/#footer">Contacto</a>
+  <a href="/">Inicio</a><a href="/#products">Productos</a>
+  <a href="/blog.html">Blog</a><a href="/#footer">Contacto</a>
 </nav>
 
-<!-- PRODUCTO HERO -->
-<section class="lp-hero">
-  <div class="lp-breadcrumb" id="lp-breadcrumb">
-    <a href="/">Inicio</a>
-    <span>›</span>
-    <a href="/#products">Productos</a>
-    <span>›</span>
-    <span id="lp-breadcrumb-name">Cargando...</span>
+<!-- ============================================================
+     PRODUCTO PRINCIPAL
+     ============================================================ -->
+<div class="lp-wrap">
+  <div class="lp-breadcrumb">
+    <a href="/">Inicio</a><span>›</span>
+    <a href="/#products">Productos</a><span>›</span>
+    <span id="lp-bc-cat"></span><span id="lp-bc-sep" style="display:none">›</span>
+    <span id="lp-bc-name">Cargando...</span>
   </div>
 
   <div class="lp-grid">
-    <!-- Galería -->
+    <!-- GALERIA -->
     <div class="lp-gallery">
-      <div class="lp-main-img-wrap">
-        <img id="lp-main-img" class="lp-main-img" src="" alt="">
-        <div class="lp-img-nav">
-          <button class="lp-img-btn" id="lp-prev">‹</button>
-          <button class="lp-img-btn" id="lp-next">›</button>
-        </div>
+      <div class="lp-main-wrap">
+        <img id="lp-main-img" class="lp-main-img" src="" alt="Producto ZOE VEOS">
+        <button class="lp-nav-btn" id="lp-prev">‹</button>
+        <button class="lp-nav-btn" id="lp-next">›</button>
       </div>
       <div class="lp-thumbs" id="lp-thumbs"></div>
     </div>
 
-    <!-- Info -->
+    <!-- INFO -->
     <div class="lp-info">
-      <div class="lp-badge-wrap" id="lp-badges"></div>
+      <div class="lp-badges" id="lp-badges"></div>
       <h1 class="lp-name" id="lp-name">Cargando...</h1>
-
-      <div class="lp-price-wrap">
+      <div class="lp-price-row">
         <div class="lp-price" id="lp-price"></div>
-        <div class="lp-price-old" id="lp-old-price"></div>
+        <div class="lp-price-old" id="lp-old-price" style="display:none"></div>
       </div>
-
       <div class="lp-stock" id="lp-stock"></div>
-
-      <!-- Botones -->
-      <div class="lp-actions" id="lp-actions">
-        <button class="lp-btn-cart" id="lp-add-cart">
-          <i class="fa-solid fa-bag-shopping"></i>
-          Agregar al carrito
-        </button>
-      </div>
-
-      <!-- Garantías -->
+      <div class="lp-divider"></div>
+      <div class="lp-short-desc" id="lp-desc"></div>
+      <div id="lp-actions"></div>
       <div class="lp-guarantees">
-        <div class="lp-guarantee-item">
-          <i class="fa-solid fa-truck"></i>
-          Envíos a todo Argentina
-        </div>
-        <div class="lp-guarantee-item">
-          <i class="fa-solid fa-shield-halved"></i>
-          Compra segura
-        </div>
-        <div class="lp-guarantee-item">
-          <i class="fa-brands fa-whatsapp"></i>
-          Atención por WhatsApp
-        </div>
+        <div class="lp-g-item"><i class="fa-solid fa-truck"></i>Envíos a todo Argentina</div>
+        <div class="lp-g-item"><i class="fa-solid fa-shield-halved"></i>Compra segura</div>
+        <div class="lp-g-item"><i class="fa-brands fa-whatsapp"></i>Atención WhatsApp</div>
       </div>
-
-      <!-- Descripción -->
-      <div class="lp-desc" id="lp-desc"></div>
-
-      <!-- Compartir -->
       <div class="lp-share">
         <span class="lp-share-label">Compartir:</span>
-        <a id="share-wa" href="#" class="lp-share-btn" target="_blank" title="WhatsApp">
-          <i class="fa-brands fa-whatsapp"></i>
-        </a>
-        <a id="share-fb" href="#" class="lp-share-btn" target="_blank" title="Facebook">
-          <i class="fa-brands fa-facebook-f"></i>
-        </a>
-        <button onclick="navigator.clipboard.writeText(location.href); showToast('✅ ¡Enlace copiado!')" class="lp-share-btn" title="Copiar enlace">
-          <i class="fa-solid fa-link"></i>
-        </button>
+        <a id="share-wa" href="#" class="lp-share-btn" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+        <a id="share-fb" href="#" class="lp-share-btn" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+        <button onclick="navigator.clipboard.writeText(location.href);showToast('✅ ¡Enlace copiado!')" class="lp-share-btn"><i class="fa-solid fa-link"></i></button>
       </div>
     </div>
   </div>
+</div>
+
+<!-- ============================================================
+     ARTÍCULO / BLOG DEL PRODUCTO
+     ============================================================ -->
+<div class="lp-article-section" id="lp-article-section">
+  <div class="lp-article-divider"><span>✦ Artículo del producto ✦</span></div>
+  <h2 class="lp-article-title" id="art-title"></h2>
+  <div class="lp-article-date" id="art-date"></div>
+  <img id="art-cover" class="lp-article-cover" src="" alt="" style="display:none">
+  <div class="lp-article-body" id="art-body"></div>
+</div>
+
+<!-- ============================================================
+     PRODUCTOS RELACIONADOS
+     ============================================================ -->
+<section class="lp-related" id="lp-related" style="display:none">
+  <div class="lp-related-inner">
+    <h2 class="lp-related-title">También te puede interesar</h2>
+    <div id="lp-related-grid" class="products-carousel-container"></div>
+  </div>
 </section>
 
-<!-- Productos relacionados -->
-<section class="lp-related">
-  <h2 class="lp-related-title">También te puede interesar</h2>
-  <div id="lp-related-grid" class="products-carousel-container"></div>
-</section>
+<!-- Footer -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ZOE VEOS</div>
+        <p class="footer-tagline">Artículos de maternidad con amor, para acompañarte en cada momento de esta hermosa etapa.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://wa.me/5493576466145" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Tienda</h4><ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/#products">Productos</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Contacto</h4><ul>
+        <li><a href="https://wa.me/5493576466145" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
+        <li><a href="#">Córdoba, Argentina</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ZOE VEOS — Todos los derechos reservados</span>
+      <span>Hecho con 🌸 en Argentina</span>
+    </div>
+  </div>
+</footer>
 
-<!-- CARRITO (igual al index) -->
+<!-- ============================================================
+     CARRINHO — idêntico ao index.html
+     ============================================================ -->
 <div id="cart-overlay"></div>
 <aside id="cart-drawer">
   <div class="cart-header">
     <h2 class="cart-title">Tu Carrito</h2>
     <div style="display:flex;align-items:center;gap:10px;">
-      <button onclick="closeCart()" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;cursor:pointer;background:none;border:none;">← Seguir comprando</button>
+      <button id="cart-keep-shopping" onclick="closeCart()" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;cursor:pointer;background:none;border:none;">← Seguir comprando</button>
       <button id="cart-close" class="cart-close">✕</button>
     </div>
   </div>
@@ -442,9 +439,7 @@
     <div id="coupon-msg" class="cart-coupon-msg"></div>
     <div class="cart-summary">
       <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
-      <div class="cart-summary-row" id="discount-row" style="display:none;">
-        <span>Descuento</span><span id="cart-discount" style="color:var(--terra)">-$0</span>
-      </div>
+      <div class="cart-summary-row" id="discount-row" style="display:none;"><span>Descuento</span><span id="cart-discount" style="color:var(--terra)">-$0</span></div>
       <div class="cart-summary-row total"><span>Total</span><span id="cart-total">$0</span></div>
     </div>
     <button id="checkout-btn" class="cart-checkout-btn">
@@ -461,20 +456,20 @@
     <p class="checkout-subtitle">Completá tus datos para continuar.</p>
     <div class="form-section-title">Tus datos</div>
     <div class="form-grid">
-      <div class="form-group"><label>Nombre *</label><input type="text" id="co-name"></div>
-      <div class="form-group"><label>WhatsApp *</label><input type="tel" id="co-whatsapp"></div>
+      <div class="form-group"><label>Nombre *</label><input type="text" id="co-name" placeholder="Tu nombre"></div>
+      <div class="form-group"><label>WhatsApp *</label><input type="tel" id="co-whatsapp" placeholder="+549 351 000 0000"></div>
       <div class="form-group"><label>Calle *</label><input type="text" id="co-street"></div>
       <div class="form-group"><label>Número *</label><input type="text" id="co-number"></div>
       <div class="form-group"><label>Barrio</label><input type="text" id="co-barrio"></div>
       <div class="form-group"><label>Ciudad *</label><input type="text" id="co-city"></div>
       <div class="form-group"><label>CP *</label><input type="text" id="co-postal"></div>
-      <div class="form-group">
-        <label>Provincia</label>
+      <div class="form-group"><label>Provincia</label>
         <select id="co-province">
           <option value="X">Córdoba</option><option value="B">Buenos Aires</option>
           <option value="C">CABA</option><option value="S">Santa Fe</option>
           <option value="M">Mendoza</option><option value="T">Tucumán</option>
           <option value="A">Salta</option><option value="Q">Neuquén</option>
+          <option value="R">Río Negro</option><option value="E">Entre Ríos</option>
         </select>
       </div>
     </div>
@@ -508,374 +503,268 @@
   </div>
 </div>
 
+<div id="product-modal" style="display:none"></div>
 <div id="toast-container"></div>
 <a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
 
+<!-- Loader inline -->
 <script>
-// Loader inline para garantir que desaparece sempre
 window.addEventListener('DOMContentLoaded', function() {
   var l = document.getElementById('loader');
-  if (l) { setTimeout(function(){ l.classList.add('fade-out'); setTimeout(function(){ l.style.display='none'; },900); }, 1500); }
+  if (l) { setTimeout(function(){ l.classList.add('fade-out'); setTimeout(function(){ l.style.display='none'; },900); }, 1200); }
 });
 </script>
+
+<!-- main.js — carrega TODO o carrinho, cupons, promoções, checkout -->
+<script type="module" src="js/main.js"></script>
+
+<!-- Lógica específica da landpage -->
 <script type="module">
-import {
-  db, WHATSAPP_NUMBER,
-  collection, getDocs, doc, getDoc, query, orderBy, where
-} from './js/firebase-config.js';
+import { db, WHATSAPP_NUMBER, collection, getDocs, doc, getDoc, query, orderBy } from './js/firebase-config.js';
 
-// ============================================================
-// CARREGAR PRODUTO VIA URL PARAM ?id=PRODUCT_ID
-// ============================================================
-const params = new URLSearchParams(location.search);
-const productId = params.get('id');
-const slugParam = params.get('slug');
-
-let currentProduct = null;
-let currentImgIdx = 0;
-let productImages = [];
-
-// Cart do main.js — importar funções essenciais
-let cart = JSON.parse(localStorage.getItem('zoeveos_cart') || '[]');
+const params  = new URLSearchParams(location.search);
+const pid     = params.get('id');
+let imgs      = [];
+let imgIdx    = 0;
+let product   = null;
 
 function fmt(n) { return Number(n).toLocaleString('es-AR'); }
-function saveCart() { localStorage.setItem('zoeveos_cart', JSON.stringify(cart)); updateCartUI(); }
 
-function addToCartLP(product) {
-  const existing = cart.find(i => i.id === product.id);
-  if (existing) existing.qty++;
-  else cart.push({ ...product, qty: 1 });
-  saveCart();
-  showToast('✅ ' + product.name + ' agregado al carrito');
-  openCart();
+// ============================================================
+// GALERIA
+// ============================================================
+function setImg(i) {
+  imgIdx = i;
+  const el = document.getElementById('lp-main-img');
+  if (el && imgs[i]) { el.style.opacity = '0'; setTimeout(() => { el.src = imgs[i]; el.style.opacity = '1'; }, 150); }
+  document.querySelectorAll('.lp-thumb').forEach((t,ti) => t.classList.toggle('active', ti === i));
 }
 
-function updateCartUI() {
-  const count = cart.reduce((s,i) => s + i.qty, 0);
-  const countEl = document.getElementById('cart-count');
-  if (countEl) { countEl.textContent = count; countEl.classList.toggle('visible', count > 0); }
-  renderCartItems();
+function renderGallery() {
+  const mainImg = document.getElementById('lp-main-img');
+  const thumbs  = document.getElementById('lp-thumbs');
+  const prev    = document.getElementById('lp-prev');
+  const next    = document.getElementById('lp-next');
+  if (!mainImg || imgs.length === 0) return;
+
+  mainImg.src = imgs[0];
+  mainImg.alt = product?.name || '';
+
+  if (prev) prev.style.display = imgs.length > 1 ? 'flex' : 'none';
+  if (next) next.style.display = imgs.length > 1 ? 'flex' : 'none';
+
+  if (thumbs) {
+    thumbs.innerHTML = imgs.map((src, i) =>
+      `<div class="lp-thumb${i===0?' active':''}" data-i="${i}"><img src="${src}" alt="Foto ${i+1}" loading="lazy"></div>`
+    ).join('');
+    thumbs.querySelectorAll('.lp-thumb').forEach(t =>
+      t.addEventListener('click', () => setImg(parseInt(t.dataset.i)))
+    );
+  }
 }
 
-function renderCartItems() {
-  const container = document.getElementById('cart-items');
-  const emptyEl = document.getElementById('cart-empty');
-  if (!container) return;
-  if (cart.length === 0) { container.innerHTML = ''; if (emptyEl) emptyEl.style.display = 'flex'; return; }
-  if (emptyEl) emptyEl.style.display = 'none';
-  container.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <img class="cart-item-img" src="${item.image||''}" alt="${item.name}" onerror="this.style.background='var(--beige-dark)'">
-      <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">$${fmt(item.price * item.qty)}</div>
-        <div class="cart-item-qty">
-          <button class="qty-btn" onclick="updateQty('${item.id}',-1)">−</button>
-          <span class="qty-num">${item.qty}</span>
-          <button class="qty-btn" onclick="updateQty('${item.id}',1)">+</button>
-        </div>
-      </div>
-      <button class="cart-item-remove" onclick="removeItem('${item.id}')">✕</button>
-    </div>`).join('');
-  const subEl = document.getElementById('cart-subtotal');
-  const totEl = document.getElementById('cart-total');
-  const sub = cart.reduce((s,i) => s + i.price * i.qty, 0);
-  if (subEl) subEl.textContent = '$' + fmt(sub);
-  if (totEl) totEl.textContent = '$' + fmt(sub);
-}
-
-window.updateQty = function(id, delta) {
-  const item = cart.find(i => i.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
-  saveCart();
-};
-window.removeItem = function(id) { cart = cart.filter(i => i.id !== id); saveCart(); };
-
-function openCart() {
-  document.getElementById('cart-overlay')?.classList.add('open');
-  document.getElementById('cart-drawer')?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-window.closeCart = function() {
-  document.getElementById('cart-overlay')?.classList.remove('open');
-  document.getElementById('cart-drawer')?.classList.remove('open');
-  document.body.style.overflow = '';
-};
-
-window.showToast = function(msg) {
-  const c = document.getElementById('toast-container');
-  if (!c) return;
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  c.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 3000);
-};
+document.getElementById('lp-prev')?.addEventListener('click', () => setImg((imgIdx - 1 + imgs.length) % imgs.length));
+document.getElementById('lp-next')?.addEventListener('click', () => setImg((imgIdx + 1) % imgs.length));
 
 // ============================================================
 // CARREGAR PRODUTO
 // ============================================================
 async function loadProduct() {
-  if (!productId && !slugParam) {
-    document.getElementById('lp-name').textContent = 'Producto no encontrado';
-    return;
-  }
-
+  if (!pid) { document.getElementById('lp-name').textContent = 'Producto no encontrado'; return; }
   try {
-    let product = null;
-
-    if (productId) {
-      const d = await getDoc(doc(db, 'products', productId));
-      if (d.exists()) product = { id: d.id, ...d.data() };
-    } else if (slugParam) {
-      const snap = await getDocs(query(collection(db, 'products'), where('slug', '==', slugParam)));
-      if (!snap.empty) product = { id: snap.docs[0].id, ...snap.docs[0].data() };
-    }
-
-    if (!product) {
-      document.getElementById('lp-name').textContent = 'Producto no encontrado';
-      return;
-    }
-
-    currentProduct = product;
+    const d = await getDoc(doc(db, 'products', pid));
+    if (!d.exists()) { document.getElementById('lp-name').textContent = 'Producto no encontrado'; return; }
+    product = { id: d.id, ...d.data() };
     renderProduct(product);
     updateSEO(product);
+    loadArticle(product);
     loadRelated(product);
-
-  } catch(e) {
-    console.error('Error loading product:', e);
-  }
+  } catch(e) { console.error('loadProduct error:', e); }
 }
 
 function renderProduct(p) {
-  // Imagens
-  productImages = Array.isArray(p.images) && p.images.length ? p.images : p.image ? [p.image] : [];
+  imgs = Array.isArray(p.images) && p.images.length ? p.images : p.image ? [p.image] : [];
   renderGallery();
 
   // Breadcrumb
-  document.getElementById('lp-breadcrumb-name').textContent = p.name;
-
-  // Nome
-  document.getElementById('lp-name').textContent = p.name;
+  const bcCat = document.getElementById('lp-bc-cat');
+  const bcSep = document.getElementById('lp-bc-sep');
+  if (p.category && bcCat) { bcCat.textContent = p.category; if (bcSep) bcSep.style.display = ''; }
+  document.getElementById('lp-bc-name').textContent = p.name;
 
   // Badges
-  const badgesEl = document.getElementById('lp-badges');
-  let badges = '';
-  if (p.category) badges += `<span class="lp-badge lp-badge-cat">${p.category}</span>`;
-  if (p.badge === 'promo') badges += `<span class="lp-badge lp-badge-promo">🔥 Promo</span>`;
-  if (p.badge === 'destaque') badges += `<span class="lp-badge lp-badge-destaque">⭐ Destaque</span>`;
-  if (p.badge === 'nuevo') badges += `<span class="lp-badge lp-badge-nuevo">✨ Nuevo</span>`;
-  badgesEl.innerHTML = badges;
+  let b = '';
+  if (p.category) b += `<span class="lp-badge badge-cat">${p.category}</span>`;
+  if (p.badge === 'promo')    b += `<span class="lp-badge badge-promo">🔥 Promo</span>`;
+  if (p.badge === 'destaque') b += `<span class="lp-badge badge-destaque">⭐ Destaque</span>`;
+  if (p.badge === 'nuevo')    b += `<span class="lp-badge badge-nuevo">✨ Nuevo</span>`;
+  document.getElementById('lp-badges').innerHTML = b;
 
-  // Preço
+  document.getElementById('lp-name').textContent = p.name;
   document.getElementById('lp-price').textContent = `$${fmt(p.price)}`;
   const oldEl = document.getElementById('lp-old-price');
-  if (p.oldPrice) oldEl.textContent = `$${fmt(p.oldPrice)}`;
-  else oldEl.style.display = 'none';
+  if (p.oldPrice) { oldEl.textContent = `$${fmt(p.oldPrice)}`; oldEl.style.display = ''; }
 
-  // Estoque
-  const stockEl = document.getElementById('lp-stock');
+  // Stock
   const sinStock = typeof p.stock === 'number' && p.stock === 0;
   const stockNum = typeof p.stock === 'number' && p.stock > 0;
+  const stockEl  = document.getElementById('lp-stock');
   if (sinStock) stockEl.innerHTML = `<div class="product-stock sin-stock"><span class="stock-dot"></span>Sin stock</div>`;
   else if (stockNum) stockEl.innerHTML = `<div class="product-stock"><span class="stock-dot"></span>${p.stock === 1 ? '¡Último disponible!' : p.stock + ' disponibles'}</div>`;
 
-  // Botão
-  const actionsEl = document.getElementById('lp-actions');
-  const waMsg = encodeURIComponent('¡Hola! Quiero encargar: ' + p.name);
-  if (sinStock) {
-    actionsEl.innerHTML = `<a class="lp-btn-cart out-of-stock" href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Encargar por WhatsApp</a>`;
-  } else {
-    const btn = document.getElementById('lp-add-cart');
-    if (btn) btn.addEventListener('click', () => addToCartLP(p));
-  }
-
-  // Descrição
+  // Descripción
   const descEl = document.getElementById('lp-desc');
   if (p.description) {
     if (p.description.includes('<') && p.description.includes('>')) descEl.innerHTML = p.description;
     else descEl.innerHTML = p.description.replace(/\n/g, '<br>');
   }
 
+  // Botón — usa window.addToCart del main.js
+  const actEl = document.getElementById('lp-actions');
+  const waMsg = encodeURIComponent(`¡Hola! Quiero encargar: ${p.name}`);
+  if (sinStock) {
+    actEl.innerHTML = `<a class="lp-btn-main wa" href="https://wa.me/${WHATSAPP_NUMBER}?text=${waMsg}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Encargar por WhatsApp</a>`;
+  } else {
+    actEl.innerHTML = `<button class="lp-btn-main" id="lp-add-cart"><i class="fa-solid fa-bag-shopping"></i> Agregar al carrito</button>`;
+    document.getElementById('lp-add-cart')?.addEventListener('click', () => {
+      if (window.addToCart) window.addToCart(p);
+    });
+  }
+
   // Share
-  const url = encodeURIComponent(location.href);
+  const url  = encodeURIComponent(location.href);
   const name = encodeURIComponent(p.name);
   document.getElementById('share-wa').href = `https://wa.me/?text=${name}%20${url}`;
   document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
 }
 
-function renderGallery() {
-  const mainImg = document.getElementById('lp-main-img');
-  const thumbsEl = document.getElementById('lp-thumbs');
-  const prevBtn = document.getElementById('lp-prev');
-  const nextBtn = document.getElementById('lp-next');
+// ============================================================
+// ARTIGO DO PRODUTO (SEO Blog)
+// ============================================================
+async function loadArticle(p) {
+  if (!p.articleContent) { document.getElementById('lp-article-section').classList.add('empty'); return; }
+  const sec = document.getElementById('lp-article-section');
+  sec.classList.remove('empty');
 
-  if (productImages.length === 0) return;
-
-  mainImg.src = productImages[currentImgIdx];
-  mainImg.alt = currentProduct?.name || '';
-
-  thumbsEl.innerHTML = productImages.map((img, i) => `
-    <div class="lp-thumb ${i === currentImgIdx ? 'active' : ''}" data-i="${i}">
-      <img src="${img}" alt="Foto ${i+1}" loading="lazy">
-    </div>`).join('');
-
-  thumbsEl.querySelectorAll('.lp-thumb').forEach(t => {
-    t.addEventListener('click', () => { currentImgIdx = parseInt(t.dataset.i); renderGallery(); });
-  });
-
-  const show = productImages.length > 1;
-  if (prevBtn) prevBtn.style.display = show ? 'flex' : 'none';
-  if (nextBtn) nextBtn.style.display = show ? 'flex' : 'none';
+  document.getElementById('art-title').textContent = p.articleTitle || `Todo sobre ${p.name}`;
+  const dateEl = document.getElementById('art-date');
+  if (p.articleDate || p.updatedAt) {
+    const d = new Date(p.articleDate || p.updatedAt);
+    dateEl.innerHTML = `<i class="fa-regular fa-calendar"></i> ${d.toLocaleDateString('es-AR', { day:'2-digit', month:'long', year:'numeric' })}`;
+  }
+  const cover = document.getElementById('art-cover');
+  if (p.articleCover) { cover.src = p.articleCover; cover.alt = p.articleTitle || p.name; cover.style.display = 'block'; }
+  document.getElementById('art-body').innerHTML = p.articleContent;
 }
-
-document.getElementById('lp-prev')?.addEventListener('click', () => {
-  currentImgIdx = (currentImgIdx - 1 + productImages.length) % productImages.length;
-  renderGallery();
-});
-document.getElementById('lp-next')?.addEventListener('click', () => {
-  currentImgIdx = (currentImgIdx + 1) % productImages.length;
-  renderGallery();
-});
 
 // ============================================================
 // SEO DINÂMICO
 // ============================================================
 function updateSEO(p) {
-  const name = p.seoTitle || p.name;
-  const desc = p.seoDescription || p.description?.replace(/<[^>]*>/g, '').slice(0, 160) || `Comprá ${p.name} en ZOE VEOS. Artículos de maternidad en Argentina. Envíos a todo el país.`;
-  const keywords = p.seoKeywords || `${p.name}, ${p.category || 'maternidad'}, artículos maternidad Argentina, ZOE VEOS`;
-  const img = productImages[0] || '';
-  const url = `https://www.zoeveos.com/product.html?id=${p.id}`;
-  const price = p.price;
+  const name  = p.seoTitle || p.name;
+  const desc  = p.seoDescription || (p.description || '').replace(/<[^>]*>/g,'').slice(0,160) || `Comprá ${p.name} en ZOE VEOS. Artículos de maternidad en Argentina.`;
+  const kw    = p.seoKeywords || `${p.name}, ${p.category||'maternidad'}, artículos maternidad Argentina, ZOE VEOS`;
+  const img   = imgs[0] || '';
+  const url   = `https://www.zoeveos.com/product.html?id=${p.id}`;
 
-  // Tags básicas
   document.title = `${name} — ZOE VEOS`;
-  document.getElementById('page-title').textContent = `${name} — ZOE VEOS`;
   document.getElementById('meta-description').content = desc;
-  document.getElementById('meta-keywords').content = keywords;
+  document.getElementById('meta-keywords').content    = kw;
+  document.getElementById('og-title').content         = `${name} — ZOE VEOS`;
+  document.getElementById('og-description').content   = desc;
+  document.getElementById('og-image').content         = img;
+  document.getElementById('og-url').content           = url;
+  document.getElementById('tw-title').content         = `${name} — ZOE VEOS`;
+  document.getElementById('tw-description').content   = desc;
+  document.getElementById('tw-image').content         = img;
+  document.getElementById('canonical').href           = url;
 
-  // OG
-  document.getElementById('og-title').content = `${name} — ZOE VEOS`;
-  document.getElementById('og-description').content = desc;
-  document.getElementById('og-image').content = img;
-  document.getElementById('og-url').content = url;
-  document.getElementById('og-price').content = price;
-
-  // Twitter
-  document.getElementById('tw-title').content = `${name} — ZOE VEOS`;
-  document.getElementById('tw-description').content = desc;
-  document.getElementById('tw-image').content = img;
-
-  // Canonical
-  document.getElementById('canonical').href = url;
-
-  // Schema.org Product
-  const schema = {
+  document.getElementById('schema-product').textContent = JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Product",
-    "name": p.name,
-    "description": desc,
-    "image": productImages,
-    "brand": { "@type": "Brand", "name": "ZOE VEOS" },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "ARS",
-      "price": price,
-      "availability": (typeof p.stock === 'number' && p.stock === 0)
-        ? "https://schema.org/OutOfStock"
-        : "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "ZOE VEOS" },
-      "url": url
-    },
-    "category": p.category || "Maternidad",
-    "url": url
-  };
-  document.getElementById('schema-product').textContent = JSON.stringify(schema, null, 2);
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": p.name,
+        "description": desc,
+        "image": imgs,
+        "brand": { "@type": "Brand", "name": "ZOE VEOS" },
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "ARS",
+          "price": p.price,
+          "availability": (typeof p.stock === 'number' && p.stock === 0)
+            ? "https://schema.org/OutOfStock"
+            : "https://schema.org/InStock",
+          "seller": { "@type": "Organization", "name": "ZOE VEOS" },
+          "url": url
+        },
+        "category": p.category || "Maternidad"
+      },
+      p.articleContent ? {
+        "@type": "Article",
+        "headline": p.articleTitle || `Todo sobre ${p.name}`,
+        "description": desc,
+        "image": p.articleCover || img,
+        "author": { "@type": "Organization", "name": "ZOE VEOS" },
+        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" },
+        "mainEntityOfPage": url
+      } : null
+    ].filter(Boolean)
+  }, null, 2);
 }
 
 // ============================================================
-// PRODUTOS RELACIONADOS
+// RELACIONADOS
 // ============================================================
 async function loadRelated(p) {
   try {
-    const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
-    const related = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
+    const snap = await getDocs(query(collection(db,'products'), orderBy('createdAt','desc')));
+    const rel  = snap.docs.map(d => ({ id:d.id, ...d.data() }))
       .filter(r => r.id !== p.id && r.category === p.category)
       .slice(0, 6);
+    if (rel.length === 0) return;
 
-    const container = document.getElementById('lp-related-grid');
-    if (!container || related.length === 0) { container.closest('.lp-related').style.display = 'none'; return; }
+    const section = document.getElementById('lp-related');
+    section.style.display = 'block';
 
-    const section = document.createElement('div');
-    section.className = 'product-category-section';
-    section.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="related-track"></div></div>`;
-    container.appendChild(section);
+    const grid = document.getElementById('lp-related-grid');
+    const wrap = document.createElement('div');
+    wrap.className = 'product-category-section';
+    wrap.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="rel-track"></div></div>`;
+    grid.appendChild(wrap);
 
-    const track = section.querySelector('#related-track');
-    related.forEach(r => {
+    const track = wrap.querySelector('#rel-track');
+    rel.forEach(r => {
       const card = document.createElement('div');
       card.className = 'product-card';
-      card.style.cursor = 'pointer';
-      const img = r.image ? `<img src="${r.image}" alt="${r.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--beige-dark)"></div>';
       card.innerHTML = `
-        <div class="product-img-wrap">${img}</div>
+        <div class="product-img-wrap">
+          ${r.image ? `<img src="${r.image}" alt="${r.name}" loading="lazy">` : ''}
+        </div>
         <div class="product-info">
           <div class="product-category-tag">${r.category||''}</div>
           <div class="product-name">${r.name}</div>
           <div class="product-price-wrap"><span class="product-price">$${fmt(r.price)}</span></div>
           <button class="product-add-btn">Ver producto</button>
         </div>`;
-      card.addEventListener('click', () => { window.location.href = `product.html?id=${r.id}`; });
-      card.querySelector('.product-add-btn').addEventListener('click', e => { e.stopPropagation(); window.location.href = `product.html?id=${r.id}`; });
+      card.addEventListener('click', () => location.href = `product.html?id=${r.id}`);
+      card.querySelector('.product-add-btn').addEventListener('click', e => { e.stopPropagation(); location.href = `product.html?id=${r.id}`; });
       track.appendChild(card);
     });
+
+    // Swipe touch
+    const carousel = wrap.querySelector('.product-carousel');
+    let sx = 0;
+    carousel.addEventListener('touchstart', e => sx = e.touches[0].clientX, { passive: true });
+    carousel.addEventListener('touchend', e => {
+      const diff = sx - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) carousel.scrollBy({ left: diff > 0 ? carousel.clientWidth * 0.8 : -carousel.clientWidth * 0.8, behavior: 'smooth' });
+    }, { passive: true });
   } catch(e) { console.error(e); }
 }
 
-// ============================================================
 // INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-  // Header scroll
-  const header = document.getElementById('header');
-  window.addEventListener('scroll', () => header?.classList.toggle('scrolled', window.scrollY > 60), { passive: true });
-
-  // Hamburger
-  document.getElementById('hamburger')?.addEventListener('click', () => document.getElementById('mobile-nav')?.classList.add('open'));
-  document.getElementById('mobile-nav-close')?.addEventListener('click', () => document.getElementById('mobile-nav')?.classList.remove('open'));
-
-  // Cart
-  document.getElementById('cart-btn')?.addEventListener('click', openCart);
-  document.getElementById('cart-overlay')?.addEventListener('click', closeCart);
-  document.getElementById('cart-close')?.addEventListener('click', closeCart);
-  document.getElementById('checkout-btn')?.addEventListener('click', () => {
-    closeCart();
-    document.getElementById('checkout-modal')?.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  });
-  document.getElementById('checkout-close')?.addEventListener('click', () => {
-    document.getElementById('checkout-modal')?.classList.remove('open');
-    document.body.style.overflow = '';
-  });
-
-  // Checkout buttons
-  document.getElementById('checkout-submit-wa')?.addEventListener('click', () => {
-    window.location.href = '/';
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('lp-checkout-wa'));
-    }, 500);
-  });
-  document.getElementById('checkout-submit-mp')?.addEventListener('click', () => {
-    window.location.href = '/';
-  });
-
-  updateCartUI();
-  await loadProduct();
-});
+document.addEventListener('DOMContentLoaded', loadProduct);
 </script>
 </body>
 </html>

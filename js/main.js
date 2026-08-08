@@ -526,12 +526,27 @@ function updateCheckoutSummary() {
 async function calculateShipping(postalCode) {
   const container = document.getElementById('shipping-options');
   if (!container || !postalCode || postalCode.length < 3) return;
-  container.innerHTML = '<div class="shipping-loading">🔄 Calculando flete con Correo Argentino...</div>';
+  container.innerHTML = '<div class="shipping-loading">🔄 Calculando flete...</div>';
 
-  // Credenciales desde config admin en Firestore
+  // Verificar si frete por WhatsApp está activo (global o por produto)
   try {
-    const configDoc = await getDoc(doc(db, 'config', 'shipping'));
-    const cfg = configDoc.exists() ? configDoc.data() : {};
+    const shippingConfigDoc = await getDoc(doc(db, 'config', 'shipping'));
+    const cfg = shippingConfigDoc.exists() ? shippingConfigDoc.data() : {};
+
+    // Verificar frete WhatsApp global
+    if (cfg.freteWhatsapp) {
+      showWhatsappShipping(container);
+      return;
+    }
+
+    // Verificar frete WhatsApp por produto (via sessionStorage)
+    const productFreteWa = sessionStorage.getItem('product_frete_whatsapp');
+    if (productFreteWa === 'true') {
+      showWhatsappShipping(container);
+      return;
+    }
+
+    const configDoc = shippingConfigDoc;
     const user = cfg.correoUser || '';
     const pass = cfg.correoPass || '';
     const customerId = cfg.correoCustomerId || '';
@@ -617,6 +632,22 @@ function addShippingListeners(container) {
   });
 }
 
+function showWhatsappShipping(container) {
+  container.innerHTML = `
+    <div class="shipping-option selected" style="background:#f0fff4;border-color:#25D366;">
+      <input type="radio" name="shipping" value="0" data-name="WhatsApp" data-wa="true" checked>
+      <div class="shipping-option-info">
+        <div class="shipping-option-name" style="color:#128c7e;">
+          <i class="fa-brands fa-whatsapp"></i> Consultar flete por WhatsApp
+        </div>
+        <div class="shipping-option-time">Te cotizamos el envío por WhatsApp</div>
+      </div>
+      <div class="shipping-option-price" style="color:#25D366;">Gratis consultar</div>
+    </div>`;
+  addShippingListeners(container);
+  updateCheckoutTotal();
+}
+
 async function checkFreeShipping() {
   try {
     const snap = await getDocs(collection(db, 'promotions'));
@@ -697,14 +728,17 @@ async function submitCheckoutWhatsApp() {
   const d = getCheckoutData();
   const sel = document.querySelector('input[name="shipping"]:checked');
   const shipName = sel?.dataset?.name || 'Correo Argentino';
+  const isWaShipping = sel?.dataset?.wa === 'true';
   const free = await checkFreeShipping();
-  const shipCost = free ? 0 : (sel ? parseFloat(sel.value) : 0);
+  const shipCost = free || isWaShipping ? 0 : (sel ? parseFloat(sel.value) : 0);
   const subtotal = getSubtotal(), disc = getDiscount();
   const total = Math.max(0, subtotal - disc + shipCost);
 
   const items = cart.map(i => `• ${i.name} x${i.qty} = $${fmt(i.price * i.qty)}`).join('\n');
   const discLine = disc > 0 ? `\n🎟 Descuento: -$${fmt(disc)}` : '';
-  const shipLine = shipCost === 0 ? '\n🎁 ¡Envío GRATIS!' : `\n🚚 Envío (${shipName}): $${fmt(shipCost)}`;
+  const shipLine = isWaShipping
+    ? '\n🚚 *Flete:* A cotizar por WhatsApp'
+    : shipCost === 0 ? '\n🎁 ¡Envío GRATIS!' : `\n🚚 Envío (${shipName}): $${fmt(shipCost)}`;
   const couponLine = appliedCoupon ? `\n🎟 Cupón: ${appliedCoupon.code}` : '';
 
   const message = `¡Hola! ¡Vengo a finalizar una compra del sitio ZOE VEOS! 🛍️
