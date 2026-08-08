@@ -177,9 +177,10 @@ window.renderProducts = function(products) {
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = buildProductCard(p);
-      // Só adiciona listener se tiver estoque (sem estoque vira link WhatsApp)
+      // Só adiciona listener se tiver estoque e não for consultarWa
       const sinStock = typeof p.stock === 'number' && p.stock === 0;
-      if (!sinStock) {
+      const isConsultaWa = p.consultarWa === true;
+      if (!sinStock && !isConsultaWa) {
         card.querySelector('.product-add-btn')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
         card.querySelector('.product-quick-add')?.addEventListener('click', e => { e.stopPropagation(); addToCart(p); });
       }
@@ -232,16 +233,27 @@ function buildProductCard(p) {
       ? `<div class="product-stock sin-stock"><span class="stock-dot"></span>Sin stock</div>`
       : '';
 
-  const waMsg = encodeURIComponent('¡Hola! Quiero encargar: ' + p.name);
-  const btnHTML = sinStock
-    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Encargar por WhatsApp</a>`
-    : `<button class="product-add-btn">Agregar al carrito</button>`;
+  const waMsg = encodeURIComponent('¡Hola! Quiero consultar el precio de: ' + p.name);
+  const waMsgEncargar = encodeURIComponent('¡Hola! Quiero encargar: ' + p.name);
+
+  // consultarWa: oculta precio y muestra botón WA
+  const consultarWa = p.consultarWa === true;
+
+  const priceHTML = consultarWa
+    ? `<span class="product-price" style="color:var(--text-muted);font-size:0.85rem;">Consultar precio</span>`
+    : `<span class="product-price">$${fmt(p.price)}</span>${oldPriceHTML}`;
+
+  const btnHTML = consultarWa
+    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank" rel="noopener" style="background:#25D366;"><i class="fa-brands fa-whatsapp"></i> Consultar precio</a>`
+    : sinStock
+      ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsgEncargar}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Encargar por WhatsApp</a>`
+      : `<button class="product-add-btn">Agregar al carrito</button>`;
 
   const imgHTML = p.image
     ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
     : '<div style="width:100%;height:100%;background:var(--beige-dark)"></div>';
 
-  const quickAdd = sinStock ? '' : '<button class="product-quick-add" title="Agregar">🛒</button>';
+  const quickAdd = (sinStock || consultarWa) ? '' : '<button class="product-quick-add" title="Agregar">🛒</button>';
 
   return `
     <div class="product-img-wrap">
@@ -253,7 +265,7 @@ function buildProductCard(p) {
       <div class="product-category-tag">${p.category||''}</div>
       <div class="product-name">${p.name}</div>
       <div class="product-price-wrap">
-        <span class="product-price">$${fmt(p.price)}</span>${oldPriceHTML}
+        ${priceHTML}
       </div>
       ${stockHTML}
       ${btnHTML}
@@ -386,6 +398,11 @@ function addToCart(product) {
   showToast(`✅ ${product.name} agregado`);
   openCart();
 }
+// Expor globalmente para landpages e product.html
+window.addToCart = addToCart;
+window.openCart  = openCart;
+window.closeCart = closeCart;
+window.showToast = showToast;
 
 window.updateCartQty = function(id, delta) {
   const item = cart.find(i => i.id === id);

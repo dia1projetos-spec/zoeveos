@@ -265,6 +265,8 @@ window.openProductModal = async function(product=null) {
   document.getElementById('p-stock').value = product?.stock??'';
   const pWaEl = document.getElementById('p-frete-wa');
   if (pWaEl) pWaEl.checked = product?.freteWhatsapp || false;
+  const pConsultaWa = document.getElementById('p-consultar-wa');
+  if (pConsultaWa) pConsultaWa.checked = product?.consultarWa || false;
   document.getElementById('p-badge').value = product?.badge||'';
   // Carregar imagens múltiplas (p-images-preview é o ID correto no HTML)
   window._productImages = product?.images?.length ? [...product.images] : (product?.image ? [product.image] : []);
@@ -321,6 +323,7 @@ window.saveProduct = async function() {
     description: document.getElementById('p-description').value.trim(),
     stock: parseInt(document.getElementById('p-stock').value)||-1,
     freteWhatsapp: document.getElementById('p-frete-wa')?.checked || false,
+    consultarWa: document.getElementById('p-consultar-wa')?.checked || false,
     badge: document.getElementById('p-badge').value,
     images: window._productImages || [],
     image: window._productImages?.[0] || '', // compatibilidade

@@ -678,6 +678,22 @@
           <label class="field-label">Precio Original (tachado)</label>
           <input type="number" id="p-old-price" class="field-input" placeholder="0 (opcional)">
         </div>
+        <div class="field-group" style="grid-column:1/-1;">
+          <div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:var(--radius-md);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div>
+              <div style="font-size:0.82rem;font-weight:600;color:#e65100;">
+                <i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> Consultar precio por WhatsApp
+              </div>
+              <div style="font-size:0.74rem;color:#bf360c;margin-top:3px;">
+                Oculta el precio y muestra botón de WhatsApp en lugar del carrito.
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="p-consultar-wa">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
         <div class="field-group">
           <label class="field-label">Stock (-1 = sin límite)</label>
           <input type="number" id="p-stock" class="field-input" placeholder="-1">
