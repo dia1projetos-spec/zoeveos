@@ -1346,6 +1346,13 @@ window.openLandpageModal = async function(lp = null) {
   document.getElementById('lp-seo-desc').value = lp?.seoDesc || '';
   document.getElementById('lp-seo-keywords').value = lp?.seoKeywords || '';
   document.getElementById('lp-slides').value = (lp?.slides || []).join('\n');
+  // Mostrar preview dos slides existentes
+  const slidesPreview = document.getElementById('lp-slides-preview');
+  if (slidesPreview) {
+    slidesPreview.innerHTML = (lp?.slides || []).map(url =>
+      `<img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid var(--rose-light);">`
+    ).join('');
+  }
 
   // Auto-slug do título
   document.getElementById('lp-title').oninput = function() {
@@ -1418,8 +1425,14 @@ function renderLPArticles() {
         <input type="text" class="field-input lp-art-title" data-i="${i}" value="${art.title||''}" placeholder="Título del artículo">
       </div>
       <div class="field-group" style="margin-bottom:10px;">
-        <label class="field-label">Imagen del artículo (URL)</label>
-        <input type="text" class="field-input lp-art-image" data-i="${i}" value="${art.image||''}" placeholder="URL de imagen">
+        <label class="field-label">Imagen del artículo</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="hidden" class="lp-art-image-url" data-i="${i}" value="${art.image||''}">
+          <input type="file" accept="image/*" class="lp-art-img-file" data-i="${i}"
+            style="font-size:0.8rem;flex:1;" onchange="uploadLPArticleImg(this, ${i})">
+          ${art.image ? `<img src="${art.image}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:2px solid var(--border);" class="lp-art-img-preview-${i}">` : `<div class="lp-art-img-preview-${i}" style="width:52px;height:52px;background:var(--beige-dark);border-radius:8px;border:2px dashed var(--border);"></div>`}
+        </div>
+        <p class="field-hint" id="lp-art-img-status-${i}"></p>
       </div>
       <div class="field-group">
         <label class="field-label">Contenido</label>
@@ -1444,8 +1457,8 @@ function renderLPArticles() {
   container.querySelectorAll('.lp-art-title').forEach(el => {
     el.addEventListener('input', () => { lpArticles[el.dataset.i].title = el.value; });
   });
-  container.querySelectorAll('.lp-art-image').forEach(el => {
-    el.addEventListener('input', () => { lpArticles[el.dataset.i].image = el.value; });
+  container.querySelectorAll('.lp-art-image-url').forEach(el => {
+    el.addEventListener('change', () => { lpArticles[el.dataset.i].image = el.value; });
   });
   container.querySelectorAll('.lp-art-content').forEach(el => {
     el.addEventListener('input', () => { lpArticles[el.dataset.i].content = el.innerHTML; });
@@ -1468,10 +1481,19 @@ window.saveLandpage = async function() {
 
   if (!title || !slug) { adminToast('Título y slug son obligatorios','err'); if (btn) btn.disabled = false; return; }
 
-  // Sync artículos antes de salvar
-  document.querySelectorAll('.lp-art-title').forEach(el => { lpArticles[el.dataset.i].title = el.value; });
-  document.querySelectorAll('.lp-art-image').forEach(el => { lpArticles[el.dataset.i].image = el.value; });
-  document.querySelectorAll('.lp-art-content').forEach(el => { lpArticles[el.dataset.i].content = el.innerHTML; });
+  // Sync artículos antes de salvar — usar index correto
+  const artItems = document.querySelectorAll('.lp-article-item');
+  artItems.forEach((item, realIdx) => {
+    if (!lpArticles[realIdx]) lpArticles[realIdx] = {};
+    const titleEl   = item.querySelector('.lp-art-title');
+    const imageEl   = item.querySelector('.lp-art-image-url');
+    const contentEl = item.querySelector('.lp-art-content');
+    if (titleEl)   lpArticles[realIdx].title   = titleEl.value;
+    if (imageEl)   lpArticles[realIdx].image   = imageEl.value;
+    if (contentEl) lpArticles[realIdx].content = contentEl.innerHTML;
+  });
+  // Filtrar artigos sem conteúdo
+  const articlesClean = lpArticles.filter(a => a.title || a.content);
 
   const featuredId = document.getElementById('lp-featured-product').value;
   let featuredProduct = null;
@@ -1489,7 +1511,7 @@ window.saveLandpage = async function() {
     slides: document.getElementById('lp-slides').value.split('\n').map(s=>s.trim()).filter(Boolean),
     featuredProductId: featuredId || null,
     featuredProduct,
-    articles: lpArticles,
+    articles: articlesClean,
     createdAt: editingLandpage?.createdAt || Date.now(),
     updatedAt: Date.now(),
   };
@@ -1513,3 +1535,72 @@ window.saveLandpage = async function() {
 };
 
 
+
+// ============================================================
+// LANDPAGE — Upload imagens Cloudinary
+// ============================================================
+window.uploadLPSlides = async function(input) {
+  const status = document.getElementById('lp-slides-status');
+  const preview = document.getElementById('lp-slides-preview');
+  const textarea = document.getElementById('lp-slides');
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  if (status) status.textContent = `⬆️ Subiendo ${files.length} imagen(es)...`;
+
+  const urls = textarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
+
+  for (const file of files) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY.uploadPreset);
+      const res = await fetch(CLOUDINARY.uploadUrl, { method:'POST', body: formData });
+      const data = await res.json();
+      if (data.secure_url) {
+        urls.push(data.secure_url);
+        // Mostrar preview
+        if (preview) {
+          const img = document.createElement('img');
+          img.src = data.secure_url;
+          img.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid var(--rose-light);';
+          preview.appendChild(img);
+        }
+      }
+    } catch(e) { console.error('Upload slide error:', e); }
+  }
+
+  textarea.value = urls.join('\n');
+  if (status) status.textContent = `✅ ${urls.length} imagen(es) lista(s)`;
+  input.value = '';
+};
+
+window.uploadLPArticleImg = async function(input, idx) {
+  const statusEl = document.getElementById(`lp-art-img-status-${idx}`);
+  const urlInput = document.querySelector(`.lp-art-image-url[data-i="${idx}"]`);
+  const file = input.files[0];
+  if (!file) return;
+
+  if (statusEl) statusEl.textContent = '⬆️ Subiendo imagen...';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY.uploadPreset);
+    const res = await fetch(CLOUDINARY.uploadUrl, { method:'POST', body: formData });
+    const data = await res.json();
+    if (data.secure_url) {
+      if (urlInput) urlInput.value = data.secure_url;
+      if (lpArticles[idx]) lpArticles[idx].image = data.secure_url;
+      // Atualizar preview
+      const prevEl = document.querySelector(`.lp-art-img-preview-${idx}`);
+      if (prevEl) {
+        prevEl.outerHTML = `<img src="${data.secure_url}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:2px solid var(--rose);" class="lp-art-img-preview-${idx}">`;
+      }
+      if (statusEl) statusEl.textContent = '✅ Imagen subida';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.textContent = '❌ Error al subir';
+    console.error('Upload art img error:', e);
+  }
+};

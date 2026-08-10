@@ -1140,11 +1140,17 @@
         </div>
       </div>
 
-      <!-- Slides del header -->
+      <!-- Slides del header — upload Cloudinary -->
       <div class="field-group">
-        <label class="field-label">Slides del Header (URLs de imágenes, una por línea)</label>
-        <textarea id="lp-slides" class="field-textarea" style="min-height:80px;" placeholder="https://res.cloudinary.com/...&#10;https://res.cloudinary.com/..."></textarea>
-        <p class="field-hint">Cada URL en una línea. Estas imágenes forman el slider del header de la landpage.</p>
+        <label class="field-label">Slides del Header</label>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <input type="file" id="lp-slides-upload" accept="image/*" multiple
+            style="font-size:0.8rem;flex:1;min-width:200px;" onchange="uploadLPSlides(this)">
+          <span id="lp-slides-status" style="font-size:0.78rem;color:var(--text-muted);"></span>
+        </div>
+        <div id="lp-slides-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+        <textarea id="lp-slides" class="field-textarea" style="min-height:60px;font-size:0.75rem;" placeholder="Las URLs se generan automáticamente al subir fotos..."></textarea>
+        <p class="field-hint">Subí una o más fotos para el slider. También podés pegar URLs directamente.</p>
       </div>
 
       <!-- Producto destacado -->
