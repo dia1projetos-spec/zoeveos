@@ -381,15 +381,6 @@ window.openCategoryModal = function(cat=null) {
   document.getElementById('cat-icon').value = cat?.icon||'';
   document.getElementById('cat-description').value = cat?.description||'';
   document.getElementById('cat-subcategories').value = (cat?.subcategories||[]).join(', ');
-  document.getElementById('cat-show-banner').checked = cat?.showBanner || false;
-  document.getElementById('cat-banner-desc').value = cat?.bannerDesc || '';
-  document.getElementById('cat-order').value = cat?.order || 1;
-  document.getElementById('cat-banner-slides').value = (cat?.bannerSlides||[]).join('\n');
-  // Preview slides existentes
-  const prev = document.getElementById('cat-banner-slides-preview');
-  if (prev) prev.innerHTML = (cat?.bannerSlides||[]).map(url =>
-    `<img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid var(--rose-light);">`
-  ).join('');
   document.getElementById('category-modal-title').textContent = cat?'Editar Categoría':'Nueva Categoría';
   openModal('category-modal');
 };
@@ -1612,35 +1603,4 @@ window.uploadLPArticleImg = async function(input, idx) {
     if (statusEl) statusEl.textContent = '❌ Error al subir';
     console.error('Upload art img error:', e);
   }
-};
-
-window.uploadCatBannerSlides = async function(input) {
-  const status  = document.getElementById('cat-banner-upload-status');
-  const preview = document.getElementById('cat-banner-slides-preview');
-  const textarea = document.getElementById('cat-banner-slides');
-  const files = Array.from(input.files);
-  if (!files.length) return;
-  if (status) status.textContent = `⬆️ Subiendo ${files.length} imagen(es)...`;
-  const urls = textarea.value.split('\n').map(s=>s.trim()).filter(Boolean);
-  for (const file of files) {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY.uploadPreset);
-      const res = await fetch(CLOUDINARY.uploadUrl, { method:'POST', body: formData });
-      const data = await res.json();
-      if (data.secure_url) {
-        urls.push(data.secure_url);
-        if (preview) {
-          const img = document.createElement('img');
-          img.src = data.secure_url;
-          img.style.cssText = 'width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid var(--rose-light);';
-          preview.appendChild(img);
-        }
-      }
-    } catch(e) { console.error('Upload cat banner error:', e); }
-  }
-  textarea.value = urls.join('\n');
-  if (status) status.textContent = `✅ ${urls.length} imagen(es) lista(s)`;
-  input.value = '';
 };
