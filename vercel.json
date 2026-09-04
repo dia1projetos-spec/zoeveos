@@ -27,6 +27,10 @@
     {
       "source": "/lp",
       "destination": "/lp.html"
+    },
+    {
+      "source": "/categoria",
+      "destination": "/categoria.html"
     }
   ],
   "redirects": [

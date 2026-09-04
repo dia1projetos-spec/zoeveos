@@ -852,6 +852,44 @@
             placeholder="Ej: Bodys, Ranitas, Conjuntos (separar con coma)">
           <p class="field-hint">Opcional. Cada subcategoría separada por coma.</p>
         </div>
+
+        <!-- Banner na página principal -->
+        <div class="field-group" style="grid-column:1/-1;">
+          <div style="background:#e3f2fd;border-radius:var(--radius-md);padding:16px;border:1.5px solid #90caf9;">
+            <p style="font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#0077b6;margin-bottom:12px;">
+              🖼️ Banner en Página Principal
+            </p>
+            <div class="field-group" style="margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <label class="field-label" style="margin:0;">Mostrar como banner en el inicio</label>
+                <label class="toggle"><input type="checkbox" id="cat-show-banner"><span class="toggle-slider"></span></label>
+              </div>
+              <p class="field-hint">Si está activo, esta categoría aparecerá como banner grande en la página principal.</p>
+            </div>
+            <div class="field-group" style="margin-bottom:10px;">
+              <label class="field-label">Descripción del banner</label>
+              <input type="text" id="cat-banner-desc" class="field-input"
+                placeholder="Ej: Todo lo que tu bebé necesita, con amor y calidad">
+            </div>
+            <div class="field-group" style="margin-bottom:10px;">
+              <label class="field-label">Orden del banner</label>
+              <input type="number" id="cat-order" class="field-input" placeholder="1, 2, 3..." min="1" value="1">
+              <p class="field-hint">Orden en que aparece en la página (1 = primero)</p>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Slides del banner (subí las imágenes)</label>
+              <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+                <input type="file" id="cat-banner-upload" accept="image/*" multiple
+                  style="font-size:0.8rem;flex:1;min-width:180px;" onchange="uploadCatBannerSlides(this)">
+                <span id="cat-banner-upload-status" style="font-size:0.78rem;color:var(--text-muted);"></span>
+              </div>
+              <div id="cat-banner-slides-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+              <textarea id="cat-banner-slides" class="field-textarea" style="min-height:60px;font-size:0.75rem;"
+                placeholder="URLs generadas al subir fotos..."></textarea>
+              <p class="field-hint">Las URLs se generan automáticamente. También podés pegar URLs directamente.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">

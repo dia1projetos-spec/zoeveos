@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Categoría — ZOE VEOS</title>
+  <meta name="description" id="meta-desc" content="">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" id="canonical" href="https://www.zoeveos.com/categoria.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .cat-page-hero {
+      height: 340px; position: relative; overflow: hidden;
+      background: var(--beige-dark);
+    }
+    .cat-page-hero-slides { position: absolute; inset: 0; }
+    .cat-page-hero-slide {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      opacity: 0; transition: opacity 1s ease;
+    }
+    .cat-page-hero-slide.active { opacity: 1; }
+    .cat-page-hero-slide::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(30,15,5,0.6) 0%, rgba(30,15,5,0.2) 60%, transparent 100%);
+    }
+    .cat-page-hero-content {
+      position: absolute; z-index: 2; top: 50%; left: 60px;
+      transform: translateY(-50%);
+    }
+    .cat-page-label {
+      font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(255,255,255,0.75); margin-bottom: 10px;
+    }
+    .cat-page-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 300; color: white; line-height: 1.05;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    }
+    .cat-page-body {
+      max-width: 1400px; margin: 0 auto;
+      padding: 40px 40px 80px;
+    }
+    .cat-page-toolbar {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      gap: 16px; margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-page-breadcrumb {
+      font-size: 0.78rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cat-page-breadcrumb a { color: var(--text-muted); transition: var(--transition); }
+    .cat-page-breadcrumb a:hover { color: var(--rose-dark); }
+    .cat-page-count {
+      font-size: 0.82rem; color: var(--text-muted);
+    }
+    /* Subcategorias */
+    .subcat-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .subcat-tab {
+      padding: 7px 18px; border-radius: var(--radius-full);
+      font-size: 0.8rem; font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: white; color: var(--text-light);
+      cursor: pointer; transition: var(--transition);
+    }
+    .subcat-tab.active, .subcat-tab:hover {
+      background: var(--rose-light); border-color: var(--rose);
+      color: var(--rose-dark);
+    }
+    /* Sort */
+    .cat-sort {
+      padding: 8px 16px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--border); background: white;
+      color: var(--text-light); font-size: 0.82rem;
+      cursor: pointer; outline: none;
+    }
+    /* Empty */
+    .cat-empty {
+      text-align: center; padding: 80px 20px;
+      color: var(--text-muted);
+    }
+    .cat-empty i { font-size: 3rem; opacity: 0.3; margin-bottom: 16px; display: block; }
+
+    @media (max-width: 768px) {
+      .cat-page-hero { height: 240px; }
+      .cat-page-hero-content { left: 28px; }
+      .cat-page-body { padding: 24px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Barra superior -->
+<div class="topbar-strip">
+  <div class="topbar-strip-inner">
+    <span><i class="fa-solid fa-truck"></i> Envíos a todo Río Primero</span>
+    <span class="topbar-strip-right">
+      <i class="fa-solid fa-tag"></i> Ofertas exclusivas &nbsp;|&nbsp;
+      <i class="fa-solid fa-headset"></i> Atención al cliente
+    </span>
+  </div>
+</div>
+
+<header id="header">
+  <div class="header-main">
+    <a href="/" class="nav-logo-new">
+      <span class="logo-text">ZOE VEOS</span>
+      <span class="logo-sub">Artículos de maternidad</span>
+    </a>
+    <div class="search-wrap">
+      <input type="text" id="search-input" class="search-input" placeholder="¿Qué estás buscando hoy?">
+      <button class="search-btn" id="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <div class="nav-actions-new">
+      <a href="/#footer" class="nav-action-item">
+        <i class="fa-regular fa-user"></i><span>Mi cuenta</span>
+      </a>
+      <button id="cart-btn" class="nav-action-item cart-action" aria-label="Carrito">
+        <div style="position:relative;display:inline-flex;align-items:center;">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span id="cart-count" class="cart-count">0</span>
+        </div>
+        <span>Carrito</span>
+      </button>
+      <button id="hamburger" class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <div class="header-nav-inner">
+      <div class="nav-cat-dropdown">
+        <button class="nav-cat-btn" id="nav-cat-btn">
+          <i class="fa-solid fa-border-all"></i> Categorías
+          <i class="fa-solid fa-chevron-down" style="font-size:0.65rem;margin-left:4px;"></i>
+        </button>
+        <div class="nav-cat-menu" id="nav-cat-menu"></div>
+      </div>
+      <a href="/" class="nav-link-item">Inicio</a>
+      <a href="/" class="nav-link-item">Novedades</a>
+      <a href="/" class="nav-link-item">Ofertas</a>
+      <a href="/blog.html" class="nav-link-item">Blog</a>
+      <a href="/#footer" class="nav-link-item">Contacto</a>
+    </div>
+  </nav>
+</header>
+
+<nav id="mobile-nav" class="mobile-nav">
+  <button id="mobile-nav-close" class="mobile-nav-close">✕</button>
+  <a href="/">Inicio</a>
+  <a href="/blog.html">Blog</a>
+  <a href="/#footer">Contacto</a>
+</nav>
+
+<!-- Hero da categoria -->
+<div class="cat-page-hero">
+  <div class="cat-page-hero-slides" id="cat-hero-slides"></div>
+  <div class="cat-page-hero-content">
+    <div class="cat-page-label">CATEGORÍA</div>
+    <h1 class="cat-page-title" id="cat-page-title">Cargando...</h1>
+  </div>
+</div>
+
+<!-- Produtos da categoria -->
+<div class="cat-page-body">
+  <div class="cat-page-toolbar">
+    <div class="cat-page-breadcrumb">
+      <a href="/"><i class="fa-solid fa-house" style="font-size:0.8rem;"></i></a>
+      <span>›</span>
+      <span id="cat-breadcrumb-name">Categoría</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span class="cat-page-count" id="cat-count"></span>
+      <select class="cat-sort" id="cat-sort" onchange="sortProducts(this.value)">
+        <option value="default">Ordenar por...</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+        <option value="newest">Más nuevos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Subcategorías -->
+  <div class="subcat-tabs" id="subcat-tabs"></div>
+
+  <!-- Grid de productos -->
+  <div id="cat-products-grid" class="products-carousel-container"></div>
+</div>
+
+<!-- Footer -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">ZOE VEOS</div>
+        <p class="footer-tagline">Artículos de maternidad con amor.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://wa.me/5493576466145" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Tienda</h4><ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/blog.html">Blog</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Contacto</h4><ul>
+        <li><a href="https://wa.me/5493576466145" target="_blank">WhatsApp</a></li>
+        <li><span>Córdoba, Argentina</span></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ZOE VEOS</span><span>Hecho con 🌸 en Argentina</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Carrito completo -->
+<div id="cart-overlay"></div>
+<aside id="cart-drawer">
+  <div class="cart-header">
+    <h2 class="cart-title">Tu Carrito</h2>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="closeCart()" style="font-size:0.78rem;color:var(--text-muted);text-decoration:underline;cursor:pointer;background:none;border:none;">← Seguir comprando</button>
+      <button id="cart-close" class="cart-close">✕</button>
+    </div>
+  </div>
+  <div id="cart-empty" class="cart-empty"><div class="cart-empty-icon">🛍️</div><p>Tu carrito está vacío</p></div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-footer">
+    <div id="cart-promos-section" class="cart-promos-section" style="display:none;">
+      <div class="cart-section-label">🎁 Promociones disponibles</div>
+      <div id="cart-promos-list"></div>
+    </div>
+    <div id="cart-cupones-section" class="cart-cupones-section" style="display:none;">
+      <button class="cart-cupones-toggle" id="cart-cupones-toggle">
+        <span>🎟️ Tengo un cupón</span><span id="cupones-arrow">▾</span>
+      </button>
+      <div class="cart-cupones-list" id="cart-cupones-list"></div>
+    </div>
+    <div id="coupon-msg" class="cart-coupon-msg"></div>
+    <div class="cart-summary">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+      <div class="cart-summary-row" id="discount-row" style="display:none;"><span>Descuento</span><span id="cart-discount" style="color:var(--terra)">-$0</span></div>
+      <div class="cart-summary-row total"><span>Total</span><span id="cart-total">$0</span></div>
+    </div>
+    <button id="checkout-btn" class="cart-checkout-btn">
+      <i class="fa-solid fa-bag-shopping"></i> Finalizar Compra
+    </button>
+  </div>
+</aside>
+
+<!-- Checkout Modal -->
+<div id="checkout-modal">
+  <div class="checkout-box">
+    <button class="checkout-close" id="checkout-close">✕</button>
+    <h2 class="checkout-title">Finalizar Compra</h2>
+    <p class="checkout-subtitle">Completá tus datos para continuar.</p>
+    <div class="form-section-title">Tus datos</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre *</label><input type="text" id="co-name"></div>
+      <div class="form-group"><label>WhatsApp *</label><input type="tel" id="co-whatsapp"></div>
+      <div class="form-group"><label>Calle *</label><input type="text" id="co-street"></div>
+      <div class="form-group"><label>Número *</label><input type="text" id="co-number"></div>
+      <div class="form-group"><label>Barrio</label><input type="text" id="co-barrio"></div>
+      <div class="form-group"><label>Ciudad *</label><input type="text" id="co-city"></div>
+      <div class="form-group"><label>CP *</label><input type="text" id="co-postal"></div>
+      <div class="form-group"><label>Provincia</label>
+        <select id="co-province">
+          <option value="X">Córdoba</option><option value="B">Buenos Aires</option>
+          <option value="C">CABA</option><option value="S">Santa Fe</option>
+          <option value="M">Mendoza</option><option value="T">Tucumán</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-section-title">Opciones de envío</div>
+    <div id="shipping-options" class="shipping-options"><div class="shipping-loading">Ingresá tu CP para calcular el flete</div></div>
+    <div class="checkout-payment-options">
+      <p class="checkout-payment-label">Elegí cómo querés pagar:</p>
+      <button id="checkout-submit-wa" class="checkout-submit-btn checkout-wa-btn">
+        <i class="fa-solid fa-money-bill-wave"></i> Pagar por ALIAS / Transferencia
+      </button>
+      <div class="alias-notice"><i class="fa-solid fa-circle-check"></i> Sin costo adicional · Total: <strong id="alias-total">$0</strong></div>
+      <div class="payment-separator"><span>o</span></div>
+      <button id="checkout-submit-mp" class="checkout-submit-btn checkout-mp-btn">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0z" fill="#009EE3"/><path d="M24.5 13.5c0 2.485-1.567 4.5-3.5 4.5h-3l-1 5h-3l2.5-12h5c1.933 0 3 .896 3 2.5z" fill="#fff"/></svg>
+        Pagar con débito / crédito
+      </button>
+      <div class="mp-surcharge-notice"><i class="fa-solid fa-circle-info"></i><span>Comisión MP 6,60% + IVA 21%.<br><strong>Total con tarjeta: <span id="mp-total-with-surcharge">$0</span></strong></span></div>
+    </div>
+    <div class="cart-summary" style="margin-top:16px;">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="checkout-subtotal">$0</span></div>
+      <div class="cart-summary-row"><span>Envío</span><span id="checkout-shipping-cost">-</span></div>
+      <div class="cart-summary-row total"><span>TOTAL</span><span id="checkout-total">$0</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="product-modal">
+  <div class="product-modal-box">
+    <div class="product-modal-gallery">
+      <button id="pm-prev" class="pm-nav-btn pm-prev-btn" style="display:none;">‹</button>
+      <img id="pm-img" src="" alt="" class="pm-main-img">
+      <button id="pm-next" class="pm-nav-btn pm-next-btn" style="display:none;">›</button>
+      <div id="pm-thumbs" class="pm-thumbs-wrap"></div>
+    </div>
+    <div class="product-modal-info">
+      <button id="product-modal-close" class="product-modal-close">✕</button>
+      <div class="product-modal-cat" id="pm-cat"></div>
+      <h2 class="product-modal-name" id="pm-name"></h2>
+      <div class="product-modal-price" id="pm-price"></div>
+      <div class="product-modal-desc" id="pm-desc"></div>
+      <button id="pm-add" class="product-modal-add">
+        <i class="fa-solid fa-bag-shopping"></i> Agregar al Carrito
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+
+<!-- Elementos ocultos necessários para o main.js -->
+<div style="display:none;">
+  <div id="categories-grid"></div>
+  <div id="products-grid"></div>
+  <div id="filter-tabs"></div>
+  <div id="category-banners-list"></div>
+  <div id="destaque-section"></div>
+  <div id="promo-section"></div>
+  <div id="blog-grid"></div>
+  <div id="blog-section"></div>
+  <div id="load-more-btn"></div>
+  <select id="sort-select"></select>
+</div>
+
+<script type="module" src="js/main.js"></script>
+<script type="module">
+import { db, collection, getDocs, query, orderBy, where } from './js/firebase-config.js';
+
+const params  = new URLSearchParams(location.search);
+const catName = params.get('cat') || '';
+let allProds  = [];
+let filtered  = [];
+
+const fmt = n => Number(n).toLocaleString('es-AR');
+
+async function init() {
+  if (!catName) { location.href = '/'; return; }
+
+  // Header scroll
+  const header = document.getElementById('header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // Hamburger
+  document.getElementById('hamburger')?.addEventListener('click', () =>
+    document.getElementById('mobile-nav')?.classList.add('open'));
+  document.getElementById('mobile-nav-close')?.addEventListener('click', () =>
+    document.getElementById('mobile-nav')?.classList.remove('open'));
+
+  // SEO
+  document.title = `${catName} — ZOE VEOS`;
+  document.getElementById('meta-desc').content = `Productos de ${catName} en ZOE VEOS. Artículos de maternidad en Argentina.`;
+  document.getElementById('canonical').href = `https://www.zoeveos.com/categoria.html?cat=${encodeURIComponent(catName)}`;
+
+  // Títulos
+  document.getElementById('cat-page-title').textContent = catName;
+  document.getElementById('cat-breadcrumb-name').textContent = catName;
+
+  // Carregar categoria para pegar slides e subcategorias
+  const catSnap = await getDocs(collection(db, 'categories'));
+  const catData = catSnap.docs.map(d => d.data()).find(c => c.name === catName);
+
+  // Hero slides
+  if (catData?.bannerSlides?.length) {
+    const slidesContainer = document.getElementById('cat-hero-slides');
+    catData.bannerSlides.forEach((src, i) => {
+      const s = document.createElement('div');
+      s.className = 'cat-page-hero-slide' + (i===0?' active':'');
+      s.style.backgroundImage = `url('${src}')`;
+      slidesContainer.appendChild(s);
+    });
+    if (catData.bannerSlides.length > 1) {
+      let cur = 0;
+      setInterval(() => {
+        const all = slidesContainer.querySelectorAll('.cat-page-hero-slide');
+        all[cur].classList.remove('active');
+        cur = (cur + 1) % all.length;
+        all[cur].classList.add('active');
+      }, 5000);
+    }
+  }
+
+  // Subcategorias
+  if (catData?.subcategories?.length) {
+    const tabs = document.getElementById('subcat-tabs');
+    const allTab = document.createElement('button');
+    allTab.className = 'subcat-tab active';
+    allTab.textContent = 'Todos';
+    allTab.addEventListener('click', () => {
+      filtered = allProds;
+      renderProds(filtered);
+      tabs.querySelectorAll('.subcat-tab').forEach(t => t.classList.remove('active'));
+      allTab.classList.add('active');
+    });
+    tabs.appendChild(allTab);
+
+    catData.subcategories.forEach(sub => {
+      const btn = document.createElement('button');
+      btn.className = 'subcat-tab';
+      btn.textContent = sub;
+      btn.addEventListener('click', () => {
+        filtered = allProds.filter(p => p.subcategory === sub);
+        renderProds(filtered);
+        tabs.querySelectorAll('.subcat-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      tabs.appendChild(btn);
+    });
+  }
+
+  // Dropdown nav categorias
+  const navMenu = document.getElementById('nav-cat-menu');
+  const navBtn  = document.getElementById('nav-cat-btn');
+  catSnap.docs.forEach(d => {
+    const c = d.data();
+    const a = document.createElement('a');
+    a.href = `categoria.html?cat=${encodeURIComponent(c.name)}`;
+    a.innerHTML = `<i class="${c.icon||'fa-solid fa-tag'}"></i>${c.name}`;
+    navMenu?.appendChild(a);
+  });
+  navBtn?.addEventListener('click', e => { e.stopPropagation(); navMenu?.classList.toggle('open'); });
+  document.addEventListener('click', () => navMenu?.classList.remove('open'));
+
+  // Carregar produtos da categoria
+  const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
+  allProds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    .filter(p => p.category === catName);
+  window.allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  filtered = allProds;
+  renderProds(filtered);
+
+  // Busca
+  initSearchCat();
+}
+
+function renderProds(prods) {
+  const grid = document.getElementById('cat-products-grid');
+  const count = document.getElementById('cat-count');
+  if (!grid) return;
+
+  if (count) count.textContent = `${prods.length} producto${prods.length!==1?'s':''}`;
+
+  if (prods.length === 0) {
+    grid.innerHTML = `<div class="cat-empty"><i class="fa-solid fa-box-open"></i><p>No hay productos en esta categoría aún.</p></div>`;
+    return;
+  }
+
+  // Usar o mesmo carrossel por subcategoria ou grid normal
+  const subcats = [...new Set(prods.map(p => p.subcategory).filter(Boolean))];
+
+  if (subcats.length > 1) {
+    // Organizar por subcategoria
+    grid.innerHTML = '';
+    subcats.forEach(sub => {
+      const items = prods.filter(p => p.subcategory === sub);
+      if (!items.length) return;
+      const section = document.createElement('div');
+      section.className = 'product-category-section';
+      section.innerHTML = `
+        <div class="product-cat-header">
+          <h3 class="product-cat-title">${sub}</h3>
+        </div>
+        <div class="product-carousel">
+          <div class="product-carousel-track" id="track-${sub.replace(/\s/g,'-')}"></div>
+        </div>`;
+      grid.appendChild(section);
+      const track = section.querySelector(`#track-${sub.replace(/\s/g,'-')}`);
+      items.forEach(p => track.appendChild(buildCard(p)));
+    });
+
+    // Sem subcategoria
+    const noSub = prods.filter(p => !p.subcategory);
+    if (noSub.length) {
+      const section = document.createElement('div');
+      section.className = 'product-category-section';
+      section.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="track-nosub"></div></div>`;
+      grid.appendChild(section);
+      const track = section.querySelector('#track-nosub');
+      noSub.forEach(p => track.appendChild(buildCard(p)));
+    }
+  } else {
+    // Grid simples
+    grid.innerHTML = '';
+    const section = document.createElement('div');
+    section.className = 'product-category-section';
+    section.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="main-track"></div></div>`;
+    grid.appendChild(section);
+    const track = section.querySelector('#main-track');
+    prods.forEach(p => track.appendChild(buildCard(p)));
+  }
+}
+
+function buildCard(p) {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  const sinStock = typeof p.stock === 'number' && p.stock === 0;
+  const stockHTML = typeof p.stock === 'number' && p.stock > 0
+    ? `<div class="product-stock"><span class="stock-dot"></span>${p.stock===1?'¡Último!':p.stock+' disponibles'}</div>`
+    : sinStock ? `<div class="product-stock sin-stock"><span class="stock-dot"></span>Sin stock</div>` : '';
+  const waMsg = encodeURIComponent(`¡Hola! Quiero consultar sobre: ${p.name}`);
+  const btnHTML = p.consultarWa
+    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Consultar precio</a>`
+    : sinStock
+      ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${encodeURIComponent('¡Hola! Quiero encargar: '+p.name)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Encargar</a>`
+      : `<button class="product-add-btn add-btn-js">Agregar al carrito</button>`;
+
+  card.innerHTML = `
+    <div class="product-img-wrap">
+      ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--beige-dark)"></div>'}
+      ${p.badge ? `<div class="product-badge badge-${p.badge}">${{promo:'🔥 Promo',destaque:'⭐ Destaque',nuevo:'✨ Nuevo'}[p.badge]||p.badge}</div>` : ''}
+      ${(!sinStock && !p.consultarWa) ? '<button class="product-quick-add quick-add-js">🛒</button>' : ''}
+    </div>
+    <div class="product-info">
+      <div class="product-category-tag">${p.subcategory||p.category||''}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-price-wrap">
+        ${p.consultarWa ? '<span class="product-price" style="font-size:0.85rem;color:var(--text-muted)">Consultar precio</span>' : `<span class="product-price">$${fmt(p.price)}</span>${p.oldPrice?`<span class="product-price-old">$${fmt(p.oldPrice)}</span>`:''}`}
+      </div>
+      ${stockHTML}
+      ${btnHTML}
+    </div>`;
+
+  card.addEventListener('click', () => {
+    location.href = `product.html?id=${p.id}`;
+  });
+  card.querySelector('.add-btn-js')?.addEventListener('click', e => {
+    e.stopPropagation();
+    if (window.addToCart) window.addToCart(p);
+  });
+  card.querySelector('.quick-add-js')?.addEventListener('click', e => {
+    e.stopPropagation();
+    if (window.addToCart) window.addToCart(p);
+  });
+  return card;
+}
+
+window.sortProducts = function(val) {
+  let sorted = [...filtered];
+  if (val === 'price-asc') sorted.sort((a,b) => a.price - b.price);
+  else if (val === 'price-desc') sorted.sort((a,b) => b.price - a.price);
+  else if (val === 'newest') sorted.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  renderProds(sorted);
+};
+
+function initSearchCat() {
+  const input = document.getElementById('search-input');
+  const btn   = document.getElementById('search-btn');
+  const res   = document.getElementById('search-results');
+  if (!input) return;
+  let debounce;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      const q = input.value.trim().toLowerCase();
+      if (!q || q.length < 2) { res?.classList.remove('open'); return; }
+      const matches = (window.allProducts||[]).filter(p =>
+        p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
+      ).slice(0,8);
+      if (!res) return;
+      res.innerHTML = matches.length
+        ? matches.map(p => `<a class="search-result-item" href="product.html?id=${p.id}">
+            <img class="search-result-img" src="${p.image||''}" alt="${p.name}" onerror="this.style.opacity='0'">
+            <div class="search-result-info"><div class="search-result-name">${p.name}</div><div class="search-result-cat">${p.category||''}</div></div>
+            <div class="search-result-price">${p.consultarWa?'Consultar':'$'+fmt(p.price)}</div>
+          </a>`).join('')
+        : `<div class="search-no-results">Sin resultados para "${input.value}"</div>`;
+      res.classList.add('open');
+    }, 280);
+  });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') res?.classList.remove('open'); });
+  btn?.addEventListener('click', () => res?.classList.remove('open'));
+  document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) res?.classList.remove('open'); });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

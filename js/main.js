@@ -49,54 +49,179 @@ function initHeader() {
 }
 
 // ============================================================
-// HERO SLIDER
+// BANNERS DE CATEGORÍAS (substitui hero slider)
 // ============================================================
-function initHeroSlider(slides) {
-  heroSlides = slides;
-  const container = document.getElementById('hero-slides');
-  const dotsContainer = document.getElementById('hero-dots');
+function initCategoryBanners(categories) {
+  const container = document.getElementById('category-banners-list');
   if (!container) return;
   container.innerHTML = '';
-  if (dotsContainer) dotsContainer.innerHTML = '';
 
-  if (!slides || slides.length === 0) {
-    container.innerHTML = `<div class="hero-slide active"><div class="hero-slide-placeholder"><span>🌸 Añade slides desde el Panel Administrativo</span></div></div>`;
-    return;
-  }
+  const bannerCats = categories.filter(c => c.bannerSlides?.length > 0 || c.image);
+  if (bannerCats.length === 0) return;
 
-  slides.forEach((slide, i) => {
-    const el = document.createElement('div');
-    el.className = `hero-slide${i === 0 ? ' active' : ''}`;
-    if (slide.image) el.style.backgroundImage = `url(${slide.image})`;
-    container.appendChild(el);
-    if (dotsContainer) {
-      const dot = document.createElement('button');
-      dot.className = `hero-dot${i === 0 ? ' active' : ''}`;
-      dot.addEventListener('click', () => goToSlide(i));
-      dotsContainer.appendChild(dot);
+  bannerCats.forEach(cat => {
+    const slides = cat.bannerSlides || (cat.image ? [cat.image] : []);
+    if (!slides.length) return;
+
+    const banner = document.createElement('div');
+    banner.className = 'cat-banner';
+
+    // Slides
+    const slidesWrap = document.createElement('div');
+    slidesWrap.className = 'cat-banner-slides';
+    slides.forEach((src, i) => {
+      const s = document.createElement('div');
+      s.className = 'cat-banner-slide' + (i===0?' active':'');
+      s.style.backgroundImage = `url('${src}')`;
+      slidesWrap.appendChild(s);
+    });
+    banner.appendChild(slidesWrap);
+
+    // Conteúdo
+    const content = document.createElement('div');
+    content.className = 'cat-banner-content';
+    content.innerHTML = `
+      <div class="cat-banner-label">CATEGORÍA</div>
+      <div class="cat-banner-name">${cat.name}</div>
+      ${cat.bannerDesc ? `<div class="cat-banner-desc">${cat.bannerDesc}</div>` : ''}
+      <a href="categoria.html?cat=${encodeURIComponent(cat.name)}" class="cat-banner-btn">
+        Ver productos <i class="fa-solid fa-arrow-right"></i>
+      </a>`;
+    banner.appendChild(content);
+
+    // Dots + autoplay se múltiplos slides
+    if (slides.length > 1) {
+      let cur = 0;
+      const dots = document.createElement('div');
+      dots.className = 'cat-banner-dots';
+
+      function goTo(n) {
+        slidesWrap.querySelectorAll('.cat-banner-slide')[cur]?.classList.remove('active');
+        dots.querySelectorAll('.cat-banner-dot')[cur]?.classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slidesWrap.querySelectorAll('.cat-banner-slide')[cur]?.classList.add('active');
+        dots.querySelectorAll('.cat-banner-dot')[cur]?.classList.add('active');
+      }
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'cat-banner-dot' + (i===0?' active':'');
+        dot.addEventListener('click', () => goTo(i));
+        dots.appendChild(dot);
+      });
+      banner.appendChild(dots);
+
+      // Flechas
+      const arrows = document.createElement('div');
+      arrows.className = 'cat-banner-arrows';
+      const aUp = document.createElement('button');
+      aUp.className = 'cat-banner-arrow';
+      aUp.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+      aUp.addEventListener('click', () => goTo(cur - 1));
+      const aDown = document.createElement('button');
+      aDown.className = 'cat-banner-arrow';
+      aDown.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+      aDown.addEventListener('click', () => goTo(cur + 1));
+      arrows.appendChild(aUp);
+      arrows.appendChild(aDown);
+      banner.appendChild(arrows);
+
+      setInterval(() => goTo(cur + 1), 5000);
     }
+
+    container.appendChild(banner);
   });
-
-  startSlideShow();
-  document.getElementById('hero-prev')?.addEventListener('click', () => goToSlide((currentSlide - 1 + heroSlides.length) % heroSlides.length));
-  document.getElementById('hero-next')?.addEventListener('click', () => goToSlide((currentSlide + 1) % heroSlides.length));
 }
 
-function goToSlide(n) {
-  const slides = document.querySelectorAll('.hero-slide');
-  const dots = document.querySelectorAll('.hero-dot');
-  slides[currentSlide]?.classList.remove('active');
-  dots[currentSlide]?.classList.remove('active');
-  currentSlide = n;
-  slides[currentSlide]?.classList.add('active');
-  dots[currentSlide]?.classList.add('active');
-  clearInterval(slideInterval);
-  startSlideShow();
+window.filterByCategoryBanner = function(catName) {
+  if (window.filterByCategory) window.filterByCategory(catName);
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+// ============================================================
+// BUSCA DE PRODUTOS
+// ============================================================
+function initSearch() {
+  const input   = document.getElementById('search-input');
+  const btn     = document.getElementById('search-btn');
+  const results = document.getElementById('search-results');
+  if (!input) return;
+
+  let debounce;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => doSearch(input.value.trim()), 280);
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { triggerSearch(input.value.trim()); }
+    if (e.key === 'Escape') closeSearch();
+  });
+  btn?.addEventListener('click', () => triggerSearch(input.value.trim()));
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) closeSearch();
+  });
 }
 
-function startSlideShow() {
-  if (heroSlides.length <= 1) return;
-  slideInterval = setInterval(() => goToSlide((currentSlide + 1) % heroSlides.length), 5000);
+function doSearch(q) {
+  const results = document.getElementById('search-results');
+  if (!results) return;
+  if (!q || q.length < 2) { closeSearch(); return; }
+
+  const prods = window.allProducts || [];
+  const ql = q.toLowerCase();
+  const matches = prods.filter(p =>
+    p.name?.toLowerCase().includes(ql) ||
+    p.category?.toLowerCase().includes(ql) ||
+    (p.description||'').replace(/<[^>]*>/g,'').toLowerCase().includes(ql)
+  ).slice(0, 8);
+
+  const fmt = n => Number(n).toLocaleString('es-AR');
+  if (matches.length === 0) {
+    results.innerHTML = `<div class="search-no-results">No se encontraron productos para "<strong>${q}</strong>"</div>`;
+  } else {
+    results.innerHTML = matches.map(p => `
+      <a class="search-result-item" href="product.html?id=${p.id}">
+        <img class="search-result-img" src="${p.image||''}" alt="${p.name}"
+          onerror="this.style.opacity='0'">
+        <div class="search-result-info">
+          <div class="search-result-name">${p.name}</div>
+          <div class="search-result-cat">${p.category||''}</div>
+        </div>
+        <div class="search-result-price">${p.consultarWa ? 'Consultar' : '$'+fmt(p.price)}</div>
+      </a>`).join('');
+  }
+  results.classList.add('open');
+}
+
+window.triggerSearch = function(q) {
+  if (!q) return;
+  closeSearch();
+  const ql = q.toLowerCase();
+  const filtered = (window.allProducts||[]).filter(p =>
+    p.name?.toLowerCase().includes(ql) || p.category?.toLowerCase().includes(ql)
+  );
+  if (window.renderProducts) window.renderProducts(filtered);
+  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+};
+
+function closeSearch() {
+  document.getElementById('search-results')?.classList.remove('open');
+}
+
+// Dropdown categorias nav
+function initNavCatDropdown(categories) {
+  const btn  = document.getElementById('nav-cat-btn');
+  const menu = document.getElementById('nav-cat-menu');
+  if (!btn || !menu) return;
+
+  menu.innerHTML = categories.map(c =>
+    `<a href="categoria.html?cat=${encodeURIComponent(c.name)}">
+      <i class="${c.icon||'fa-solid fa-tag'}"></i>${c.name}
+     </a>`
+  ).join('');
+
+  btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('open'); });
+  document.addEventListener('click', () => menu.classList.remove('open'));
 }
 
 // ============================================================
@@ -920,10 +1045,7 @@ function initReveal() {
 // ============================================================
 async function loadFromFirebase() {
   try {
-    // Slides
-    const slidesSnap = await getDocs(query(collection(db, 'slides'), orderBy('createdAt', 'asc')));
-    const slides = slidesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    initHeroSlider(slides);
+    // Sem slides separados — banners são por categoria
 
     // Products — carrega ANTES das categorias pra calcular count correto
     const prodsSnap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
@@ -944,6 +1066,8 @@ async function loadFromFirebase() {
     });
     renderCategories(categories);
     initProductFilters(categories);
+    initCategoryBanners(categories);
+    initNavCatDropdown(categories);
 
     // Destaque
     const destDoc = await getDoc(doc(db, 'config', 'destaque'));
@@ -964,7 +1088,7 @@ async function loadFromFirebase() {
 
   } catch(e) {
     console.error('Firebase load error:', e);
-    initHeroSlider([]);
+    initCategoryBanners([]);
     renderCategories([]);
     initProductFilters([]);
     window.renderProducts([]);
@@ -1030,6 +1154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   window.addEventListener('scroll', initReveal, { passive: true });
   handleMPReturn();
+  initSearch();
 });
 
 // ============================================================
