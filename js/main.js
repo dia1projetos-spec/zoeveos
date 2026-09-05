@@ -56,11 +56,15 @@ function initCategoryBanners(categories) {
   if (!container) return;
   container.innerHTML = '';
 
-  const bannerCats = categories.filter(c => c.bannerSlides?.length > 0 || c.image);
+  // Só categorias com showBanner ativo E com slides, ordenadas por order
+  const bannerCats = categories
+    .filter(c => c.showBanner === true && c.bannerSlides?.length > 0)
+    .sort((a, b) => (a.order || 99) - (b.order || 99));
+
   if (bannerCats.length === 0) return;
 
   bannerCats.forEach(cat => {
-    const slides = cat.bannerSlides || (cat.image ? [cat.image] : []);
+    const slides = cat.bannerSlides || [];
     if (!slides.length) return;
 
     const banner = document.createElement('div');
@@ -263,12 +267,15 @@ window.renderProducts = function(products) {
   }
 
   // Agrupar por categoria, mantendo orden de último produto adicionado
+  // Considera tanto p.category (principal) quanto p.categories[] (múltiplas)
   const catOrder = [];
   const byCat = {};
   [...products].sort((a,b) => (b.createdAt||0) - (a.createdAt||0)).forEach(p => {
-    const cat = p.category || 'Sin categoría';
-    if (!byCat[cat]) { byCat[cat] = []; catOrder.push(cat); }
-    byCat[cat].push(p);
+    const cats = (p.categories?.length > 0) ? p.categories : [p.category || 'Sin categoría'];
+    cats.forEach(cat => {
+      if (!byCat[cat]) { byCat[cat] = []; catOrder.push(cat); }
+      if (!byCat[cat].find(x => x.id === p.id)) byCat[cat].push(p);
+    });
   });
 
   // Reordenar categorias: a do produto mais recente vai primeiro

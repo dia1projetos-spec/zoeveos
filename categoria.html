@@ -446,7 +446,10 @@ async function init() {
   // Carregar produtos da categoria
   const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
   allProds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    .filter(p => p.category === catName);
+    .filter(p =>
+      p.category === catName ||
+      (Array.isArray(p.categories) && p.categories.includes(catName))
+    );
   window.allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   filtered = allProds;
   renderProds(filtered);

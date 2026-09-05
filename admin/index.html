@@ -659,7 +659,13 @@
         </div>
         <div class="field-group">
           <label class="field-label">Categoría</label>
-          <select id="p-category" class="field-select"></select>
+          <!-- Categorias múltiplas -->
+          <div id="p-categories-wrap" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:var(--beige);min-height:42px;">
+            <span style="font-size:0.78rem;color:var(--text-muted);width:100%;margin-bottom:4px;">Seleccioná una o más categorías:</span>
+          </div>
+          <!-- campo oculto para compatibilidade -->
+          <input type="hidden" id="p-category">
+          <input type="hidden" id="p-categories-json" value="[]">
         </div>
         <div class="field-group">
           <label class="field-label">Etiqueta</label>

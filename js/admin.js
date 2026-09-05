@@ -291,11 +291,23 @@ window.openProductModal = async function(product=null) {
   document.getElementById('p-width').value = product?.width||'';
   document.getElementById('p-depth').value = product?.depth||'';
 
-  // Load categories
+  // Load categories — múltiplas selecionáveis com checkboxes
   const snap = await getDocs(collection(db,'categories'));
   const cats = snap.docs.map(d => d.data());
-  document.getElementById('p-category').innerHTML = '<option value="">Sin categoría</option>' +
-    cats.map(c => `<option value="${c.name}" ${product?.category===c.name?'selected':''}>${c.name}</option>`).join('');
+  const productCats = product?.categories || (product?.category ? [product.category] : []);
+  const catsWrap = document.getElementById('p-categories-wrap');
+  if (catsWrap) {
+    catsWrap.innerHTML = '<span style="font-size:0.78rem;color:var(--text-muted);width:100%;margin-bottom:4px;display:block;">Seleccioná una o más categorías:</span>';
+    cats.forEach(c => {
+      const checked = productCats.includes(c.name);
+      const lbl = document.createElement('label');
+      lbl.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;padding:4px 10px;background:white;border-radius:99px;border:1.5px solid var(--border);';
+      lbl.innerHTML = `<input type="checkbox" value="${c.name}" class="p-cat-check" ${checked?'checked':''}> ${c.name}`;
+      catsWrap.appendChild(lbl);
+    });
+    catsWrap.addEventListener('change', syncCategoryFields);
+    syncCategoryFields();
+  }
 
   openModal('product-modal');
 };
@@ -318,6 +330,7 @@ window.saveProduct = async function() {
   const data = {
     name,
     category: document.getElementById('p-category').value,
+    categories: JSON.parse(document.getElementById('p-categories-json')?.value || '[]'),
     price,
     oldPrice: parseFloat(document.getElementById('p-old-price').value)||null,
     description: document.getElementById('p-description').value.trim(),
@@ -1644,3 +1657,12 @@ window.uploadCatBannerSlides = async function(input) {
   if (status) status.textContent = `✅ ${urls.length} imagen(es) lista(s)`;
   input.value = '';
 };
+
+function syncCategoryFields() {
+  const checks = document.querySelectorAll('.p-cat-check:checked');
+  const selected = Array.from(checks).map(c => c.value);
+  const catField = document.getElementById('p-category');
+  const catsJson = document.getElementById('p-categories-json');
+  if (catField) catField.value = selected[0] || '';
+  if (catsJson) catsJson.value = JSON.stringify(selected);
+}
