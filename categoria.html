@@ -160,12 +160,11 @@
   <a href="/#footer">Contacto</a>
 </nav>
 
-<!-- Hero da categoria -->
-<div class="cat-page-hero">
-  <div class="cat-page-hero-slides" id="cat-hero-slides"></div>
-  <div class="cat-page-hero-content">
-    <div class="cat-page-label">CATEGORÍA</div>
-    <h1 class="cat-page-title" id="cat-page-title">Cargando...</h1>
+<!-- Header da categoria (sem slide) -->
+<div class="cat-page-hero-simple">
+  <div class="cat-page-hero-content-simple">
+    <div class="cat-page-label-simple">CATEGORÍA</div>
+    <h1 class="cat-page-title-simple" id="cat-page-title">Cargando...</h1>
   </div>
 </div>
 
@@ -329,23 +328,111 @@
 <div id="toast-container"></div>
 <a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
 
-<!-- Elementos ocultos necessários para o main.js -->
-<div style="display:none;">
-  <div id="categories-grid"></div>
-  <div id="products-grid"></div>
-  <div id="filter-tabs"></div>
-  <div id="category-banners-list"></div>
-  <div id="destaque-section"></div>
-  <div id="promo-section"></div>
-  <div id="blog-grid"></div>
-  <div id="blog-section"></div>
-  <div id="load-more-btn"></div>
-  <select id="sort-select"></select>
-</div>
 
-<script type="module" src="js/main.js"></script>
+
+
 <script type="module">
-import { db, collection, getDocs, query, orderBy, where } from './js/firebase-config.js';
+import {
+  db, auth, WHATSAPP_NUMBER,
+  collection, getDocs, addDoc, doc, getDoc, setDoc,
+  query, orderBy, where
+} from './js/firebase-config.js';
+
+// ============================================================
+// CARRINHO STANDALONE (sem main.js)
+// ============================================================
+let cart = JSON.parse(localStorage.getItem('zoeveos_cart') || '[]');
+let appliedCoupon = null;
+
+const fmt = n => Number(n).toLocaleString('es-AR');
+
+function saveCart() {
+  localStorage.setItem('zoeveos_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+window.addToCart = function(product) {
+  const existing = cart.find(i => i.id === product.id);
+  if (existing) existing.qty++;
+  else cart.push({ ...product, qty: 1 });
+  saveCart();
+  showToast('✅ ' + product.name + ' agregado');
+  openCart();
+};
+
+window.updateQtyCart = function(id, delta) {
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+  saveCart();
+};
+
+window.removeFromCartItem = function(id) {
+  cart = cart.filter(i => i.id !== id);
+  saveCart();
+};
+
+function getSubtotal() { return cart.reduce((s,i) => s + i.price * i.qty, 0); }
+
+function updateCartUI() {
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+  const countEl = document.getElementById('cart-count');
+  if (countEl) { countEl.textContent = count; countEl.classList.toggle('visible', count > 0); }
+
+  const emptyEl = document.getElementById('cart-empty');
+  const itemsEl = document.getElementById('cart-items');
+  if (!itemsEl) return;
+
+  if (cart.length === 0) {
+    itemsEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'flex';
+  } else {
+    if (emptyEl) emptyEl.style.display = 'none';
+    itemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img class="cart-item-img" src="${item.image||''}" alt="${item.name}" onerror="this.style.background='var(--beige-dark)'">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${fmt(item.price * item.qty)}</div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="updateQtyCart('${item.id}',-1)">−</button>
+            <span class="qty-num">${item.qty}</span>
+            <button class="qty-btn" onclick="updateQtyCart('${item.id}',1)">+</button>
+          </div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCartItem('${item.id}')">✕</button>
+      </div>`).join('');
+  }
+
+  const sub = getSubtotal();
+  const subEl = document.getElementById('cart-subtotal');
+  const totEl = document.getElementById('cart-total');
+  if (subEl) subEl.textContent = '$' + fmt(sub);
+  if (totEl) totEl.textContent = '$' + fmt(sub);
+}
+
+window.openCart = function() {
+  document.getElementById('cart-overlay')?.classList.add('open');
+  document.getElementById('cart-drawer')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeCart = function() {
+  document.getElementById('cart-overlay')?.classList.remove('open');
+  document.getElementById('cart-drawer')?.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.showToast = function(msg) {
+  const c = document.getElementById('toast-container');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = 'toast success';
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000);
+};
 
 const params  = new URLSearchParams(location.search);
 const catName = params.get('cat') || '';

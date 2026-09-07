@@ -2184,13 +2184,14 @@ input, textarea, select {
 
 /* Barra superior */
 .topbar-strip {
-  background: var(--brown);
-  color: rgba(255,255,255,0.88);
+  background: var(--beige-dark);
+  color: var(--text-light);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   padding: 7px 40px;
   position: relative;
   z-index: 1001;
+  border-bottom: 1px solid var(--border);
 }
 .topbar-strip-inner {
   max-width: 1400px; margin: 0 auto;
@@ -2347,12 +2348,13 @@ input, textarea, select {
 .nav-cat-btn {
   display: flex; align-items: center; gap: 8px;
   padding: 11px 16px; font-size: 0.82rem; font-weight: 600;
-  color: white; background: var(--brown);
-  border: none; cursor: pointer; border-radius: 6px;
+  color: var(--brown); background: var(--rose-light);
+  border: 1.5px solid var(--rose);
+  cursor: pointer; border-radius: 6px;
   transition: var(--transition); letter-spacing: 0.04em;
   margin: 6px 8px 6px 0;
 }
-.nav-cat-btn:hover { background: var(--rose-dark); }
+.nav-cat-btn:hover { background: var(--rose); color: white; }
 .nav-cat-menu {
   position: absolute; top: calc(100% + 4px); left: 0;
   background: white; border-radius: var(--radius-lg);
@@ -2395,7 +2397,7 @@ input, textarea, select {
 .cat-banner-slide.active { opacity: 1; }
 .cat-banner-slide::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(30,15,5,0.55) 0%, rgba(30,15,5,0.2) 50%, transparent 100%);
+  background: linear-gradient(90deg, rgba(245,239,230,0.72) 0%, rgba(245,239,230,0.25) 55%, transparent 100%);
 }
 
 /* Conteúdo do banner */
@@ -2405,32 +2407,31 @@ input, textarea, select {
 }
 .cat-banner-label {
   font-size: 0.7rem; letter-spacing: 0.3em;
-  text-transform: uppercase; color: rgba(255,255,255,0.75);
+  text-transform: uppercase; color: var(--rose-dark);
   margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
 }
-.cat-banner-label::before { content: ''; width: 24px; height: 1px; background: rgba(255,255,255,0.6); }
+.cat-banner-label::before { content: ''; width: 24px; height: 1.5px; background: var(--rose); }
 .cat-banner-name {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 300; color: white; line-height: 1.05;
+  font-weight: 300; color: var(--brown); line-height: 1.05;
   margin-bottom: 14px;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.2);
 }
 .cat-banner-desc {
-  font-size: 0.92rem; color: rgba(255,255,255,0.85);
+  font-size: 0.92rem; color: var(--text-light);
   line-height: 1.7; margin-bottom: 24px; max-width: 320px;
 }
 .cat-banner-btn {
   display: inline-flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,0.95); color: var(--brown);
+  background: var(--brown); color: white;
   font-size: 0.8rem; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
   padding: 13px 28px; border-radius: var(--radius-full);
   border: none; cursor: pointer; text-decoration: none;
   transition: var(--transition);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px var(--shadow-md);
 }
-.cat-banner-btn:hover { background: white; transform: translateX(4px); }
+.cat-banner-btn:hover { background: var(--rose-dark); transform: translateX(4px); }
 .cat-banner-btn i { font-size: 0.8rem; }
 
 /* Dots do banner */
@@ -2440,10 +2441,10 @@ input, textarea, select {
 }
 .cat-banner-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: rgba(255,255,255,0.45);
+  background: var(--border);
   border: none; cursor: pointer; transition: var(--transition);
 }
-.cat-banner-dot.active { width: 24px; border-radius: 4px; background: white; }
+.cat-banner-dot.active { width: 24px; border-radius: 4px; background: var(--rose-dark); }
 
 /* Flechas do banner */
 .cat-banner-arrows {
@@ -2453,19 +2454,19 @@ input, textarea, select {
 }
 .cat-banner-arrow {
   width: 38px; height: 38px; border-radius: 50%;
-  background: rgba(255,255,255,0.2); backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.35);
-  color: white; font-size: 1rem; cursor: pointer;
+  background: white; border: 1.5px solid var(--border);
+  color: var(--brown); font-size: 1rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: var(--transition);
+  box-shadow: 0 2px 8px var(--shadow);
 }
-.cat-banner-arrow:hover { background: rgba(255,255,255,0.35); }
+.cat-banner-arrow:hover { background: var(--rose-light); border-color: var(--rose); }
 
 /* ============================================================
    BARRA DE GARANTIAS
    ============================================================ */
 .guarantees-bar {
-  background: white;
+  background: var(--warm-white);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 20px 40px;
@@ -2528,4 +2529,28 @@ input, textarea, select {
   .guarantees-bar-inner { grid-template-columns: 1fr; gap: 14px; }
   .cat-banner-content { padding: 32px 20px; }
   .cat-banner-name { font-size: 2rem; }
+}
+
+/* ============================================================
+   CATEGORIA PAGE — Header simples sem slide
+   ============================================================ */
+.cat-page-hero-simple {
+  background: linear-gradient(135deg, var(--beige) 0%, var(--rose-light) 100%);
+  padding: 60px 60px 48px;
+  border-bottom: 1px solid var(--border);
+}
+.cat-page-label-simple {
+  font-size: 0.7rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--rose-dark);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
+}
+.cat-page-label-simple::before { content: ''; width: 28px; height: 1.5px; background: var(--rose); }
+.cat-page-title-simple {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 300; color: var(--brown);
+  line-height: 1.1;
+}
+@media (max-width: 768px) {
+  .cat-page-hero-simple { padding: 40px 20px 32px; }
 }
