@@ -422,14 +422,33 @@ window.saveCategory = async function() {
   const id = document.getElementById('cat-id').value;
   const name = document.getElementById('cat-name').value.trim();
   if (!name) { adminToast('El nombre es obligatorio','err'); return; }
+
   const subRaw = document.getElementById('cat-subcategories')?.value?.trim() || '';
   const subcategories = subRaw ? subRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-  const data = { name, icon: document.getElementById('cat-icon').value.trim(), description: document.getElementById('cat-description').value.trim(), subcategories };
+
+  // Banner fields
+  const showBanner = document.getElementById('cat-show-banner')?.checked || false;
+  const bannerDesc = document.getElementById('cat-banner-desc')?.value?.trim() || '';
+  const order = parseInt(document.getElementById('cat-order')?.value) || 1;
+  const slidesRaw = document.getElementById('cat-banner-slides')?.value || '';
+  const bannerSlides = slidesRaw.split('\n').map(s => s.trim()).filter(Boolean);
+
+  const data = {
+    name,
+    icon: document.getElementById('cat-icon').value.trim(),
+    description: document.getElementById('cat-description').value.trim(),
+    subcategories,
+    showBanner,
+    bannerDesc,
+    order,
+    bannerSlides
+  };
+
   try {
     if (id) { await updateDoc(doc(db,'categories',id), data); adminToast('Categoría actualizada ✅','ok'); }
     else { await addDoc(collection(db,'categories'), data); adminToast('Categoría creada ✅','ok'); }
     closeModal('category-modal'); loadCategories();
-  } catch(e) { adminToast('Error al guardar','err'); }
+  } catch(e) { adminToast('Error al guardar','err'); console.error(e); }
 };
 
 // ============================================================
