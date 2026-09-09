@@ -12,92 +12,70 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .cat-page-hero {
-      height: 340px; position: relative; overflow: hidden;
-      background: var(--beige-dark);
+    .cat-page-header {
+      background: linear-gradient(135deg, #FAF7F2 0%, #F0DADA 100%);
+      padding: 56px 60px 44px;
+      border-bottom: 1px solid #E5D8CC;
     }
-    .cat-page-hero-slides { position: absolute; inset: 0; }
-    .cat-page-hero-slide {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      opacity: 0; transition: opacity 1s ease;
+    .cat-page-eyebrow {
+      font-size: 0.68rem; letter-spacing: 0.32em; text-transform: uppercase;
+      color: #B87A7A; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
     }
-    .cat-page-hero-slide.active { opacity: 1; }
-    .cat-page-hero-slide::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(90deg, rgba(30,15,5,0.6) 0%, rgba(30,15,5,0.2) 60%, transparent 100%);
+    .cat-page-eyebrow::before { content: ''; width: 28px; height: 1.5px; background: #D4A5A5; }
+    .cat-page-h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 300; color: #5C3D2E; line-height: 1.1;
     }
-    .cat-page-hero-content {
-      position: absolute; z-index: 2; top: 50%; left: 60px;
-      transform: translateY(-50%);
-    }
-    .cat-page-label {
-      font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
-      color: rgba(255,255,255,0.75); margin-bottom: 10px;
-    }
-    .cat-page-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 300; color: white; line-height: 1.05;
-      text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    .cat-page-desc {
+      font-size: 0.9rem; color: #6B4E3D; margin-top: 10px; max-width: 500px;
     }
     .cat-page-body {
-      max-width: 1400px; margin: 0 auto;
-      padding: 40px 40px 80px;
+      max-width: 1400px; margin: 0 auto; padding: 36px 40px 80px;
+      background: white;
     }
-    .cat-page-toolbar {
-      display: flex; align-items: center;
-      justify-content: space-between; flex-wrap: wrap;
-      gap: 16px; margin-bottom: 32px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
+    .cat-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px;
+      padding-bottom: 20px; margin-bottom: 24px;
+      border-bottom: 1px solid #E5D8CC;
     }
-    .cat-page-breadcrumb {
-      font-size: 0.78rem; color: var(--text-muted);
+    .cat-breadcrumb {
+      font-size: 0.78rem; color: #A08070;
       display: flex; align-items: center; gap: 8px;
     }
-    .cat-page-breadcrumb a { color: var(--text-muted); transition: var(--transition); }
-    .cat-page-breadcrumb a:hover { color: var(--rose-dark); }
-    .cat-page-count {
-      font-size: 0.82rem; color: var(--text-muted);
+    .cat-breadcrumb a { color: #A08070; text-decoration: none; }
+    .cat-breadcrumb a:hover { color: #B87A7A; }
+    .cat-count { font-size: 0.82rem; color: #A08070; }
+    .cat-sort {
+      padding: 8px 16px; border-radius: 99px;
+      border: 1.5px solid #E5D8CC; background: white;
+      color: #6B4E3D; font-size: 0.82rem; cursor: pointer; outline: none;
+      font-family: 'DM Sans', sans-serif;
     }
-    /* Subcategorias */
-    .subcat-tabs {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;
-    }
+    .subcat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
     .subcat-tab {
-      padding: 7px 18px; border-radius: var(--radius-full);
-      font-size: 0.8rem; font-weight: 500;
-      border: 1.5px solid var(--border);
-      background: white; color: var(--text-light);
-      cursor: pointer; transition: var(--transition);
+      padding: 7px 18px; border-radius: 99px; font-size: 0.8rem; font-weight: 500;
+      border: 1.5px solid #E5D8CC; background: white; color: #6B4E3D;
+      cursor: pointer; transition: all 0.3s ease;
+      font-family: 'DM Sans', sans-serif;
     }
     .subcat-tab.active, .subcat-tab:hover {
-      background: var(--rose-light); border-color: var(--rose);
-      color: var(--rose-dark);
+      background: #F0DADA; border-color: #D4A5A5; color: #B87A7A;
     }
-    /* Sort */
-    .cat-sort {
-      padding: 8px 16px; border-radius: var(--radius-full);
-      border: 1.5px solid var(--border); background: white;
-      color: var(--text-light); font-size: 0.82rem;
-      cursor: pointer; outline: none;
-    }
-    /* Empty */
     .cat-empty {
-      text-align: center; padding: 80px 20px;
-      color: var(--text-muted);
+      text-align: center; padding: 80px 20px; color: #A08070;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;
     }
-    .cat-empty i { font-size: 3rem; opacity: 0.3; margin-bottom: 16px; display: block; }
-
+    .cat-empty i { display: block; font-size: 2.5rem; opacity: 0.3; margin-bottom: 16px; }
     @media (max-width: 768px) {
-      .cat-page-hero { height: 240px; }
-      .cat-page-hero-content { left: 28px; }
-      .cat-page-body { padding: 24px 20px 60px; }
+      .cat-page-header { padding: 40px 20px 32px; }
+      .cat-page-body { padding: 24px 16px 60px; }
     }
   </style>
 </head>
-<body>
+<body style="background:white;">
 
 <!-- Barra superior -->
 <div class="topbar-strip">
@@ -160,25 +138,24 @@
   <a href="/#footer">Contacto</a>
 </nav>
 
-<!-- Header da categoria (sem slide) -->
-<div class="cat-page-hero-simple">
-  <div class="cat-page-hero-content-simple">
-    <div class="cat-page-label-simple">CATEGORÍA</div>
-    <h1 class="cat-page-title-simple" id="cat-page-title">Cargando...</h1>
-  </div>
+<!-- Header de categoría -->
+<div class="cat-page-header">
+  <div class="cat-page-eyebrow">CATEGORÍA</div>
+  <h1 class="cat-page-h1" id="cat-title">Cargando...</h1>
+  <p class="cat-page-desc" id="cat-desc"></p>
 </div>
 
-<!-- Produtos da categoria -->
+<!-- Productos -->
 <div class="cat-page-body">
-  <div class="cat-page-toolbar">
-    <div class="cat-page-breadcrumb">
-      <a href="/"><i class="fa-solid fa-house" style="font-size:0.8rem;"></i></a>
+  <div class="cat-toolbar">
+    <div class="cat-breadcrumb">
+      <a href="/"><i class="fa-solid fa-house" style="font-size:0.75rem;"></i></a>
       <span>›</span>
       <span id="cat-breadcrumb-name">Categoría</span>
     </div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <span class="cat-page-count" id="cat-count"></span>
-      <select class="cat-sort" id="cat-sort" onchange="sortProducts(this.value)">
+      <span class="cat-count" id="cat-count"></span>
+      <select class="cat-sort" id="cat-sort">
         <option value="default">Ordenar por...</option>
         <option value="price-asc">Precio: menor a mayor</option>
         <option value="price-desc">Precio: mayor a menor</option>
@@ -186,11 +163,7 @@
       </select>
     </div>
   </div>
-
-  <!-- Subcategorías -->
   <div class="subcat-tabs" id="subcat-tabs"></div>
-
-  <!-- Grid de productos -->
   <div id="cat-products-grid" class="products-carousel-container"></div>
 </div>
 
@@ -223,7 +196,7 @@
   </div>
 </footer>
 
-<!-- Carrito completo -->
+<!-- Carrito -->
 <div id="cart-overlay"></div>
 <aside id="cart-drawer">
   <div class="cart-header">
@@ -236,20 +209,8 @@
   <div id="cart-empty" class="cart-empty"><div class="cart-empty-icon">🛍️</div><p>Tu carrito está vacío</p></div>
   <div id="cart-items" class="cart-items"></div>
   <div class="cart-footer">
-    <div id="cart-promos-section" class="cart-promos-section" style="display:none;">
-      <div class="cart-section-label">🎁 Promociones disponibles</div>
-      <div id="cart-promos-list"></div>
-    </div>
-    <div id="cart-cupones-section" class="cart-cupones-section" style="display:none;">
-      <button class="cart-cupones-toggle" id="cart-cupones-toggle">
-        <span>🎟️ Tengo un cupón</span><span id="cupones-arrow">▾</span>
-      </button>
-      <div class="cart-cupones-list" id="cart-cupones-list"></div>
-    </div>
-    <div id="coupon-msg" class="cart-coupon-msg"></div>
     <div class="cart-summary">
       <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
-      <div class="cart-summary-row" id="discount-row" style="display:none;"><span>Descuento</span><span id="cart-discount" style="color:var(--terra)">-$0</span></div>
       <div class="cart-summary-row total"><span>Total</span><span id="cart-total">$0</span></div>
     </div>
     <button id="checkout-btn" class="cart-checkout-btn">
@@ -258,52 +219,7 @@
   </div>
 </aside>
 
-<!-- Checkout Modal -->
-<div id="checkout-modal">
-  <div class="checkout-box">
-    <button class="checkout-close" id="checkout-close">✕</button>
-    <h2 class="checkout-title">Finalizar Compra</h2>
-    <p class="checkout-subtitle">Completá tus datos para continuar.</p>
-    <div class="form-section-title">Tus datos</div>
-    <div class="form-grid">
-      <div class="form-group"><label>Nombre *</label><input type="text" id="co-name"></div>
-      <div class="form-group"><label>WhatsApp *</label><input type="tel" id="co-whatsapp"></div>
-      <div class="form-group"><label>Calle *</label><input type="text" id="co-street"></div>
-      <div class="form-group"><label>Número *</label><input type="text" id="co-number"></div>
-      <div class="form-group"><label>Barrio</label><input type="text" id="co-barrio"></div>
-      <div class="form-group"><label>Ciudad *</label><input type="text" id="co-city"></div>
-      <div class="form-group"><label>CP *</label><input type="text" id="co-postal"></div>
-      <div class="form-group"><label>Provincia</label>
-        <select id="co-province">
-          <option value="X">Córdoba</option><option value="B">Buenos Aires</option>
-          <option value="C">CABA</option><option value="S">Santa Fe</option>
-          <option value="M">Mendoza</option><option value="T">Tucumán</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-section-title">Opciones de envío</div>
-    <div id="shipping-options" class="shipping-options"><div class="shipping-loading">Ingresá tu CP para calcular el flete</div></div>
-    <div class="checkout-payment-options">
-      <p class="checkout-payment-label">Elegí cómo querés pagar:</p>
-      <button id="checkout-submit-wa" class="checkout-submit-btn checkout-wa-btn">
-        <i class="fa-solid fa-money-bill-wave"></i> Pagar por ALIAS / Transferencia
-      </button>
-      <div class="alias-notice"><i class="fa-solid fa-circle-check"></i> Sin costo adicional · Total: <strong id="alias-total">$0</strong></div>
-      <div class="payment-separator"><span>o</span></div>
-      <button id="checkout-submit-mp" class="checkout-submit-btn checkout-mp-btn">
-        <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16S24.837 0 16 0z" fill="#009EE3"/><path d="M24.5 13.5c0 2.485-1.567 4.5-3.5 4.5h-3l-1 5h-3l2.5-12h5c1.933 0 3 .896 3 2.5z" fill="#fff"/></svg>
-        Pagar con débito / crédito
-      </button>
-      <div class="mp-surcharge-notice"><i class="fa-solid fa-circle-info"></i><span>Comisión MP 6,60% + IVA 21%.<br><strong>Total con tarjeta: <span id="mp-total-with-surcharge">$0</span></strong></span></div>
-    </div>
-    <div class="cart-summary" style="margin-top:16px;">
-      <div class="cart-summary-row"><span>Subtotal</span><span id="checkout-subtotal">$0</span></div>
-      <div class="cart-summary-row"><span>Envío</span><span id="checkout-shipping-cost">-</span></div>
-      <div class="cart-summary-row total"><span>TOTAL</span><span id="checkout-total">$0</span></div>
-    </div>
-  </div>
-</div>
-
+<!-- Modal producto -->
 <div id="product-modal">
   <div class="product-modal-box">
     <div class="product-modal-gallery">
@@ -328,88 +244,80 @@
 <div id="toast-container"></div>
 <a href="https://wa.me/5493576466145" class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
 
-
-
-
 <script type="module">
+// ============================================================
+// IMPORTS — só o que existe no firebase-config
+// ============================================================
 import {
-  db, auth, WHATSAPP_NUMBER,
-  collection, getDocs, addDoc, doc, getDoc, setDoc,
-  query, orderBy, where
+  db,
+  collection, getDocs, doc, getDoc,
+  query, orderBy
 } from './js/firebase-config.js';
 
 // ============================================================
-// CARRINHO STANDALONE (sem main.js)
+// CARRINHO
 // ============================================================
 let cart = JSON.parse(localStorage.getItem('zoeveos_cart') || '[]');
-let appliedCoupon = null;
-
 const fmt = n => Number(n).toLocaleString('es-AR');
 
 function saveCart() {
   localStorage.setItem('zoeveos_cart', JSON.stringify(cart));
-  updateCartUI();
+  renderCart();
 }
 
-window.addToCart = function(product) {
-  const existing = cart.find(i => i.id === product.id);
-  if (existing) existing.qty++;
-  else cart.push({ ...product, qty: 1 });
+window.addToCart = function(p) {
+  const ex = cart.find(i => i.id === p.id);
+  if (ex) ex.qty++; else cart.push({...p, qty:1});
   saveCart();
-  showToast('✅ ' + product.name + ' agregado');
+  showToast('✅ ' + p.name + ' agregado');
   openCart();
 };
 
-window.updateQtyCart = function(id, delta) {
-  const item = cart.find(i => i.id === id);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+window.updateQtyCart = function(id, d) {
+  const it = cart.find(i => i.id === id);
+  if (!it) return;
+  it.qty += d;
+  if (it.qty <= 0) cart = cart.filter(i => i.id !== id);
   saveCart();
 };
 
-window.removeFromCartItem = function(id) {
+window.removeFromCart = function(id) {
   cart = cart.filter(i => i.id !== id);
   saveCart();
 };
 
-function getSubtotal() { return cart.reduce((s,i) => s + i.price * i.qty, 0); }
-
-function updateCartUI() {
-  const count = cart.reduce((s,i) => s + i.qty, 0);
-  const countEl = document.getElementById('cart-count');
-  if (countEl) { countEl.textContent = count; countEl.classList.toggle('visible', count > 0); }
-
-  const emptyEl = document.getElementById('cart-empty');
-  const itemsEl = document.getElementById('cart-items');
-  if (!itemsEl) return;
-
+function renderCart() {
+  const cnt = cart.reduce((s,i) => s+i.qty, 0);
+  const el = document.getElementById('cart-count');
+  if (el) { el.textContent = cnt; el.classList.toggle('visible', cnt>0); }
+  const empty = document.getElementById('cart-empty');
+  const items = document.getElementById('cart-items');
+  if (!items) return;
   if (cart.length === 0) {
-    itemsEl.innerHTML = '';
-    if (emptyEl) emptyEl.style.display = 'flex';
+    items.innerHTML = '';
+    if (empty) empty.style.display = 'flex';
   } else {
-    if (emptyEl) emptyEl.style.display = 'none';
-    itemsEl.innerHTML = cart.map(item => `
+    if (empty) empty.style.display = 'none';
+    items.innerHTML = cart.map(i => `
       <div class="cart-item">
-        <img class="cart-item-img" src="${item.image||''}" alt="${item.name}" onerror="this.style.background='var(--beige-dark)'">
+        <img class="cart-item-img" src="${i.image||''}" alt="${i.name}" onerror="this.style.opacity=0">
         <div class="cart-item-info">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-price">$${fmt(item.price * item.qty)}</div>
+          <div class="cart-item-name">${i.name}</div>
+          <div class="cart-item-price">$${fmt(i.price*i.qty)}</div>
           <div class="cart-item-qty">
-            <button class="qty-btn" onclick="updateQtyCart('${item.id}',-1)">−</button>
-            <span class="qty-num">${item.qty}</span>
-            <button class="qty-btn" onclick="updateQtyCart('${item.id}',1)">+</button>
+            <button class="qty-btn" onclick="updateQtyCart('${i.id}',-1)">−</button>
+            <span class="qty-num">${i.qty}</span>
+            <button class="qty-btn" onclick="updateQtyCart('${i.id}',1)">+</button>
           </div>
         </div>
-        <button class="cart-item-remove" onclick="removeFromCartItem('${item.id}')">✕</button>
+        <button class="cart-item-remove" onclick="removeFromCart('${i.id}')">✕</button>
       </div>`).join('');
   }
-
-  const sub = getSubtotal();
+  const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
   const subEl = document.getElementById('cart-subtotal');
   const totEl = document.getElementById('cart-total');
-  if (subEl) subEl.textContent = '$' + fmt(sub);
-  if (totEl) totEl.textContent = '$' + fmt(sub);
+  if (subEl) subEl.textContent = '$'+fmt(sub);
+  if (totEl) totEl.textContent = '$'+fmt(sub);
 }
 
 window.openCart = function() {
@@ -417,273 +325,265 @@ window.openCart = function() {
   document.getElementById('cart-drawer')?.classList.add('open');
   document.body.style.overflow = 'hidden';
 };
-
 window.closeCart = function() {
   document.getElementById('cart-overlay')?.classList.remove('open');
   document.getElementById('cart-drawer')?.classList.remove('open');
   document.body.style.overflow = '';
 };
-
 window.showToast = function(msg) {
   const c = document.getElementById('toast-container');
   if (!c) return;
   const t = document.createElement('div');
-  t.className = 'toast success';
-  t.textContent = msg;
+  t.className = 'toast success'; t.textContent = msg;
   c.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),400); }, 3000);
+  setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(),400); },3000);
 };
 
+// ============================================================
+// VARIÁVEIS
+// ============================================================
 const params  = new URLSearchParams(location.search);
-const catName = params.get('cat') || '';
+const catName = decodeURIComponent(params.get('cat') || '');
 let allProds  = [];
 let filtered  = [];
 
-const fmt = n => Number(n).toLocaleString('es-AR');
-
+// ============================================================
+// INIT
+// ============================================================
 async function init() {
   if (!catName) { location.href = '/'; return; }
+
+  // SEO e título
+  document.title = catName + ' — ZOE VEOS';
+  document.getElementById('cat-title').textContent = catName;
+  document.getElementById('cat-breadcrumb-name').textContent = catName;
+  document.getElementById('meta-desc').content = `Productos de ${catName} en ZOE VEOS. Artículos de maternidad en Argentina.`;
 
   // Header scroll
   const header = document.getElementById('header');
   window.addEventListener('scroll', () => {
-    header?.classList.toggle('scrolled', window.scrollY > 60);
+    if (header) header.classList.toggle('scrolled', window.scrollY > 60);
   }, { passive: true });
 
-  // Hamburger
+  // Mobile nav
   document.getElementById('hamburger')?.addEventListener('click', () =>
     document.getElementById('mobile-nav')?.classList.add('open'));
   document.getElementById('mobile-nav-close')?.addEventListener('click', () =>
     document.getElementById('mobile-nav')?.classList.remove('open'));
 
-  // SEO
-  document.title = `${catName} — ZOE VEOS`;
-  document.getElementById('meta-desc').content = `Productos de ${catName} en ZOE VEOS. Artículos de maternidad en Argentina.`;
-  document.getElementById('canonical').href = `https://www.zoeveos.com/categoria.html?cat=${encodeURIComponent(catName)}`;
+  // Cart buttons
+  document.getElementById('cart-btn')?.addEventListener('click', openCart);
+  document.getElementById('cart-close')?.addEventListener('click', closeCart);
+  document.getElementById('cart-overlay')?.addEventListener('click', closeCart);
+  document.getElementById('checkout-btn')?.addEventListener('click', () => {
+    location.href = '/?checkout=1';
+  });
 
-  // Títulos
-  document.getElementById('cat-page-title').textContent = catName;
-  document.getElementById('cat-breadcrumb-name').textContent = catName;
+  // Renderizar carrito inicial
+  renderCart();
 
-  // Carregar categoria para pegar slides e subcategorias
-  const catSnap = await getDocs(collection(db, 'categories'));
-  const catData = catSnap.docs.map(d => d.data()).find(c => c.name === catName);
+  // Carregar categorias para nav dropdown
+  try {
+    const catsSnap = await getDocs(collection(db, 'categories'));
+    const cats = catsSnap.docs.map(d => d.data());
 
-  // Hero slides
-  if (catData?.bannerSlides?.length) {
-    const slidesContainer = document.getElementById('cat-hero-slides');
-    catData.bannerSlides.forEach((src, i) => {
-      const s = document.createElement('div');
-      s.className = 'cat-page-hero-slide' + (i===0?' active':'');
-      s.style.backgroundImage = `url('${src}')`;
-      slidesContainer.appendChild(s);
-    });
-    if (catData.bannerSlides.length > 1) {
-      let cur = 0;
-      setInterval(() => {
-        const all = slidesContainer.querySelectorAll('.cat-page-hero-slide');
-        all[cur].classList.remove('active');
-        cur = (cur + 1) % all.length;
-        all[cur].classList.add('active');
-      }, 5000);
+    // Descrição da categoria atual
+    const catData = cats.find(c => c.name === catName);
+    if (catData?.bannerDesc) {
+      document.getElementById('cat-desc').textContent = catData.bannerDesc;
     }
-  }
 
-  // Subcategorias
-  if (catData?.subcategories?.length) {
-    const tabs = document.getElementById('subcat-tabs');
-    const allTab = document.createElement('button');
-    allTab.className = 'subcat-tab active';
-    allTab.textContent = 'Todos';
-    allTab.addEventListener('click', () => {
-      filtered = allProds;
-      renderProds(filtered);
-      tabs.querySelectorAll('.subcat-tab').forEach(t => t.classList.remove('active'));
-      allTab.classList.add('active');
-    });
-    tabs.appendChild(allTab);
-
-    catData.subcategories.forEach(sub => {
-      const btn = document.createElement('button');
-      btn.className = 'subcat-tab';
-      btn.textContent = sub;
-      btn.addEventListener('click', () => {
-        filtered = allProds.filter(p => p.subcategory === sub);
+    // Subcategorias
+    if (catData?.subcategories?.length) {
+      const tabs = document.getElementById('subcat-tabs');
+      const todosBtn = document.createElement('button');
+      todosBtn.className = 'subcat-tab active';
+      todosBtn.textContent = 'Todos';
+      todosBtn.onclick = () => {
+        filtered = allProds;
         renderProds(filtered);
         tabs.querySelectorAll('.subcat-tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
+        todosBtn.classList.add('active');
+      };
+      tabs.appendChild(todosBtn);
+      catData.subcategories.forEach(sub => {
+        const btn = document.createElement('button');
+        btn.className = 'subcat-tab';
+        btn.textContent = sub;
+        btn.onclick = () => {
+          filtered = allProds.filter(p => p.subcategory === sub);
+          renderProds(filtered);
+          tabs.querySelectorAll('.subcat-tab').forEach(t => t.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        tabs.appendChild(btn);
       });
-      tabs.appendChild(btn);
+    }
+
+    // Nav dropdown
+    const menu = document.getElementById('nav-cat-menu');
+    const navBtn = document.getElementById('nav-cat-btn');
+    if (menu) {
+      menu.innerHTML = cats.map(c =>
+        `<a href="categoria.html?cat=${encodeURIComponent(c.name)}">
+          <i class="${c.icon||'fa-solid fa-tag'}"></i>${c.name}
+        </a>`).join('');
+    }
+    navBtn?.addEventListener('click', e => {
+      e.stopPropagation();
+      menu?.classList.toggle('open');
     });
-  }
+    document.addEventListener('click', () => menu?.classList.remove('open'));
 
-  // Dropdown nav categorias
-  const navMenu = document.getElementById('nav-cat-menu');
-  const navBtn  = document.getElementById('nav-cat-btn');
-  catSnap.docs.forEach(d => {
-    const c = d.data();
-    const a = document.createElement('a');
-    a.href = `categoria.html?cat=${encodeURIComponent(c.name)}`;
-    a.innerHTML = `<i class="${c.icon||'fa-solid fa-tag'}"></i>${c.name}`;
-    navMenu?.appendChild(a);
-  });
-  navBtn?.addEventListener('click', e => { e.stopPropagation(); navMenu?.classList.toggle('open'); });
-  document.addEventListener('click', () => navMenu?.classList.remove('open'));
+  } catch(e) { console.error('Error loading categories:', e); }
 
-  // Carregar produtos da categoria
-  const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
-  allProds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    .filter(p =>
+  // Carregar produtos
+  try {
+    const snap = await getDocs(query(collection(db, 'products'), orderBy('createdAt', 'desc')));
+    const todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Filtrar por categoria principal OU categories[]
+    allProds = todos.filter(p =>
       p.category === catName ||
       (Array.isArray(p.categories) && p.categories.includes(catName))
     );
-  window.allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  filtered = allProds;
-  renderProds(filtered);
 
-  // Busca
-  initSearchCat();
+    filtered = allProds;
+    renderProds(filtered);
+
+    // Busca
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    if (searchInput && searchResults) {
+      let deb;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(deb);
+        deb = setTimeout(() => {
+          const q = searchInput.value.trim().toLowerCase();
+          if (!q || q.length < 2) { searchResults.classList.remove('open'); return; }
+          const matches = todos.filter(p =>
+            p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
+          ).slice(0, 8);
+          searchResults.innerHTML = matches.length
+            ? matches.map(p => `<a class="search-result-item" href="product.html?id=${p.id}">
+                <img class="search-result-img" src="${p.image||''}" alt="${p.name}" onerror="this.style.opacity=0">
+                <div class="search-result-info">
+                  <div class="search-result-name">${p.name}</div>
+                  <div class="search-result-cat">${p.category||''}</div>
+                </div>
+                <div class="search-result-price">${p.consultarWa?'Consultar':'$'+fmt(p.price)}</div>
+              </a>`).join('')
+            : `<div class="search-no-results">Sin resultados</div>`;
+          searchResults.classList.add('open');
+        }, 280);
+      });
+      document.addEventListener('click', e => {
+        if (!e.target.closest('.search-wrap')) searchResults.classList.remove('open');
+      });
+    }
+
+  } catch(e) { console.error('Error loading products:', e); }
+
+  // Sort
+  document.getElementById('cat-sort')?.addEventListener('change', function() {
+    let sorted = [...filtered];
+    if (this.value === 'price-asc') sorted.sort((a,b) => a.price - b.price);
+    else if (this.value === 'price-desc') sorted.sort((a,b) => b.price - a.price);
+    else if (this.value === 'newest') sorted.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
+    renderProds(sorted);
+  });
 }
 
+// ============================================================
+// RENDERIZAR PRODUTOS
+// ============================================================
 function renderProds(prods) {
   const grid = document.getElementById('cat-products-grid');
-  const count = document.getElementById('cat-count');
+  const countEl = document.getElementById('cat-count');
   if (!grid) return;
 
-  if (count) count.textContent = `${prods.length} producto${prods.length!==1?'s':''}`;
+  if (countEl) countEl.textContent = `${prods.length} producto${prods.length!==1?'s':''}`;
 
   if (prods.length === 0) {
-    grid.innerHTML = `<div class="cat-empty"><i class="fa-solid fa-box-open"></i><p>No hay productos en esta categoría aún.</p></div>`;
+    grid.innerHTML = `<div class="cat-empty"><i class="fa-solid fa-box-open"></i>No hay productos en esta categoría aún.</div>`;
     return;
   }
 
-  // Usar o mesmo carrossel por subcategoria ou grid normal
-  const subcats = [...new Set(prods.map(p => p.subcategory).filter(Boolean))];
+  grid.innerHTML = '';
+  const section = document.createElement('div');
+  section.className = 'product-category-section';
 
-  if (subcats.length > 1) {
-    // Organizar por subcategoria
-    grid.innerHTML = '';
-    subcats.forEach(sub => {
-      const items = prods.filter(p => p.subcategory === sub);
-      if (!items.length) return;
-      const section = document.createElement('div');
-      section.className = 'product-category-section';
-      section.innerHTML = `
-        <div class="product-cat-header">
-          <h3 class="product-cat-title">${sub}</h3>
-        </div>
-        <div class="product-carousel">
-          <div class="product-carousel-track" id="track-${sub.replace(/\s/g,'-')}"></div>
-        </div>`;
-      grid.appendChild(section);
-      const track = section.querySelector(`#track-${sub.replace(/\s/g,'-')}`);
-      items.forEach(p => track.appendChild(buildCard(p)));
-    });
+  const carousel = document.createElement('div');
+  carousel.className = 'product-carousel';
 
-    // Sem subcategoria
-    const noSub = prods.filter(p => !p.subcategory);
-    if (noSub.length) {
-      const section = document.createElement('div');
-      section.className = 'product-category-section';
-      section.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="track-nosub"></div></div>`;
-      grid.appendChild(section);
-      const track = section.querySelector('#track-nosub');
-      noSub.forEach(p => track.appendChild(buildCard(p)));
-    }
-  } else {
-    // Grid simples
-    grid.innerHTML = '';
-    const section = document.createElement('div');
-    section.className = 'product-category-section';
-    section.innerHTML = `<div class="product-carousel"><div class="product-carousel-track" id="main-track"></div></div>`;
-    grid.appendChild(section);
-    const track = section.querySelector('#main-track');
-    prods.forEach(p => track.appendChild(buildCard(p)));
-  }
+  const track = document.createElement('div');
+  track.className = 'product-carousel-track';
+
+  prods.forEach(p => {
+    const card = buildCard(p);
+    track.appendChild(card);
+  });
+
+  // Swipe mobile
+  let sx = 0;
+  carousel.addEventListener('touchstart', e => sx = e.touches[0].clientX, { passive: true });
+  carousel.addEventListener('touchend', e => {
+    const diff = sx - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) carousel.scrollBy({ left: diff > 0 ? carousel.clientWidth*0.8 : -carousel.clientWidth*0.8, behavior: 'smooth' });
+  }, { passive: true });
+
+  carousel.appendChild(track);
+  section.appendChild(carousel);
+  grid.appendChild(section);
 }
 
 function buildCard(p) {
   const card = document.createElement('div');
   card.className = 'product-card';
+  card.style.cursor = 'pointer';
+
   const sinStock = typeof p.stock === 'number' && p.stock === 0;
-  const stockHTML = typeof p.stock === 'number' && p.stock > 0
+  const stockNum = typeof p.stock === 'number' && p.stock > 0;
+
+  const stockHTML = stockNum
     ? `<div class="product-stock"><span class="stock-dot"></span>${p.stock===1?'¡Último!':p.stock+' disponibles'}</div>`
     : sinStock ? `<div class="product-stock sin-stock"><span class="stock-dot"></span>Sin stock</div>` : '';
-  const waMsg = encodeURIComponent(`¡Hola! Quiero consultar sobre: ${p.name}`);
+
+  const waMsg = encodeURIComponent('¡Hola! Me interesa: ' + p.name);
   const btnHTML = p.consultarWa
-    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Consultar precio</a>`
+    ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${waMsg}" target="_blank" onclick="event.stopPropagation()"><i class="fa-brands fa-whatsapp"></i> Consultar precio</a>`
     : sinStock
-      ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${encodeURIComponent('¡Hola! Quiero encargar: '+p.name)}" target="_blank"><i class="fa-brands fa-whatsapp"></i> Encargar</a>`
-      : `<button class="product-add-btn add-btn-js">Agregar al carrito</button>`;
+      ? `<a class="product-add-btn out-of-stock" href="https://wa.me/5493576466145?text=${encodeURIComponent('¡Hola! Quiero encargar: '+p.name)}" target="_blank" onclick="event.stopPropagation()"><i class="fa-brands fa-whatsapp"></i> Encargar</a>`
+      : `<button class="product-add-btn" onclick="event.stopPropagation();addToCart(window._prod_${p.id.replace(/[^a-z0-9]/gi,'_')})">Agregar al carrito</button>`;
+
+  // Guardar produto em variável global para acesso no onclick
+  window[`_prod_${p.id.replace(/[^a-z0-9]/gi,'_')}`] = p;
 
   card.innerHTML = `
     <div class="product-img-wrap">
-      ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:var(--beige-dark)"></div>'}
+      ${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : '<div style="width:100%;height:100%;background:#EDE3D6"></div>'}
       ${p.badge ? `<div class="product-badge badge-${p.badge}">${{promo:'🔥 Promo',destaque:'⭐ Destaque',nuevo:'✨ Nuevo'}[p.badge]||p.badge}</div>` : ''}
-      ${(!sinStock && !p.consultarWa) ? '<button class="product-quick-add quick-add-js">🛒</button>' : ''}
+      ${(!sinStock&&!p.consultarWa)?'<button class="product-quick-add" onclick="event.stopPropagation();addToCart(window._prod_'+p.id.replace(/[^a-z0-9]/gi,'_')+')">🛒</button>':''}
     </div>
     <div class="product-info">
       <div class="product-category-tag">${p.subcategory||p.category||''}</div>
       <div class="product-name">${p.name}</div>
       <div class="product-price-wrap">
-        ${p.consultarWa ? '<span class="product-price" style="font-size:0.85rem;color:var(--text-muted)">Consultar precio</span>' : `<span class="product-price">$${fmt(p.price)}</span>${p.oldPrice?`<span class="product-price-old">$${fmt(p.oldPrice)}</span>`:''}`}
+        ${p.consultarWa
+          ? '<span class="product-price" style="font-size:0.82rem;color:#A08070">Consultar precio</span>'
+          : `<span class="product-price">$${fmt(p.price)}</span>${p.oldPrice?`<span class="product-price-old">$${fmt(p.oldPrice)}</span>`:''}`}
       </div>
       ${stockHTML}
       ${btnHTML}
     </div>`;
 
-  card.addEventListener('click', () => {
-    location.href = `product.html?id=${p.id}`;
-  });
-  card.querySelector('.add-btn-js')?.addEventListener('click', e => {
-    e.stopPropagation();
-    if (window.addToCart) window.addToCart(p);
-  });
-  card.querySelector('.quick-add-js')?.addEventListener('click', e => {
-    e.stopPropagation();
-    if (window.addToCart) window.addToCart(p);
-  });
+  // Click no card → vai para landpage do produto
+  card.addEventListener('click', () => { location.href = `product.html?id=${p.id}`; });
+
   return card;
 }
 
-window.sortProducts = function(val) {
-  let sorted = [...filtered];
-  if (val === 'price-asc') sorted.sort((a,b) => a.price - b.price);
-  else if (val === 'price-desc') sorted.sort((a,b) => b.price - a.price);
-  else if (val === 'newest') sorted.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-  renderProds(sorted);
-};
-
-function initSearchCat() {
-  const input = document.getElementById('search-input');
-  const btn   = document.getElementById('search-btn');
-  const res   = document.getElementById('search-results');
-  if (!input) return;
-  let debounce;
-  input.addEventListener('input', () => {
-    clearTimeout(debounce);
-    debounce = setTimeout(() => {
-      const q = input.value.trim().toLowerCase();
-      if (!q || q.length < 2) { res?.classList.remove('open'); return; }
-      const matches = (window.allProducts||[]).filter(p =>
-        p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)
-      ).slice(0,8);
-      if (!res) return;
-      res.innerHTML = matches.length
-        ? matches.map(p => `<a class="search-result-item" href="product.html?id=${p.id}">
-            <img class="search-result-img" src="${p.image||''}" alt="${p.name}" onerror="this.style.opacity='0'">
-            <div class="search-result-info"><div class="search-result-name">${p.name}</div><div class="search-result-cat">${p.category||''}</div></div>
-            <div class="search-result-price">${p.consultarWa?'Consultar':'$'+fmt(p.price)}</div>
-          </a>`).join('')
-        : `<div class="search-no-results">Sin resultados para "${input.value}"</div>`;
-      res.classList.add('open');
-    }, 280);
-  });
-  input.addEventListener('keydown', e => { if (e.key === 'Escape') res?.classList.remove('open'); });
-  btn?.addEventListener('click', () => res?.classList.remove('open'));
-  document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) res?.classList.remove('open'); });
-}
-
+// Iniciar
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
