@@ -1,5 +1,5 @@
 // js/categoria.js
-import { db, collection, getDocs, doc, getDoc, query, where, orderBy } from "./firebase-config.js";
+import { db, collection, getDocs, doc, getDoc, query, where } from "./firebase-config.js";
 import { initHeader } from "./header.js";
 import { optimizedUrl } from "./cloudinary.js";
 import { getParam } from "./utils.js";
@@ -24,7 +24,9 @@ async function load() {
       document.title = catSnap.data().nombre + " · Zoë νέος";
     }
 
-    const q = query(collection(db, "subcategorias"), where("categoriaId", "==", catId), orderBy("orden", "asc"));
+    // Nota: filtramos solo por categoriaId (sin orderBy en la consulta) para no depender
+    // de un índice compuesto en Firestore. El orden se aplica acá, en el navegador.
+    const q = query(collection(db, "subcategorias"), where("categoriaId", "==", catId));
     const snap = await getDocs(q);
     const subcats = [];
     snap.forEach((d) => {
@@ -32,6 +34,7 @@ async function load() {
       if (data.activo === false) return;
       subcats.push({ id: d.id, ...data });
     });
+    subcats.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
     if (subcats.length === 0) {
       grid.innerHTML = `<div class="empty-state">Todavía no hay subcategorías en esta categoría.</div>`;

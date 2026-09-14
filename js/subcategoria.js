@@ -1,5 +1,5 @@
 // js/subcategoria.js
-import { db, collection, getDocs, doc, getDoc, query, where, orderBy } from "./firebase-config.js";
+import { db, collection, getDocs, doc, getDoc, query, where } from "./firebase-config.js";
 import { initHeader } from "./header.js";
 import { initCartUI, addToCart } from "./cart.js";
 import { optimizedUrl } from "./cloudinary.js";
@@ -26,7 +26,9 @@ async function load() {
     document.title = sc.nombre + " · Zoë νέος";
     renderHero(sc);
 
-    const q = query(collection(db, "productos"), where("subcategoriaId", "==", scId), orderBy("nombre", "asc"));
+    // Nota: filtramos solo por subcategoriaId (sin orderBy en la consulta) para no
+    // depender de un índice compuesto en Firestore. El orden se aplica acá, en el navegador.
+    const q = query(collection(db, "productos"), where("subcategoriaId", "==", scId));
     const snap = await getDocs(q);
     const products = [];
     snap.forEach((d) => {
@@ -34,6 +36,7 @@ async function load() {
       if (data.activo === false) return;
       products.push({ id: d.id, ...data });
     });
+    products.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es"));
 
     if (products.length === 0) {
       grid.innerHTML = `<div class="empty-state">Todavía no hay productos en esta subcategoría.</div>`;
