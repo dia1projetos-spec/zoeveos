@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · Zoë νέος</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <h2>Zoë νέος</h2>
+    <nav class="admin-nav" id="adminNav">
+      <button data-tab="config" class="active">⚙️ Configuración</button>
+      <button data-tab="categorias">🗂️ Categorías</button>
+      <button data-tab="subcategorias">📁 Subcategorías</button>
+      <button data-tab="productos">🛍️ Productos</button>
+      <button data-tab="pedidos">📦 Pedidos</button>
+      <button data-tab="blog">📝 Blog</button>
+    </nav>
+    <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+  </aside>
+
+  <main class="admin-main">
+
+    <!-- CONFIGURACIÓN -->
+    <section class="tab-panel active" id="panel-config">
+      <h1>Configuración general</h1>
+      <p class="admin-sub">Logo del sitio y WhatsApp de atención.</p>
+      <div class="admin-card">
+        <div class="form-row">
+          <label>Logo</label>
+          <div class="slides-manager" id="logoPreviewWrap"></div>
+          <div class="upload-box" id="logoUploadBox">Subir logo</div>
+          <input type="file" id="logoInput" accept="image/*" style="display:none;">
+          <div class="upload-progress" id="logoProgress"></div>
+        </div>
+        <div class="form-row">
+          <label for="siteName">Nombre del sitio</label>
+          <input type="text" id="siteName" placeholder="Zoë νέος">
+        </div>
+        <div class="form-row">
+          <label for="whatsappNumber">WhatsApp de la tienda (con código de país, sin espacios ni +)</label>
+          <input type="text" id="whatsappNumber" placeholder="Ej: 5493515551234">
+        </div>
+        <button class="btn btn-primary" id="saveConfigBtn">Guardar configuración</button>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="tab-panel" id="panel-categorias">
+      <h1>Categorías principales</h1>
+      <p class="admin-sub">Cada categoría se muestra como un banner en la página de inicio.</p>
+
+      <div class="admin-card">
+        <h3 id="catFormTitle" style="margin-bottom:16px;">Nueva categoría</h3>
+        <input type="hidden" id="catId">
+        <div class="form-grid-2">
+          <div class="form-row"><label>Nombre</label><input type="text" id="catNombre"></div>
+          <div class="form-row"><label>Orden</label><input type="number" id="catOrden" value="0"></div>
+        </div>
+        <div class="form-row"><label>Descripción</label><textarea id="catDescripcion"></textarea></div>
+        <div class="form-row">
+          <label>Imágenes / videos del banner (slide)</label>
+          <div class="slides-manager" id="catSlidesWrap"></div>
+          <div class="upload-box" id="catUploadBox">+ Agregar</div>
+          <input type="file" id="catFileInput" accept="image/*,video/*" style="display:none;">
+          <div class="upload-progress" id="catProgress"></div>
+        </div>
+        <div class="form-row"><label><input type="checkbox" id="catActivo" checked style="width:auto;"> Activa</label></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveCatBtn">Guardar categoría</button>
+          <button class="btn btn-secondary" id="cancelCatBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Nombre</th><th>Orden</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="catTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SUBCATEGORIAS -->
+    <section class="tab-panel" id="panel-subcategorias">
+      <h1>Subcategorías</h1>
+      <p class="admin-sub">Cada subcategoría pertenece a una categoría principal y también tiene su propio banner slide.</p>
+
+      <div class="admin-card">
+        <h3 style="margin-bottom:16px;" id="subcatFormTitle">Nueva subcategoría</h3>
+        <input type="hidden" id="subcatId">
+        <div class="form-grid-2">
+          <div class="form-row"><label>Nombre</label><input type="text" id="subcatNombre"></div>
+          <div class="form-row"><label>Categoría principal</label><select id="subcatCategoriaId"></select></div>
+        </div>
+        <div class="form-row"><label>Orden</label><input type="number" id="subcatOrden" value="0"></div>
+        <div class="form-row">
+          <label>Imágenes / videos del banner (slide)</label>
+          <div class="slides-manager" id="subcatSlidesWrap"></div>
+          <div class="upload-box" id="subcatUploadBox">+ Agregar</div>
+          <input type="file" id="subcatFileInput" accept="image/*,video/*" style="display:none;">
+          <div class="upload-progress" id="subcatProgress"></div>
+        </div>
+        <div class="form-row"><label><input type="checkbox" id="subcatActivo" checked style="width:auto;"> Activa</label></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveSubcatBtn">Guardar subcategoría</button>
+          <button class="btn btn-secondary" id="cancelSubcatBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Nombre</th><th>Categoría</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="subcatTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS -->
+    <section class="tab-panel" id="panel-productos">
+      <h1>Productos</h1>
+      <p class="admin-sub">Cada producto pertenece a una subcategoría y tiene su propio carrusel de imágenes.</p>
+
+      <div class="admin-card">
+        <h3 style="margin-bottom:16px;" id="prodFormTitle">Nuevo producto</h3>
+        <input type="hidden" id="prodId">
+        <div class="form-grid-2">
+          <div class="form-row"><label>Nombre</label><input type="text" id="prodNombre"></div>
+          <div class="form-row"><label>Subcategoría</label><select id="prodSubcategoriaId"></select></div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row"><label>Precio (ARS)</label><input type="number" id="prodPrecio"></div>
+          <div class="form-row"><label>Stock</label><input type="number" id="prodStock" value="0"></div>
+        </div>
+        <div class="form-row"><label>Descripción</label><textarea id="prodDescripcion"></textarea></div>
+        <div class="form-row">
+          <label>Imágenes del producto (carrusel)</label>
+          <div class="slides-manager" id="prodImagesWrap"></div>
+          <div class="upload-box" id="prodUploadBox">+ Agregar</div>
+          <input type="file" id="prodFileInput" accept="image/*" multiple style="display:none;">
+          <div class="upload-progress" id="prodProgress"></div>
+        </div>
+        <div class="form-row"><label><input type="checkbox" id="prodActivo" checked style="width:auto;"> Activo</label></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveProdBtn">Guardar producto</button>
+          <button class="btn btn-secondary" id="cancelProdBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Nombre</th><th>Subcategoría</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="prodTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PEDIDOS -->
+    <section class="tab-panel" id="panel-pedidos">
+      <h1>Pedidos</h1>
+      <p class="admin-sub">Pedidos recibidos desde el checkout. Se coordinan por WhatsApp.</p>
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>WhatsApp</th><th>Dirección</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="pedidosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="tab-panel" id="panel-blog">
+      <h1>Blog</h1>
+      <p class="admin-sub">Cada artículo es una landing page independiente, ideal para SEO.</p>
+
+      <div class="admin-card">
+        <h3 style="margin-bottom:16px;" id="blogFormTitle">Nuevo artículo</h3>
+        <input type="hidden" id="blogId">
+        <div class="form-row"><label>Título</label><input type="text" id="blogTitulo"></div>
+        <div class="form-row"><label>Slug (URL, se genera automáticamente)</label><input type="text" id="blogSlug"></div>
+        <div class="form-row"><label>Meta descripción (para SEO / Google)</label><textarea id="blogMetaDesc" maxlength="160"></textarea></div>
+        <div class="form-row">
+          <label>Imagen de portada</label>
+          <div class="slides-manager" id="blogCoverWrap"></div>
+          <div class="upload-box" id="blogUploadBox">Subir portada</div>
+          <input type="file" id="blogFileInput" accept="image/*" style="display:none;">
+        </div>
+        <div class="form-row"><label>Contenido (HTML permitido: &lt;p&gt;, &lt;h2&gt;, &lt;img&gt;, etc.)</label><textarea id="blogContenido" style="min-height:200px;"></textarea></div>
+        <div class="form-row"><label>Producto destacado (opcional)</label><select id="blogProductoId"><option value="">Ninguno</option></select></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveBlogBtn">Guardar artículo</button>
+          <button class="btn btn-secondary" id="cancelBlogBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Título</th><th>Fecha</th><th></th></tr></thead>
+          <tbody id="blogTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="/admin/js/admin-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizar compra · Zoë νέος</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div id="app-header"></div>
+
+<div class="checkout-wrap">
+  <section id="checkoutForm">
+    <h1 style="text-align:center;margin-bottom:26px;">Finalizar compra</h1>
+
+    <div class="order-summary" id="orderSummary"></div>
+
+    <form id="dataForm">
+      <div class="form-group">
+        <label for="nombre">Nombre y apellido</label>
+        <input type="text" id="nombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="whatsapp">WhatsApp</label>
+        <input type="tel" id="whatsapp" name="whatsapp" placeholder="Ej: 351 555 1234" required>
+      </div>
+      <div class="form-group">
+        <label for="calle">Calle y número</label>
+        <input type="text" id="calle" name="calle" required>
+      </div>
+      <div class="form-group">
+        <label for="ciudad">Ciudad</label>
+        <input type="text" id="ciudad" name="ciudad" required>
+      </div>
+      <div class="form-group">
+        <label for="region">Provincia</label>
+        <select id="region" name="region" required></select>
+      </div>
+      <button type="submit" class="btn-full" id="submitBtn">Confirmar pedido</button>
+    </form>
+  </section>
+
+  <section id="checkoutConfirm" class="confirmation-box" style="display:none;">
+    <h1>¡Gracias por tu pedido! 🌿</h1>
+    <p>Ya registramos tus datos. Para coordinar el método de pago y el costo de envío, tocá el botón de abajo y finalizá por WhatsApp.</p>
+    <a href="#" id="waLink" target="_blank" rel="noopener" class="whatsapp-btn" style="justify-content:center;">
+      <svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>
+      Finalizar por WhatsApp
+    </a>
+  </section>
+</div>
+
+<div id="app-cart-drawer"></div>
+
+<script type="module" src="/js/checkout.js"></script>
+</body>
+</html>
