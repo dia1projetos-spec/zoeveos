@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap");
 
 :root{
   --cream: #f7f0e6;
@@ -18,6 +18,7 @@
   --radius-md: 18px;
   --radius-pill: 999px;
   --shadow-soft: 0 10px 30px rgba(92, 76, 60, 0.10);
+  --shadow-btn: 0 8px 20px rgba(180, 130, 100, 0.22);
   --font-serif: "Playfair Display", serif;
   --font-sans: "Jost", sans-serif;
 }
@@ -30,13 +31,16 @@ body{
   color: var(--text-main);
   font-family: var(--font-sans);
   font-weight: 300;
-  line-height: 1.6;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
 }
 img{ max-width: 100%; display: block; }
 a{ color: inherit; text-decoration: none; }
 button{ font-family: inherit; cursor: pointer; border: none; background: none; }
 ul{ list-style: none; margin: 0; padding: 0; }
-h1,h2,h3{ font-family: var(--font-serif); font-weight: 600; margin: 0; }
+h1,h2,h3{ font-family: var(--font-serif); font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.15; }
+p{ letter-spacing: 0.005em; }
 .container{ max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
 /* ===== Focus visibility ===== */
@@ -81,9 +85,21 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   justify-content: center;
   position: relative;
   overflow: hidden;
+  transition: background .2s ease, box-shadow .2s ease;
+}
+/* Cuando hay un logo real cargado (normalmente PNG con fondo transparente),
+   sacamos el círculo blanco y la sombra para no "encajonar" el diseño del logo. */
+.brand-badge.has-logo{
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
 }
 .brand-badge img.logo-img{
   width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+}
+.brand-badge.has-logo img.logo-img{
+  object-fit: contain; border-radius: 0; width: auto; max-width: 100%; height: 100%;
 }
 .brand-badge .logo-fallback-title{
   font-family: var(--font-serif);
@@ -183,17 +199,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 26px;
+  padding: 15px 28px;
   border-radius: var(--radius-pill);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
   width: fit-content;
-  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow-btn);
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
 }
-.btn-pill:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
-.btn-taupe{ background: var(--taupe); }
+.btn-pill svg{ width: 15px; height: 15px; transition: transform .25s ease; }
+.btn-pill:hover{ transform: translateY(-3px); box-shadow: 0 14px 26px rgba(180,130,100,0.3); filter: brightness(1.04); }
+.btn-pill:hover svg{ transform: translateX(3px); }
+.btn-pill:active{ transform: translateY(-1px); }
+.btn-taupe{ background: linear-gradient(135deg, #c7b299, var(--taupe)); }
 .btn-pink{ background: linear-gradient(135deg, var(--pink), var(--pink-dark)); }
-.btn-pill svg{ width: 16px; height: 16px; }
 
 .cb-media{ position: relative; overflow: hidden; }
 .cb-slides{ position: relative; width: 100%; height: 100%; min-height: 420px; }
@@ -291,19 +312,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .pc-dots span.active{ background: #fff; }
 
 .product-card .p-info{ padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.product-card h3{ font-size: 1.15rem; }
+.product-card h3{ font-size: 1.15rem; font-weight: 500; }
 .product-card .price{ color: var(--pink-dark); font-weight: 500; font-size: 1.1rem; }
 .product-card .add-btn{
   margin-top: auto;
-  background: var(--taupe);
+  background: linear-gradient(135deg, #c7b299, var(--taupe));
   color: #fff;
-  padding: 10px;
+  padding: 12px;
   border-radius: var(--radius-pill);
   text-align: center;
-  font-size: 0.9rem;
-  transition: background .2s ease;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 16px rgba(180,150,110,0.22);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
 }
-.product-card .add-btn:hover{ background: var(--taupe-dark); }
+.product-card .add-btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 20px rgba(180,150,110,0.3); filter: brightness(1.03); }
+.product-card .add-btn:active{ transform: translateY(0); }
 
 /* ===== Product detail page ===== */
 .product-detail{
@@ -361,13 +386,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .whatsapp-btn{
   background: var(--whatsapp);
   color: #fff;
-  padding: 16px 30px;
+  padding: 16px 32px;
   border-radius: var(--radius-pill);
   display: flex; align-items: center; gap: 10px;
-  font-size: 1rem;
-  transition: background .2s ease;
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px rgba(37,211,102,0.28);
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
 }
-.whatsapp-btn:hover{ background: var(--whatsapp-dark); }
+.whatsapp-btn:hover{ background: var(--whatsapp-dark); transform: translateY(-3px); box-shadow: 0 14px 28px rgba(37,211,102,0.35); }
+.whatsapp-btn:active{ transform: translateY(-1px); }
 .whatsapp-btn svg{ width: 22px; height: 22px; }
 
 /* ===== Footer ===== */
@@ -385,7 +414,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .footer-bottom{
   text-align: center; padding: 20px; font-size: 0.85rem; color: var(--text-soft);
   border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
+.admin-link{
+  font-size: 0.76rem;
+  color: var(--taupe-dark);
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+  transition: opacity .2s ease, color .2s ease;
+}
+.admin-link:hover{ opacity: 1; color: var(--pink-dark); text-decoration: underline; }
 
 /* ===== Cart drawer ===== */
 .cart-overlay{
@@ -434,13 +472,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .btn-full{
   width: 100%;
   text-align: center;
-  padding: 15px;
+  padding: 16px;
   border-radius: var(--radius-pill);
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
-  font-size: 1rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  box-shadow: var(--shadow-btn);
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
 }
-.btn-full:disabled{ opacity: 0.6; cursor: not-allowed; }
+.btn-full:hover{ transform: translateY(-2px); box-shadow: 0 14px 26px rgba(180,130,100,0.3); filter: brightness(1.03); }
+.btn-full:active{ transform: translateY(0); }
+.btn-full:disabled{ opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .confirmation-box{ text-align: center; padding: 50px 24px; max-width: 520px; margin: 0 auto; }
 .confirmation-box h1{ font-size: 2rem; margin-bottom: 14px; }

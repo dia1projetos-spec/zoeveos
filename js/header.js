@@ -78,6 +78,7 @@ async function loadLogo() {
     const snap = await getDoc(doc(db, "config", "site"));
     const badge = document.getElementById("brandBadge");
     if (snap.exists() && snap.data().logoUrl && badge) {
+      badge.classList.add("has-logo");
       badge.innerHTML = `<img class="logo-img" src="${snap.data().logoUrl}" alt="Logo">`;
     }
   } catch (e) {
