@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">ZOE VEOS</title>
+  <title id="page-title">Zoë Vέος</title>
   <meta name="description" id="meta-description" content="">
   <meta name="keywords" id="meta-keywords" content="">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-  <meta name="author" content="ZOE VEOS">
+  <meta name="author" content="Zoë Vέος">
   <meta name="geo.region" content="AR-X">
   <meta property="og:type" content="product">
-  <meta property="og:site_name" content="ZOE VEOS">
+  <meta property="og:site_name" content="Zoë Vέος">
   <meta property="og:locale" content="es_AR">
   <meta property="og:title" id="og-title" content="">
   <meta property="og:description" id="og-description" content="">
@@ -286,7 +286,7 @@
 <!-- Header igual ao site principal -->
 <header id="header">
   <nav class="nav-inner">
-    <a href="/" class="nav-logo">ZOE VEOS</a>
+    <a href="/" class="nav-logo">Zoë Vέος</a>
     <ul class="nav-links">
       <li><a href="/#categories">Categorías</a></li>
       <li><a href="/#products">Productos</a></li>
@@ -325,7 +325,7 @@
     <!-- GALERIA -->
     <div class="lp-gallery">
       <div class="lp-main-wrap">
-        <img id="lp-main-img" class="lp-main-img" src="" alt="Producto ZOE VEOS">
+        <img id="lp-main-img" class="lp-main-img" src="" alt="Producto Zoë Vέος">
         <button class="lp-nav-btn" id="lp-prev">‹</button>
         <button class="lp-nav-btn" id="lp-next">›</button>
       </div>
@@ -385,7 +385,7 @@
   <div class="footer-inner">
     <div class="footer-grid">
       <div>
-        <div class="footer-brand">ZOE VEOS</div>
+        <div class="footer-brand">Zoë Vέος</div>
         <p class="footer-tagline">Artículos de maternidad con amor, para acompañarte en cada momento de esta hermosa etapa.</p>
         <div class="footer-social">
           <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -405,7 +405,7 @@
       </ul></div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 ZOE VEOS — Todos los derechos reservados</span>
+      <span>© 2025 Zoë Vέος — Todos los derechos reservados</span>
       <span>Hecho con 🌸 en Argentina</span>
     </div>
   </div>
@@ -662,19 +662,19 @@ async function loadArticle(p) {
 // ============================================================
 function updateSEO(p) {
   const name  = p.seoTitle || p.name;
-  const desc  = p.seoDescription || (p.description || '').replace(/<[^>]*>/g,'').slice(0,160) || `Comprá ${p.name} en ZOE VEOS. Artículos de maternidad en Argentina.`;
-  const kw    = p.seoKeywords || `${p.name}, ${p.category||'maternidad'}, artículos maternidad Argentina, ZOE VEOS`;
+  const desc  = p.seoDescription || (p.description || '').replace(/<[^>]*>/g,'').slice(0,160) || `Comprá ${p.name} en Zoë Vέος. Artículos de maternidad en Argentina.`;
+  const kw    = p.seoKeywords || `${p.name}, ${p.category||'maternidad'}, artículos maternidad Argentina, Zoë Vέος`;
   const img   = imgs[0] || '';
   const url   = `https://www.zoeveos.com/product.html?id=${p.id}`;
 
-  document.title = `${name} — ZOE VEOS`;
+  document.title = `${name} — Zoë Vέος`;
   document.getElementById('meta-description').content = desc;
   document.getElementById('meta-keywords').content    = kw;
-  document.getElementById('og-title').content         = `${name} — ZOE VEOS`;
+  document.getElementById('og-title').content         = `${name} — Zoë Vέος`;
   document.getElementById('og-description').content   = desc;
   document.getElementById('og-image').content         = img;
   document.getElementById('og-url').content           = url;
-  document.getElementById('tw-title').content         = `${name} — ZOE VEOS`;
+  document.getElementById('tw-title').content         = `${name} — Zoë Vέος`;
   document.getElementById('tw-description').content   = desc;
   document.getElementById('tw-image').content         = img;
   document.getElementById('canonical').href           = url;
@@ -687,7 +687,7 @@ function updateSEO(p) {
         "name": p.name,
         "description": desc,
         "image": imgs,
-        "brand": { "@type": "Brand", "name": "ZOE VEOS" },
+        "brand": { "@type": "Brand", "name": "Zoë Vέος" },
         "offers": {
           "@type": "Offer",
           "priceCurrency": "ARS",
@@ -695,7 +695,7 @@ function updateSEO(p) {
           "availability": (typeof p.stock === 'number' && p.stock === 0)
             ? "https://schema.org/OutOfStock"
             : "https://schema.org/InStock",
-          "seller": { "@type": "Organization", "name": "ZOE VEOS" },
+          "seller": { "@type": "Organization", "name": "Zoë Vέος" },
           "url": url
         },
         "category": p.category || "Maternidad"
@@ -705,8 +705,8 @@ function updateSEO(p) {
         "headline": p.articleTitle || `Todo sobre ${p.name}`,
         "description": desc,
         "image": p.articleCover || img,
-        "author": { "@type": "Organization", "name": "ZOE VEOS" },
-        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" },
+        "author": { "@type": "Organization", "name": "Zoë Vέος" },
+        "publisher": { "@type": "Organization", "name": "Zoë Vέος", "url": "https://www.zoeveos.com" },
         "mainEntityOfPage": url
       } : null
     ].filter(Boolean)

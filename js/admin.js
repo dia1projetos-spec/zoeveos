@@ -1,5 +1,5 @@
 // ============================================================
-// ZOE VEOS — admin.js (Firebase + Cloudinary reais)
+// Zoë Vέος — admin.js (Firebase + Cloudinary reais)
 // ============================================================
 import {
   db, auth, CLOUDINARY,
@@ -398,6 +398,13 @@ window.openCategoryModal = function(cat=null) {
   document.getElementById('cat-banner-desc').value = cat?.bannerDesc || '';
   document.getElementById('cat-order').value = cat?.order || 1;
   document.getElementById('cat-banner-slides').value = (cat?.bannerSlides||[]).join('\n');
+
+  // Nível
+  const level = cat?.level || 1;
+  const radio = document.getElementById('cat-level-' + level);
+  if (radio) radio.checked = true;
+  await loadParentCats(cat);
+  onCatLevelChange(level);
   // Preview slides existentes
   const prev = document.getElementById('cat-banner-slides-preview');
   if (prev) prev.innerHTML = (cat?.bannerSlides||[]).map(url =>
@@ -426,8 +433,17 @@ window.saveCategory = async function() {
   const subRaw = document.getElementById('cat-subcategories')?.value?.trim() || '';
   const subcategories = subRaw ? subRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-  // Banner fields
-  const showBanner = document.getElementById('cat-show-banner')?.checked || false;
+  // Nível e hierarquia
+  const level = parseInt(document.querySelector('input[name="cat-level"]:checked')?.value || '1');
+  const parent1El = document.getElementById('cat-parent1');
+  const parent2El = document.getElementById('cat-parent2');
+  const parentId   = level === 2 ? (parent1El?.value||'') : level === 3 ? (parent2El?.value||'') : '';
+  const parentName = level === 2
+    ? (parent1El?.selectedOptions[0]?.text||'')
+    : level === 3 ? (parent2El?.selectedOptions[0]?.text||'') : '';
+
+  // Banner — só para nível 1
+  const showBanner = level === 1 ? (document.getElementById('cat-show-banner')?.checked || false) : false;
   const bannerDesc = document.getElementById('cat-banner-desc')?.value?.trim() || '';
   const order = parseInt(document.getElementById('cat-order')?.value) || 1;
   const slidesRaw = document.getElementById('cat-banner-slides')?.value || '';
@@ -438,6 +454,9 @@ window.saveCategory = async function() {
     icon: document.getElementById('cat-icon').value.trim(),
     description: document.getElementById('cat-description').value.trim(),
     subcategories,
+    level,
+    parentId,
+    parentName,
     showBanner,
     bannerDesc,
     order,
@@ -953,7 +972,7 @@ async function loadCatalogo() {
 
 
 // ============================================================
-// ZOE VEOS — Gerador de Catálogo PDF
+// Zoë Vέος — Gerador de Catálogo PDF
 // Usa jsPDF (carregado via CDN no admin HTML)
 // 3 produtos por linha, retrato A4, organizado por categoria
 // ============================================================
@@ -978,7 +997,7 @@ window.generateCatalogPDF = async function() {
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...'; }
 
   try {
-    const title     = document.getElementById('cat-pdf-title')?.value || 'ZOE VEOS — Catálogo';
+    const title     = document.getElementById('cat-pdf-title')?.value || 'Zoë Vέος — Catálogo';
     const subtitle  = document.getElementById('cat-pdf-subtitle')?.value || 'Artículos de Maternidad';
     const filterCat = document.getElementById('cat-pdf-category')?.value || '';
     const showPrice = document.getElementById('cat-pdf-price')?.value !== 'no';
@@ -1081,7 +1100,7 @@ async function drawCover(doc, title, subtitle, totalProducts) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(36);
   doc.setFont('helvetica', 'bold');
-  doc.text('ZOE VEOS', w / 2, 100, { align: 'center' });
+  doc.text('Zoë Vέος', w / 2, 100, { align: 'center' });
 
   // Linha divisória
   doc.setDrawColor(...ACCENT_COLOR);
@@ -1098,7 +1117,7 @@ async function drawCover(doc, title, subtitle, totalProducts) {
   doc.setTextColor(200, 200, 200);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  const displayTitle = title.includes('ZOE VEOS') ? title.replace('ZOE VEOS —', '').trim() : title;
+  const displayTitle = title.includes('Zoë Vέος') ? title.replace('Zoë Vέος —', '').trim() : title;
   doc.text(displayTitle, w / 2, 132, { align: 'center' });
 
   // Box central decorativo
@@ -1145,7 +1164,7 @@ async function drawCategoryPage(doc, category, items, showPrice, catalogTitle) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.text('ZOE VEOS', MARGIN, 14);
+  doc.text('Zoë Vέος', MARGIN, 14);
 
   // Nome da categoria no centro
   doc.setTextColor(...ACCENT_COLOR);
@@ -1184,7 +1203,7 @@ async function drawCategoryPage(doc, category, items, showPrice, catalogTitle) {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
-      doc.text('ZOE VEOS', MARGIN, 10);
+      doc.text('Zoë Vέος', MARGIN, 10);
       doc.setTextColor(...ACCENT_COLOR);
       doc.text(category.toUpperCase(), PAGE_W / 2, 10, { align: 'center' });
       doc.setDrawColor(...ACCENT_COLOR);
@@ -1282,7 +1301,7 @@ function drawPageFooter(doc, pageNum, totalPages, title) {
   doc.setTextColor(...GRAY_TEXT);
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'normal');
-  doc.text('ZOE VEOS — www.zoeveos.com', MARGIN, y + 1);
+  doc.text('Zoë Vέος — www.zoeveos.com', MARGIN, y + 1);
   doc.text(`Página ${pageNum}`, PAGE_W - MARGIN, y + 1, { align: 'right' });
 }
 

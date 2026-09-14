@@ -1,5 +1,5 @@
 // ============================================================
-// ZOE VEOS — main.js (Firebase + Cloudinary conectados)
+// Zoë Vέος — main.js (Firebase + Cloudinary conectados)
 // ============================================================
 import {
   db, auth, CLOUDINARY, WHATSAPP_NUMBER, CORREO_ORIGIN_POSTAL,
@@ -890,7 +890,7 @@ async function submitCheckoutWhatsApp() {
     : shipCost === 0 ? '\n🎁 ¡Envío GRATIS!' : `\n🚚 Envío (${shipName}): $${fmt(shipCost)}`;
   const couponLine = appliedCoupon ? `\n🎟 Cupón: ${appliedCoupon.code}` : '';
 
-  const message = `¡Hola! ¡Vengo a finalizar una compra del sitio ZOE VEOS! 🛍️
+  const message = `¡Hola! ¡Vengo a finalizar una compra del sitio Zoë Vέος! 🛍️
 
 👤 *Nombre:* ${d.name}
 📱 *WhatsApp:* ${d.whatsapp}
@@ -1336,7 +1336,7 @@ function handleMPReturn() {
   if (!mp) return;
 
   if (mp === 'success') {
-    showToast('✅ ¡Pago aprobado! Gracias por tu compra en ZOE VEOS 🌸');
+    showToast('✅ ¡Pago aprobado! Gracias por tu compra en Zoë Vέος 🌸');
     // Limpiar URL
     history.replaceState({}, '', '/');
   } else if (mp === 'failure') {

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="page-title">ZOE VEOS</title>
+  <title id="page-title">Zoë Vέος</title>
   <meta name="description" id="meta-desc" content="">
   <meta name="keywords" id="meta-kw" content="">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-  <meta name="author" content="ZOE VEOS">
+  <meta name="author" content="Zoë Vέος">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="ZOE VEOS">
+  <meta property="og:site_name" content="Zoë Vέος">
   <meta property="og:locale" content="es_AR">
   <meta property="og:title" id="og-title" content="">
   <meta property="og:description" id="og-desc" content="">
@@ -211,7 +211,7 @@
 <!-- Header -->
 <header id="header">
   <nav class="nav-inner">
-    <a href="/" class="nav-logo">ZOE VEOS</a>
+    <a href="/" class="nav-logo">Zoë Vέος</a>
     <ul class="nav-links">
       <li><a href="/#categories">Categorías</a></li>
       <li><a href="/#products">Productos</a></li>
@@ -238,7 +238,7 @@
 <section id="lp-hero">
   <div id="lp-slides-container"></div>
   <div class="lp-hero-content">
-    <div class="lp-hero-eyebrow" id="lp-eyebrow">ZOE VEOS</div>
+    <div class="lp-hero-eyebrow" id="lp-eyebrow">Zoë Vέος</div>
     <h1 class="lp-hero-title" id="lp-hero-title">Cargando...</h1>
   </div>
   <div class="lp-hero-dots" id="lp-hero-dots"></div>
@@ -281,7 +281,7 @@
   <div class="footer-inner">
     <div class="footer-grid">
       <div>
-        <div class="footer-brand">ZOE VEOS</div>
+        <div class="footer-brand">Zoë Vέος</div>
         <p class="footer-tagline">Artículos de maternidad con amor.</p>
         <div class="footer-social">
           <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -299,7 +299,7 @@
       </ul></div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 ZOE VEOS</span><span>Hecho con 🌸 en Argentina</span>
+      <span>© 2025 Zoë Vέος</span><span>Hecho con 🌸 en Argentina</span>
     </div>
   </div>
 </footer>
@@ -424,7 +424,7 @@ async function loadLP() {
 function renderLP(lp) {
   // Hero title
   document.getElementById('lp-hero-title').textContent = lp.title;
-  document.getElementById('lp-eyebrow').textContent = 'ZOE VEOS';
+  document.getElementById('lp-eyebrow').textContent = 'Zoë Vέος';
 
   // Slides
   slides = lp.slides || [];
@@ -491,18 +491,18 @@ window.goSlide = function(n) {
 
 function updateSEO(lp) {
   const title = lp.seoTitle || lp.title;
-  const desc  = lp.seoDesc || `${lp.title} — ZOE VEOS. Artículos de maternidad en Argentina.`;
+  const desc  = lp.seoDesc || `${lp.title} — Zoë Vέος. Artículos de maternidad en Argentina.`;
   const img   = lp.slides?.[0] || '';
   const url   = `https://www.zoeveos.com/lp/${lp.slug}`;
 
-  document.title = `${title} — ZOE VEOS`;
+  document.title = `${title} — Zoë Vέος`;
   document.getElementById('meta-desc').content    = desc;
-  document.getElementById('meta-kw').content      = lp.seoKeywords || `${lp.title}, maternidad, ZOE VEOS, Argentina`;
-  document.getElementById('og-title').content     = `${title} — ZOE VEOS`;
+  document.getElementById('meta-kw').content      = lp.seoKeywords || `${lp.title}, maternidad, Zoë Vέος, Argentina`;
+  document.getElementById('og-title').content     = `${title} — Zoë Vέος`;
   document.getElementById('og-desc').content      = desc;
   document.getElementById('og-img').content       = img;
   document.getElementById('og-url').content       = url;
-  document.getElementById('tw-title').content     = `${title} — ZOE VEOS`;
+  document.getElementById('tw-title').content     = `${title} — Zoë Vέος`;
   document.getElementById('tw-desc').content      = desc;
   document.getElementById('canonical').href       = url;
 
@@ -515,14 +515,14 @@ function updateSEO(lp) {
         "name": title,
         "description": desc,
         "url": url,
-        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" }
+        "publisher": { "@type": "Organization", "name": "Zoë Vέος", "url": "https://www.zoeveos.com" }
       },
       ...(lp.articles||[]).filter(a=>a.title&&a.content).map(a => ({
         "@type": "Article",
         "headline": a.title,
         "image": a.image || img,
-        "author": { "@type": "Organization", "name": "ZOE VEOS" },
-        "publisher": { "@type": "Organization", "name": "ZOE VEOS", "url": "https://www.zoeveos.com" },
+        "author": { "@type": "Organization", "name": "Zoë Vέος" },
+        "publisher": { "@type": "Organization", "name": "Zoë Vέος", "url": "https://www.zoeveos.com" },
         "mainEntityOfPage": url
       }))
     ]

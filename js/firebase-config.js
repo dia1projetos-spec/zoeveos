@@ -1,58 +1,44 @@
-// js/firebase-config.js
-// Configuração central do Firebase. Importado por todos os outros módulos JS.
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+// ============================================================
+// FIREBASE CONFIGURATION — ZOE VEOS
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAd5JuDF61emOfhgyJpL7LRNfF58FDt6cE",
-  authDomain: "monkeyzoeveos.firebaseapp.com",
-  projectId: "monkeyzoeveos",
-  storageBucket: "monkeyzoeveos.firebasestorage.app",
-  messagingSenderId: "423280715430",
-  appId: "1:423280715430:web:02b844ab538674beeab667",
+  apiKey: "AIzaSyClydiw5NBkPu2yE4VPxbNw6raQW8sqXsg",
+  authDomain: "zoeveos.firebaseapp.com",
+  projectId: "zoeveos",
+  storageBucket: "zoeveos.firebasestorage.app",
+  messagingSenderId: "440531916711",
+  appId: "1:440531916711:web:572ec2dfd022ffe54a4882"
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 export {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  serverTimestamp,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
+  collection, getDocs, addDoc, updateDoc, deleteDoc,
+  doc, query, orderBy, setDoc, getDoc,
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
 };
+
+// ============================================================
+// CLOUDINARY — dbjwnfjcn
+// ============================================================
+export const CLOUDINARY = {
+  cloudName: "dbjwnfjcn",
+  uploadPreset: "zoeveos-upload",
+  uploadUrl: "https://api.cloudinary.com/v1_1/dbjwnfjcn/image/upload"
+};
+
+// ============================================================
+// WHATSAPP
+// ============================================================
+export const WHATSAPP_NUMBER = "5493576466145";
+
+// ============================================================
+// CORREO ARGENTINO
+// ============================================================
+export const CORREO_ORIGIN_POSTAL = "2434";
