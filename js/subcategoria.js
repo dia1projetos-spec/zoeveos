@@ -9,6 +9,7 @@ await initHeader();
 
 const scId = getParam("id");
 const heroWrap = document.getElementById("subcatHero");
+const childrenGrid = document.getElementById("childrenGrid");
 const grid = document.getElementById("productsGrid");
 
 async function load() {
@@ -26,30 +27,75 @@ async function load() {
     document.title = sc.nombre + " · Zoë νέος";
     renderHero(sc);
 
-    // Nota: filtramos solo por subcategoriaId (sin orderBy en la consulta) para no
-    // depender de un índice compuesto en Firestore. El orden se aplica acá, en el navegador.
-    const q = query(collection(db, "productos"), where("subcategoriaId", "==", scId));
-    const snap = await getDocs(q);
-    const products = [];
-    snap.forEach((d) => {
+    // Primero nos fijamos si esta subcategoría tiene subcategorías anidadas.
+    // Si tiene, mostramos esa lista en vez de ir directo a los productos.
+    const childrenQ = query(collection(db, "subcategorias"), where("subcategoriaPadreId", "==", scId));
+    const childrenSnap = await getDocs(childrenQ);
+    const children = [];
+    childrenSnap.forEach((d) => {
       const data = d.data();
       if (data.activo === false) return;
-      products.push({ id: d.id, ...data });
+      children.push({ id: d.id, ...data });
     });
-    products.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es"));
+    children.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
-    if (products.length === 0) {
-      grid.innerHTML = `<div class="empty-state">Todavía no hay productos en esta subcategoría.</div>`;
+    if (children.length > 0) {
+      renderChildren(children);
       return;
     }
 
-    grid.innerHTML = products.map((p, i) => renderProductCard(p, i)).join("");
-    products.forEach((p, i) => initProductCarousel(`pcard-${i}`, p.images || []));
-    bindAddButtons(products);
+    await loadProducts();
   } catch (e) {
     console.error(e);
-    grid.innerHTML = `<div class="empty-state">No se pudieron cargar los productos.</div>`;
+    grid.innerHTML = `<div class="empty-state">No se pudieron cargar los datos.</div>`;
   }
+}
+
+function renderChildren(children) {
+  grid.style.display = "none";
+  childrenGrid.style.display = "grid";
+  childrenGrid.innerHTML = children.map(renderChildCard).join("");
+}
+
+function renderChildCard(sc) {
+  const cover = sc.slides && sc.slides.length ? sc.slides[0] : null;
+  const media = cover
+    ? cover.type === "video"
+      ? `<video src="${cover.url}" autoplay muted loop playsinline></video>`
+      : `<img src="${optimizedUrl(cover.url, 600)}" alt="${sc.nombre}">`
+    : `<img src="https://placehold.co/600x400/f7f0e6/b9a488?text=${encodeURIComponent(sc.nombre)}" alt="${sc.nombre}">`;
+
+  return `
+  <a class="subcat-card" href="/subcategoria.html?id=${sc.id}">
+    <div class="thumb">${media}</div>
+    <div class="info">
+      <h3>${sc.nombre}</h3>
+      <span>Ver más →</span>
+    </div>
+  </a>`;
+}
+
+async function loadProducts() {
+  // Nota: filtramos solo por subcategoriaId (sin orderBy en la consulta) para no
+  // depender de un índice compuesto en Firestore. El orden se aplica acá, en el navegador.
+  const q = query(collection(db, "productos"), where("subcategoriaId", "==", scId));
+  const snap = await getDocs(q);
+  const products = [];
+  snap.forEach((d) => {
+    const data = d.data();
+    if (data.activo === false) return;
+    products.push({ id: d.id, ...data });
+  });
+  products.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es"));
+
+  if (products.length === 0) {
+    grid.innerHTML = `<div class="empty-state">Todavía no hay productos en esta subcategoría.</div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map((p, i) => renderProductCard(p, i)).join("");
+  products.forEach((p, i) => initProductCarousel(`pcard-${i}`, p.images || []));
+  bindAddButtons(products);
 }
 
 function renderHero(sc) {
@@ -94,6 +140,8 @@ function renderHero(sc) {
 
 function renderProductCard(p, i) {
   const images = p.images && p.images.length ? p.images : ["https://placehold.co/500x400/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre)];
+  const hasVariants = p.variantes && p.variantes.length > 0;
+
   return `
   <article class="product-card">
     <a href="/producto.html?id=${p.id}" class="product-carousel" id="pcard-${i}">
@@ -111,7 +159,11 @@ function renderProductCard(p, i) {
     <div class="p-info">
       <h3><a href="/producto.html?id=${p.id}">${p.nombre}</a></h3>
       <div class="price">${formatPrice(p.precio)}</div>
-      <button class="add-btn" data-id="${p.id}">Agregar al carrito</button>
+      ${
+        hasVariants
+          ? `<a href="/producto.html?id=${p.id}" class="add-btn">Ver opciones</a>`
+          : `<button class="add-btn" data-id="${p.id}">Agregar al carrito</button>`
+      }
     </div>
   </article>`;
 }
@@ -141,7 +193,7 @@ function initProductCarousel(id, images) {
 }
 
 function bindAddButtons(products) {
-  grid.querySelectorAll(".add-btn").forEach((btn) => {
+  grid.querySelectorAll(".add-btn[data-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const p = products.find((x) => x.id === btn.dataset.id);
       addToCart({ id: p.id, nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);

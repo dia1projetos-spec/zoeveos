@@ -4,6 +4,7 @@ import { initConfigTab } from "./admin-config.js";
 import { initCategoriasTab } from "./admin-categorias.js";
 import { initSubcategoriasTab, fillCategoriaSelect } from "./admin-subcategorias.js";
 import { initProductosTab, fillSubcategoriaSelect } from "./admin-productos.js";
+import { initStockTab, refreshStockTab } from "./admin-stock.js";
 import { initPedidosTab } from "./admin-pedidos.js";
 import { initBlogTab, fillProductoSelect } from "./admin-blog.js";
 
@@ -33,6 +34,7 @@ async function boot() {
   await initCategoriasTab();
   await initSubcategoriasTab();
   await initProductosTab();
+  await initStockTab();
   await initPedidosTab();
   await initBlogTab();
 }
@@ -49,6 +51,7 @@ function setupTabs() {
       // Refresca los selects dependientes al entrar a cada pestaña
       if (btn.dataset.tab === "subcategorias") fillCategoriaSelect();
       if (btn.dataset.tab === "productos") fillSubcategoriaSelect();
+      if (btn.dataset.tab === "stock") refreshStockTab();
       if (btn.dataset.tab === "blog") fillProductoSelect();
     });
   });

@@ -1,11 +1,14 @@
 // admin/js/admin-productos.js
 import { db, collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, orderBy } from "/js/firebase-config.js";
 import { createSlidesManager, showToast } from "./admin-shared.js";
+import { uploadToCloudinary, optimizedUrl } from "/js/cloudinary.js";
 import { getCachedSubcategorias } from "./admin-subcategorias.js";
 
 let imagesManager;
 let editingId = null;
 let cachedProductos = [];
+let variants = []; // [{ id, nombre, imagen, stock }]
+let variantFileTargetId = null;
 
 export async function initProductosTab() {
   imagesManager = createSlidesManager({
@@ -17,9 +20,17 @@ export async function initProductosTab() {
 
   fillSubcategoriaSelect();
 
+  document.getElementById("addVariantBtn").addEventListener("click", () => {
+    variants.push({ id: genId(), nombre: "", imagen: "", stock: 0 });
+    renderVariants();
+  });
+
+  document.getElementById("variantFileInput").addEventListener("change", onVariantFileChange);
+
   document.getElementById("saveProdBtn").addEventListener("click", saveProducto);
   document.getElementById("cancelProdBtn").addEventListener("click", resetForm);
 
+  renderVariants();
   await loadProductos();
 }
 
@@ -32,6 +43,81 @@ export function fillSubcategoriaSelect() {
   const subs = getCachedSubcategorias();
   select.innerHTML = subs.map((s) => `<option value="${s.id}">${s.nombre}</option>`).join("") || `<option value="">Creá una subcategoría primero</option>`;
 }
+
+function genId() {
+  return "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+/* ---------------- Variantes ---------------- */
+
+function renderVariants() {
+  const wrap = document.getElementById("prodVariantsWrap");
+  const simpleStockWrap = document.getElementById("prodStockSimpleWrap");
+  simpleStockWrap.style.opacity = variants.length > 0 ? "0.45" : "1";
+  document.getElementById("prodStock").disabled = variants.length > 0;
+
+  if (variants.length === 0) {
+    wrap.innerHTML = `<p style="font-size:0.85rem;color:var(--text-soft);">Todavía no agregaste ninguna variación.</p>`;
+    return;
+  }
+
+  wrap.innerHTML = variants
+    .map(
+      (v) => `
+    <div class="variant-row" data-id="${v.id}">
+      <div class="variant-thumb" data-thumb="${v.id}">
+        ${v.imagen ? `<img src="${optimizedUrl(v.imagen, 120)}">` : `<span>Foto</span>`}
+      </div>
+      <input type="text" placeholder="Ej: Celeste, Rayas..." value="${v.nombre.replace(/"/g, "&quot;")}" data-field="nombre" data-id="${v.id}">
+      <input type="number" placeholder="Stock" value="${v.stock}" data-field="stock" data-id="${v.id}">
+      <button type="button" class="remove-variant" data-remove="${v.id}">Eliminar</button>
+    </div>`
+    )
+    .join("");
+
+  wrap.querySelectorAll("[data-thumb]").forEach((el) =>
+    el.addEventListener("click", () => {
+      variantFileTargetId = el.dataset.thumb;
+      document.getElementById("variantFileInput").click();
+    })
+  );
+  wrap.querySelectorAll('input[data-field="nombre"]').forEach((el) =>
+    el.addEventListener("input", () => {
+      const v = variants.find((x) => x.id === el.dataset.id);
+      if (v) v.nombre = el.value;
+    })
+  );
+  wrap.querySelectorAll('input[data-field="stock"]').forEach((el) =>
+    el.addEventListener("input", () => {
+      const v = variants.find((x) => x.id === el.dataset.id);
+      if (v) v.stock = Number(el.value) || 0;
+    })
+  );
+  wrap.querySelectorAll("[data-remove]").forEach((el) =>
+    el.addEventListener("click", () => {
+      variants = variants.filter((x) => x.id !== el.dataset.remove);
+      renderVariants();
+    })
+  );
+}
+
+async function onVariantFileChange(e) {
+  const file = e.target.files[0];
+  if (!file || !variantFileTargetId) return;
+  const v = variants.find((x) => x.id === variantFileTargetId);
+  if (!v) return;
+  try {
+    const result = await uploadToCloudinary(file);
+    v.imagen = result.url;
+    renderVariants();
+  } catch (err) {
+    console.error(err);
+    alert("Error al subir la imagen de la variación.");
+  }
+  e.target.value = "";
+}
+
+/* ---------------- CRUD de productos ---------------- */
 
 async function loadProductos() {
   const tbody = document.getElementById("prodTableBody");
@@ -54,7 +140,7 @@ async function loadProductos() {
       return `
       <tr>
         <td>${thumb ? `<img src="${thumb}">` : ""}</td>
-        <td>${p.nombre}</td>
+        <td>${p.nombre}${p.variantes && p.variantes.length ? ` <span style="font-size:0.75rem;color:var(--text-soft);">(${p.variantes.length} variaciones)</span>` : ""}</td>
         <td>${subsById[p.subcategoriaId] || "—"}</td>
         <td>$${Number(p.precio || 0).toLocaleString("es-AR")}</td>
         <td><span class="badge ${p.activo === false ? "badge-inactive" : "badge-active"}">${p.activo === false ? "Inactivo" : "Activo"}</span></td>
@@ -83,6 +169,8 @@ async function editProducto(id) {
   document.getElementById("prodDescripcion").value = p.descripcion || "";
   document.getElementById("prodActivo").checked = p.activo !== false;
   imagesManager.setSlides((p.images || []).map((url) => ({ type: "image", url })));
+  variants = (p.variantes || []).map((v) => ({ ...v }));
+  renderVariants();
   document.getElementById("cancelProdBtn").style.display = "inline-flex";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -96,6 +184,8 @@ function resetForm() {
   document.getElementById("prodDescripcion").value = "";
   document.getElementById("prodActivo").checked = true;
   imagesManager.setSlides([]);
+  variants = [];
+  renderVariants();
   document.getElementById("cancelProdBtn").style.display = "none";
 }
 
@@ -107,6 +197,16 @@ async function saveProducto() {
     alert("Completá el nombre y elegí una subcategoría.");
     return;
   }
+
+  const variantesLimpias = variants
+    .map((v) => ({ id: v.id, nombre: v.nombre.trim(), imagen: v.imagen || "", stock: Number(v.stock) || 0 }))
+    .filter((v) => v.nombre);
+
+  if (variants.length > 0 && variantesLimpias.length === 0) {
+    alert("Completá el nombre de al menos una variación, o eliminalas todas si no querés usar variaciones.");
+    return;
+  }
+
   const payload = {
     nombre,
     subcategoriaId,
@@ -115,6 +215,7 @@ async function saveProducto() {
     descripcion: document.getElementById("prodDescripcion").value.trim(),
     activo: document.getElementById("prodActivo").checked,
     images: imagesManager.getSlides().map((s) => s.url),
+    variantes: variantesLimpias,
   };
 
   const btn = document.getElementById("saveProdBtn");

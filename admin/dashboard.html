@@ -17,6 +17,7 @@
       <button data-tab="categorias">🗂️ Categorías</button>
       <button data-tab="subcategorias">📁 Subcategorías</button>
       <button data-tab="productos">🛍️ Productos</button>
+      <button data-tab="stock">📊 Stock</button>
       <button data-tab="pedidos">📦 Pedidos</button>
       <button data-tab="blog">📝 Blog</button>
     </nav>
@@ -87,15 +88,32 @@
     <!-- SUBCATEGORIAS -->
     <section class="tab-panel" id="panel-subcategorias">
       <h1>Subcategorías</h1>
-      <p class="admin-sub">Cada subcategoría pertenece a una categoría principal y también tiene su propio banner slide.</p>
+      <p class="admin-sub">Cada subcategoría puede depender de una categoría principal, o de otra subcategoría (subcategoría anidada). También tiene su propio banner slide.</p>
 
       <div class="admin-card">
         <h3 style="margin-bottom:16px;" id="subcatFormTitle">Nueva subcategoría</h3>
         <input type="hidden" id="subcatId">
-        <div class="form-grid-2">
-          <div class="form-row"><label>Nombre</label><input type="text" id="subcatNombre"></div>
-          <div class="form-row"><label>Categoría principal</label><select id="subcatCategoriaId"></select></div>
+        <div class="form-row"><label>Nombre</label><input type="text" id="subcatNombre"></div>
+
+        <div class="form-row">
+          <label>Esta subcategoría depende de:</label>
+          <select id="subcatParentType">
+            <option value="categoria">Una categoría principal</option>
+            <option value="subcategoria">Otra subcategoría (subcategoría anidada)</option>
+          </select>
         </div>
+        <div class="form-row" id="subcatParentCategoriaWrap">
+          <label>Categoría principal</label>
+          <select id="subcatCategoriaId"></select>
+        </div>
+        <div class="form-row" id="subcatParentSubcatWrap" style="display:none;">
+          <label>Subcategoría padre</label>
+          <select id="subcatParentSubcategoriaId"></select>
+          <p style="font-size:0.8rem;color:var(--text-soft);margin-top:6px;">
+            Al entrar a la subcategoría padre, en vez de ver productos directamente, el visitante va a ver primero la lista de sus subcategorías anidadas (como "Sábanas", "Acolchados", etc. dentro de "Ropa de cama").
+          </p>
+        </div>
+
         <div class="form-row"><label>Orden</label><input type="number" id="subcatOrden" value="0"></div>
         <div class="form-row">
           <label>Imágenes / videos del banner (slide)</label>
@@ -133,7 +151,7 @@
         </div>
         <div class="form-grid-2">
           <div class="form-row"><label>Precio (ARS)</label><input type="number" id="prodPrecio"></div>
-          <div class="form-row"><label>Stock</label><input type="number" id="prodStock" value="0"></div>
+          <div class="form-row" id="prodStockSimpleWrap"><label>Stock</label><input type="number" id="prodStock" value="0"></div>
         </div>
         <div class="form-row"><label>Descripción</label><textarea id="prodDescripcion"></textarea></div>
         <div class="form-row">
@@ -141,8 +159,19 @@
           <div class="slides-manager" id="prodImagesWrap"></div>
           <div class="upload-box" id="prodUploadBox">+ Agregar</div>
           <input type="file" id="prodFileInput" accept="image/*" multiple style="display:none;">
+        <input type="file" id="variantFileInput" accept="image/*" style="display:none;">
           <div class="upload-progress" id="prodProgress"></div>
         </div>
+
+        <div class="form-row">
+          <label>Variaciones (opcional — color, estampa, etc.)</label>
+          <p style="font-size:0.8rem;color:var(--text-soft);margin:-2px 0 10px;">
+            Si agregás variaciones, el stock se controla por variación (el campo "Stock" de arriba se ignora) y el cliente va a tener que elegir una antes de agregar al carrito.
+          </p>
+          <div id="prodVariantsWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
+          <button type="button" class="btn btn-secondary" id="addVariantBtn">+ Agregar variación</button>
+        </div>
+
         <div class="form-row"><label><input type="checkbox" id="prodActivo" checked style="width:auto;"> Activo</label></div>
         <div style="display:flex;gap:10px;">
           <button class="btn btn-primary" id="saveProdBtn">Guardar producto</button>
@@ -154,6 +183,40 @@
         <table class="admin-table">
           <thead><tr><th></th><th>Nombre</th><th>Subcategoría</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
           <tbody id="prodTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STOCK -->
+    <section class="tab-panel" id="panel-stock">
+      <h1>Control de stock</h1>
+      <p class="admin-sub">Todo tu inventario en un solo lugar. Editá la cantidad directamente en la tabla.</p>
+
+      <div class="admin-card">
+        <div class="form-grid-2" style="margin-bottom:0;">
+          <div class="form-row">
+            <label>Buscar producto</label>
+            <input type="text" id="stockSearch" placeholder="Nombre del producto...">
+          </div>
+          <div class="form-row">
+            <label>Subcategoría</label>
+            <select id="stockFilterSubcat"><option value="">Todas</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="max-width:260px;">
+          <label>Mostrar</label>
+          <select id="stockFilterLevel">
+            <option value="todos">Todos</option>
+            <option value="bajo">Stock bajo (5 o menos)</option>
+            <option value="sin">Sin stock</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Producto</th><th>Variación</th><th>Subcategoría</th><th>Stock</th></tr></thead>
+          <tbody id="stockTableBody"></tbody>
         </table>
       </div>
     </section>
