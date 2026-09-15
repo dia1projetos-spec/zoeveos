@@ -388,7 +388,7 @@ async function loadCategories() {
     </tr>`).join('') || `<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">Sin categorías</td></tr>`;
 }
 
-window.openCategoryModal = function(cat=null) {
+window.openCategoryModal = async function(cat=null) {
   document.getElementById('cat-id').value = cat?.id||'';
   document.getElementById('cat-name').value = cat?.name||'';
   document.getElementById('cat-icon').value = cat?.icon||'';
