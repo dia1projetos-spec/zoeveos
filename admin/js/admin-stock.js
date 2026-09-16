@@ -30,6 +30,7 @@ function buildRows() {
   const subsById = Object.fromEntries(getCachedSubcategorias().map((s) => [s.id, s.nombre]));
   const rows = [];
   getCachedProductos().forEach((p) => {
+    if (p.porEncargo) return; // los productos por encargo no llevan control de stock
     const subNombre = subsById[p.subcategoriaId] || "—";
     if (p.variantes && p.variantes.length > 0) {
       p.variantes.forEach((v) => {

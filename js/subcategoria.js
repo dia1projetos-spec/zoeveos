@@ -205,9 +205,12 @@ function renderProductCard(p, compact) {
     </a>
     <div class="p-info">
       <h3><a href="/producto.html?id=${p.id}">${p.nombre}</a></h3>
+      ${p.porEncargo ? `<span class="badge-encargo" style="margin-bottom:0;">Por encargo</span>` : ""}
       <div class="price">${formatPrice(p.precio)}</div>
       ${
-        hasVariants
+        p.porEncargo
+          ? `<a href="/producto.html?id=${p.id}" class="add-btn add-btn-encargo">Consultar</a>`
+          : hasVariants
           ? `<a href="/producto.html?id=${p.id}" class="add-btn">Ver opciones</a>`
           : `<button class="add-btn" data-id="${p.id}">Agregar al carrito</button>`
       }

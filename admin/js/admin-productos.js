@@ -140,7 +140,7 @@ async function loadProductos() {
       return `
       <tr>
         <td>${thumb ? `<img src="${thumb}">` : ""}</td>
-        <td>${p.nombre}${p.variantes && p.variantes.length ? ` <span style="font-size:0.75rem;color:var(--text-soft);">(${p.variantes.length} variaciones)</span>` : ""}</td>
+        <td>${p.nombre}${p.variantes && p.variantes.length ? ` <span style="font-size:0.75rem;color:var(--text-soft);">(${p.variantes.length} variaciones)</span>` : ""}${p.porEncargo ? ` <span class="badge badge-low">Por encargo</span>` : ""}</td>
         <td>${subsById[p.subcategoriaId] || "—"}</td>
         <td>$${Number(p.precio || 0).toLocaleString("es-AR")}</td>
         <td><span class="badge ${p.activo === false ? "badge-inactive" : "badge-active"}">${p.activo === false ? "Inactivo" : "Activo"}</span></td>
@@ -168,6 +168,7 @@ async function editProducto(id) {
   document.getElementById("prodStock").value = p.stock || 0;
   document.getElementById("prodDescripcion").value = p.descripcion || "";
   document.getElementById("prodActivo").checked = p.activo !== false;
+  document.getElementById("prodPorEncargo").checked = !!p.porEncargo;
   imagesManager.setSlides((p.images || []).map((url) => ({ type: "image", url })));
   variants = (p.variantes || []).map((v) => ({ ...v }));
   renderVariants();
@@ -183,6 +184,7 @@ function resetForm() {
   document.getElementById("prodStock").value = 0;
   document.getElementById("prodDescripcion").value = "";
   document.getElementById("prodActivo").checked = true;
+  document.getElementById("prodPorEncargo").checked = false;
   imagesManager.setSlides([]);
   variants = [];
   renderVariants();
@@ -214,6 +216,7 @@ async function saveProducto() {
     stock: Number(document.getElementById("prodStock").value) || 0,
     descripcion: document.getElementById("prodDescripcion").value.trim(),
     activo: document.getElementById("prodActivo").checked,
+    porEncargo: document.getElementById("prodPorEncargo").checked,
     images: imagesManager.getSlides().map((s) => s.url),
     variantes: variantesLimpias,
   };

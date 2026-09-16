@@ -442,6 +442,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .product-card .add-btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 20px rgba(180,150,110,0.3); filter: brightness(1.03); }
 .product-card .add-btn:active{ transform: translateY(0); }
+.product-card .add-btn-encargo{
+  background: linear-gradient(135deg, #2fd873, var(--whatsapp));
+  box-shadow: 0 6px 16px rgba(37,211,102,0.25);
+}
+.product-card .add-btn-encargo:hover{ box-shadow: 0 10px 20px rgba(37,211,102,0.32); }
 
 /* ===== Product detail page ===== */
 .product-detail{
@@ -455,8 +460,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .pd-gallery{ border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-soft); }
 .pd-gallery .product-carousel{ aspect-ratio: 1 / 1; }
 .pd-info h1{ font-size: 2.2rem; margin-bottom: 10px; }
+.badge-encargo{
+  display: inline-block;
+  background: #fdf1de;
+  color: #b8791f;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
 .pd-info .price{ font-size: 1.6rem; color: var(--pink-dark); margin-bottom: 18px; }
 .pd-info .desc{ color: var(--text-soft); margin-bottom: 26px; white-space: pre-line; }
+.encargo-hint{ font-size: 0.82rem; color: var(--text-soft); margin-top: 12px; max-width: 320px; }
 .variant-selector{ margin-bottom: 24px; }
 .variant-selector label{ display: block; font-size: 0.85rem; color: var(--text-soft); margin-bottom: 10px; }
 .variant-pills{ display: flex; flex-wrap: wrap; gap: 10px; }
@@ -528,6 +545,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .whatsapp-btn:hover{ background: var(--whatsapp-dark); transform: translateY(-3px); box-shadow: 0 14px 28px rgba(37,211,102,0.35); }
 .whatsapp-btn:active{ transform: translateY(-1px); }
 .whatsapp-btn svg{ width: 22px; height: 22px; }
+.whatsapp-btn.is-disabled{ opacity: 0.5; pointer-events: none; box-shadow: none; }
 
 /* ===== Footer ===== */
 .footer-features{

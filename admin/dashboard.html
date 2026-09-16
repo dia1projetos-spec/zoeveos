@@ -172,6 +172,15 @@
           <button type="button" class="btn btn-secondary" id="addVariantBtn">+ Agregar variación</button>
         </div>
 
+        <div class="form-row" id="prodEncargoWrap" style="background:var(--cream-light);border-radius:12px;padding:14px 16px;">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <input type="checkbox" id="prodPorEncargo" style="width:auto;"> Este producto es <strong>por encargo</strong> (bajo pedido)
+          </label>
+          <p style="font-size:0.8rem;color:var(--text-soft);margin:4px 0 0;">
+            En vez de "Agregar al carrito", en la página del producto va a aparecer un botón para consultar directo por WhatsApp (usa el número configurado en Configuración). No se controla stock para este producto.
+          </p>
+        </div>
+
         <div class="form-row"><label><input type="checkbox" id="prodActivo" checked style="width:auto;"> Activo</label></div>
         <div style="display:flex;gap:10px;">
           <button class="btn btn-primary" id="saveProdBtn">Guardar producto</button>
