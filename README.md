@@ -149,3 +149,12 @@ Si un producto tiene variaciones, el campo "Stock" general del producto se ignor
 
 La pestaña **Stock** del panel muestra todo el inventario en una sola tabla: un producto por fila (o una fila por variación, si el producto tiene variaciones), con la subcategoría y la cantidad. La cantidad se edita directamente ahí — no hace falta entrar a editar el producto entero. Tiene buscador por nombre, filtro por subcategoría, y un filtro para ver solo productos con "stock bajo" (5 unidades o menos) o "sin stock". Los productos con poco o ningún stock muestran una etiqueta de aviso.
 
+## 10. Menú lateral: subcategorías desplegables y búsqueda
+
+El menú (☰) ahora muestra, debajo de cada categoría que tiene subcategorías, una flechita para desplegarlas sin salir de la página — tocándola en celular, o simplemente pasando el mouse por arriba en computadora. También tiene un buscador arriba de todo: al escribir el nombre de un producto, aparecen resultados con foto y precio, tocás uno y va directo a la página de ese producto. La búsqueda funciona sobre el nombre del producto y no necesita ninguna configuración adicional.
+
+## 11. Filas estilo Netflix para subcategorías anidadas
+
+Cuando una subcategoría tiene subcategorías anidadas (ver punto 7), en vez de mostrar una simple lista para elegir y tener que entrar de nuevo, la página ya muestra una fila por cada subcategoría anidada, con sus productos en una tira que se puede arrastrar hacia el costado (con el mouse en computadora, con el dedo en celular) — igual que las filas de Netflix. Cada fila tiene un "Ver más" que lleva a la página completa de esa subcategoría específica.
+
+

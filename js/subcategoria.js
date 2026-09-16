@@ -1,7 +1,7 @@
 // js/subcategoria.js
 import { db, collection, getDocs, doc, getDoc, query, where } from "./firebase-config.js";
 import { initHeader } from "./header.js";
-import { initCartUI, addToCart } from "./cart.js";
+import { addToCart } from "./cart.js";
 import { optimizedUrl } from "./cloudinary.js";
 import { getParam, formatPrice } from "./utils.js";
 
@@ -11,6 +11,9 @@ const scId = getParam("id");
 const heroWrap = document.getElementById("subcatHero");
 const childrenGrid = document.getElementById("childrenGrid");
 const grid = document.getElementById("productsGrid");
+
+let globalCardIndex = 0;
+const allProductsById = {};
 
 async function load() {
   if (!scId) {
@@ -28,7 +31,7 @@ async function load() {
     renderHero(sc);
 
     // Primero nos fijamos si esta subcategoría tiene subcategorías anidadas.
-    // Si tiene, mostramos esa lista en vez de ir directo a los productos.
+    // Si tiene, mostramos una fila (estilo Netflix) por cada una, con sus productos.
     const childrenQ = query(collection(db, "subcategorias"), where("subcategoriaPadreId", "==", scId));
     const childrenSnap = await getDocs(childrenQ);
     const children = [];
@@ -40,7 +43,7 @@ async function load() {
     children.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
     if (children.length > 0) {
-      renderChildren(children);
+      await renderNetflixRows(children);
       return;
     }
 
@@ -51,29 +54,63 @@ async function load() {
   }
 }
 
-function renderChildren(children) {
+/* ---------------- Filas estilo Netflix (subcategorías anidadas) ---------------- */
+
+async function renderNetflixRows(children) {
   grid.style.display = "none";
-  childrenGrid.style.display = "grid";
-  childrenGrid.innerHTML = children.map(renderChildCard).join("");
+  childrenGrid.style.display = "flex";
+  childrenGrid.classList.add("netflix-rows");
+  childrenGrid.innerHTML = `<div class="empty-state">Cargando...</div>`;
+
+  const rowsHtml = [];
+  for (const child of children) {
+    const q = query(collection(db, "productos"), where("subcategoriaId", "==", child.id));
+    const snap = await getDocs(q);
+    const products = [];
+    snap.forEach((d) => {
+      const data = d.data();
+      if (data.activo === false) return;
+      products.push({ id: d.id, ...data });
+    });
+    products.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es"));
+    rowsHtml.push(renderNetflixRow(child, products));
+  }
+
+  childrenGrid.innerHTML = rowsHtml.join("");
+
+  childrenGrid.querySelectorAll(".product-carousel[data-images]").forEach((el) => {
+    const images = JSON.parse(el.dataset.images || "[]");
+    initProductCarousel(el.id, images);
+  });
+  bindAddButtons(childrenGrid);
+  enableDragScroll(childrenGrid);
 }
 
-function renderChildCard(sc) {
-  const cover = sc.slides && sc.slides.length ? sc.slides[0] : null;
-  const media = cover
-    ? cover.type === "video"
-      ? `<video src="${cover.url}" autoplay muted loop playsinline></video>`
-      : `<img src="${optimizedUrl(cover.url, 600)}" alt="${sc.nombre}">`
-    : `<img src="https://placehold.co/600x400/f7f0e6/b9a488?text=${encodeURIComponent(sc.nombre)}" alt="${sc.nombre}">`;
+function renderNetflixRow(child, products) {
+  if (products.length === 0) {
+    return `
+    <div class="netflix-row">
+      <div class="netflix-row-header">
+        <h2>${child.nombre}</h2>
+        <a href="/subcategoria.html?id=${child.id}" class="row-link">Ver más →</a>
+      </div>
+      <div class="empty-state" style="padding:16px 0;text-align:left;">Todavía no hay productos acá.</div>
+    </div>`;
+  }
+
+  const cardsHtml = products.map((p) => renderProductCard(p, true)).join("");
 
   return `
-  <a class="subcat-card" href="/subcategoria.html?id=${sc.id}">
-    <div class="thumb">${media}</div>
-    <div class="info">
-      <h3>${sc.nombre}</h3>
-      <span>Ver más →</span>
+  <div class="netflix-row">
+    <div class="netflix-row-header">
+      <h2>${child.nombre}</h2>
+      <a href="/subcategoria.html?id=${child.id}" class="row-link">Ver más →</a>
     </div>
-  </a>`;
+    <div class="netflix-row-scroll" data-drag-scroll>${cardsHtml}</div>
+  </div>`;
 }
+
+/* ---------------- Grid normal de productos (sin subcategorías anidadas) ---------------- */
 
 async function loadProducts() {
   // Nota: filtramos solo por subcategoriaId (sin orderBy en la consulta) para no
@@ -93,10 +130,15 @@ async function loadProducts() {
     return;
   }
 
-  grid.innerHTML = products.map((p, i) => renderProductCard(p, i)).join("");
-  products.forEach((p, i) => initProductCarousel(`pcard-${i}`, p.images || []));
-  bindAddButtons(products);
+  grid.innerHTML = products.map((p) => renderProductCard(p, false)).join("");
+  grid.querySelectorAll(".product-carousel[data-images]").forEach((el) => {
+    const images = JSON.parse(el.dataset.images || "[]");
+    initProductCarousel(el.id, images);
+  });
+  bindAddButtons(grid);
 }
+
+/* ---------------- Banner de la subcategoría ---------------- */
 
 function renderHero(sc) {
   const slides = sc.slides && sc.slides.length ? sc.slides : null;
@@ -138,13 +180,18 @@ function renderHero(sc) {
   }
 }
 
-function renderProductCard(p, i) {
+/* ---------------- Card de producto (reutilizado en grid normal y en filas Netflix) ---------------- */
+
+function renderProductCard(p, compact) {
+  const i = globalCardIndex++;
+  allProductsById[p.id] = p;
   const images = p.images && p.images.length ? p.images : ["https://placehold.co/500x400/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre)];
   const hasVariants = p.variantes && p.variantes.length > 0;
+  const cardClass = compact ? "product-card product-card-compact" : "product-card";
 
   return `
-  <article class="product-card">
-    <a href="/producto.html?id=${p.id}" class="product-carousel" id="pcard-${i}">
+  <article class="${cardClass}">
+    <a href="/producto.html?id=${p.id}" class="product-carousel" id="pcard-${i}" data-images='${JSON.stringify(images).replace(/'/g, "&#39;")}'>
       <div class="pc-track">
         ${images.map((img, si) => `<div class="pc-slide ${si === 0 ? "active" : ""}"><img src="${optimizedUrl(img, 600)}" alt="${p.nombre}"></div>`).join("")}
       </div>
@@ -171,6 +218,7 @@ function renderProductCard(p, i) {
 function initProductCarousel(id, images) {
   if (!images || images.length <= 1) return;
   const el = document.getElementById(id);
+  if (!el) return;
   const slides = el.querySelectorAll(".pc-slide");
   const dots = el.querySelectorAll(".pc-dots span");
   let current = 0;
@@ -192,14 +240,60 @@ function initProductCarousel(id, images) {
   });
 }
 
-function bindAddButtons(products) {
-  grid.querySelectorAll(".add-btn[data-id]").forEach((btn) => {
+function bindAddButtons(container) {
+  container.querySelectorAll(".add-btn[data-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const p = products.find((x) => x.id === btn.dataset.id);
+      const p = allProductsById[btn.dataset.id];
+      if (!p) return;
       addToCart({ id: p.id, nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
       btn.textContent = "¡Agregado!";
       setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
     });
+  });
+}
+
+/* ---------------- Arrastrar para el costado (estilo Netflix) con mouse ---------------- */
+
+function enableDragScroll(container) {
+  container.querySelectorAll("[data-drag-scroll]").forEach((row) => {
+    let isDown = false;
+    let startX = 0;
+    let scrollStart = 0;
+    let moved = false;
+
+    row.addEventListener("mousedown", (e) => {
+      isDown = true;
+      moved = false;
+      row.classList.add("dragging");
+      startX = e.pageX;
+      scrollStart = row.scrollLeft;
+    });
+    window.addEventListener("mouseup", () => {
+      isDown = false;
+      row.classList.remove("dragging");
+    });
+    row.addEventListener("mouseleave", () => {
+      isDown = false;
+      row.classList.remove("dragging");
+    });
+    row.addEventListener("mousemove", (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const delta = e.pageX - startX;
+      if (Math.abs(delta) > 5) moved = true;
+      row.scrollLeft = scrollStart - delta;
+    });
+    // Evita que un simple "arrastrón" termine activando el link del producto.
+    row.addEventListener(
+      "click",
+      (e) => {
+        if (moved) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      },
+      true
+    );
   });
 }
 
