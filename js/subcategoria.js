@@ -31,7 +31,7 @@ async function load() {
     renderHero(sc);
 
     // Primero nos fijamos si esta subcategoría tiene subcategorías anidadas.
-    // Si tiene, mostramos una fila (estilo Netflix) por cada una, con sus productos.
+    // Si tiene, mostramos una grilla de tarjetas (igual que categoria.html) para elegir.
     const childrenQ = query(collection(db, "subcategorias"), where("subcategoriaPadreId", "==", scId));
     const childrenSnap = await getDocs(childrenQ);
     const children = [];
@@ -43,7 +43,7 @@ async function load() {
     children.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
     if (children.length > 0) {
-      await renderNetflixRows(children);
+      renderChildrenGrid(children);
       return;
     }
 
@@ -54,72 +54,28 @@ async function load() {
   }
 }
 
-/* ---------------- Filas estilo Netflix (subcategorías anidadas) ---------------- */
+/* ---------------- Grilla de subcategorías anidadas (mismo estilo que categoria.html) ---------------- */
 
-async function renderNetflixRows(children) {
+function renderChildrenGrid(children) {
   grid.style.display = "none";
-  childrenGrid.style.display = "flex";
-  childrenGrid.classList.add("netflix-rows");
-  childrenGrid.innerHTML = `<div class="empty-state">Cargando...</div>`;
-
-  const rowsHtml = [];
-  for (const child of children) {
-    const q = query(collection(db, "productos"), where("subcategoriaId", "==", child.id));
-    const snap = await getDocs(q);
-    const products = [];
-    snap.forEach((d) => {
-      const data = d.data();
-      if (data.activo === false) return;
-      products.push({ id: d.id, ...data });
-    });
-    products.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es"));
-    rowsHtml.push(renderNetflixRow(child, products));
-  }
-
-  childrenGrid.innerHTML = rowsHtml.join("");
-
-  childrenGrid.querySelectorAll(".product-carousel[data-images]").forEach((el) => {
-    const images = JSON.parse(el.dataset.images || "[]");
-    initProductCarousel(el.id, images);
-  });
-  bindAddButtons(childrenGrid);
-  enableDragScroll(childrenGrid);
+  childrenGrid.style.display = "grid";
+  childrenGrid.innerHTML = children.map(renderChildCard).join("");
 }
 
-function renderNetflixRow(child, products) {
-  const bannerHtml = renderRowBanner(child);
-  const bodyHtml =
-    products.length === 0
-      ? `<div class="empty-state" style="padding:6px 24px 20px;text-align:left;">Todavía no hay productos acá.</div>`
-      : `<div class="netflix-row-scroll" data-drag-scroll>${products.map((p) => renderProductCard(p, true)).join("")}</div>`;
-
-  return `<div class="netflix-row">${bannerHtml}${bodyHtml}</div>`;
-}
-
-function renderRowBanner(child) {
-  const slides = child.slides && child.slides.length ? child.slides : null;
-
-  if (!slides) {
-    // Sin imagen/video cargado: mostramos el título con un botón "Ver más" bien visible.
-    return `
-    <div class="netflix-row-header">
-      <h2>${child.nombre}</h2>
-      <a href="/subcategoria.html?id=${child.id}" class="btn-pill btn-pill-sm btn-taupe">Ver más</a>
-    </div>`;
-  }
-
-  const first = slides[0];
-  const media =
-    first.type === "video"
-      ? `<video src="${first.url}" autoplay muted loop playsinline></video>`
-      : `<img src="${optimizedUrl(first.url, 900)}" alt="${child.nombre}">`;
+function renderChildCard(sc) {
+  const cover = sc.slides && sc.slides.length ? sc.slides[0] : null;
+  const media = cover
+    ? cover.type === "video"
+      ? `<video src="${cover.url}" autoplay muted loop playsinline></video>`
+      : `<img src="${optimizedUrl(cover.url, 600)}" alt="${sc.nombre}">`
+    : `<img src="https://placehold.co/600x400/f7f0e6/b9a488?text=${encodeURIComponent(sc.nombre)}" alt="${sc.nombre}">`;
 
   return `
-  <a href="/subcategoria.html?id=${child.id}" class="netflix-row-banner">
-    ${media}
-    <div class="netflix-row-banner-overlay">
-      <h2>${child.nombre}</h2>
-      <span class="btn-pill btn-pill-sm btn-pink">Ver más</span>
+  <a class="subcat-card" href="/subcategoria.html?id=${sc.id}">
+    <div class="thumb">${media}</div>
+    <div class="info">
+      <h3>${sc.nombre}</h3>
+      <span class="btn-pill btn-pill-sm btn-taupe">Ver más</span>
     </div>
   </a>`;
 }
@@ -144,7 +100,7 @@ async function loadProducts() {
     return;
   }
 
-  grid.innerHTML = products.map((p) => renderProductCard(p, false)).join("");
+  grid.innerHTML = products.map((p) => renderProductCard(p)).join("");
   grid.querySelectorAll(".product-carousel[data-images]").forEach((el) => {
     const images = JSON.parse(el.dataset.images || "[]");
     initProductCarousel(el.id, images);
@@ -194,17 +150,16 @@ function renderHero(sc) {
   }
 }
 
-/* ---------------- Card de producto (reutilizado en grid normal y en filas Netflix) ---------------- */
+/* ---------------- Card de producto ---------------- */
 
-function renderProductCard(p, compact) {
+function renderProductCard(p) {
   const i = globalCardIndex++;
   allProductsById[p.id] = p;
   const images = p.images && p.images.length ? p.images : ["https://placehold.co/500x400/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre)];
   const hasVariants = p.variantes && p.variantes.length > 0;
-  const cardClass = compact ? "product-card product-card-compact" : "product-card";
 
   return `
-  <article class="${cardClass}">
+  <article class="product-card">
     <a href="/producto.html?id=${p.id}" class="product-carousel" id="pcard-${i}" data-images='${JSON.stringify(images).replace(/'/g, "&#39;")}'>
       <div class="pc-track">
         ${images.map((img, si) => `<div class="pc-slide ${si === 0 ? "active" : ""}"><img src="${optimizedUrl(img, 600)}" alt="${p.nombre}"></div>`).join("")}
@@ -266,51 +221,6 @@ function bindAddButtons(container) {
       btn.textContent = "¡Agregado!";
       setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
     });
-  });
-}
-
-/* ---------------- Arrastrar para el costado (estilo Netflix) con mouse ---------------- */
-
-function enableDragScroll(container) {
-  container.querySelectorAll("[data-drag-scroll]").forEach((row) => {
-    let isDown = false;
-    let startX = 0;
-    let scrollStart = 0;
-    let moved = false;
-
-    row.addEventListener("mousedown", (e) => {
-      isDown = true;
-      moved = false;
-      row.classList.add("dragging");
-      startX = e.pageX;
-      scrollStart = row.scrollLeft;
-    });
-    window.addEventListener("mouseup", () => {
-      isDown = false;
-      row.classList.remove("dragging");
-    });
-    row.addEventListener("mouseleave", () => {
-      isDown = false;
-      row.classList.remove("dragging");
-    });
-    row.addEventListener("mousemove", (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const delta = e.pageX - startX;
-      if (Math.abs(delta) > 5) moved = true;
-      row.scrollLeft = scrollStart - delta;
-    });
-    // Evita que un simple "arrastrón" termine activando el link del producto.
-    row.addEventListener(
-      "click",
-      (e) => {
-        if (moved) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      },
-      true
-    );
   });
 }
 
