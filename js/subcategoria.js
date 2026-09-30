@@ -87,27 +87,41 @@ async function renderNetflixRows(children) {
 }
 
 function renderNetflixRow(child, products) {
-  if (products.length === 0) {
+  const bannerHtml = renderRowBanner(child);
+  const bodyHtml =
+    products.length === 0
+      ? `<div class="empty-state" style="padding:6px 24px 20px;text-align:left;">Todavía no hay productos acá.</div>`
+      : `<div class="netflix-row-scroll" data-drag-scroll>${products.map((p) => renderProductCard(p, true)).join("")}</div>`;
+
+  return `<div class="netflix-row">${bannerHtml}${bodyHtml}</div>`;
+}
+
+function renderRowBanner(child) {
+  const slides = child.slides && child.slides.length ? child.slides : null;
+
+  if (!slides) {
+    // Sin imagen/video cargado: mostramos el título con un botón "Ver más" bien visible.
     return `
-    <div class="netflix-row">
-      <div class="netflix-row-header">
-        <h2>${child.nombre}</h2>
-        <a href="/subcategoria.html?id=${child.id}" class="row-link">Ver más →</a>
-      </div>
-      <div class="empty-state" style="padding:16px 0;text-align:left;">Todavía no hay productos acá.</div>
+    <div class="netflix-row-header">
+      <h2>${child.nombre}</h2>
+      <a href="/subcategoria.html?id=${child.id}" class="btn-pill btn-pill-sm btn-taupe">Ver más</a>
     </div>`;
   }
 
-  const cardsHtml = products.map((p) => renderProductCard(p, true)).join("");
+  const first = slides[0];
+  const media =
+    first.type === "video"
+      ? `<video src="${first.url}" autoplay muted loop playsinline></video>`
+      : `<img src="${optimizedUrl(first.url, 900)}" alt="${child.nombre}">`;
 
   return `
-  <div class="netflix-row">
-    <div class="netflix-row-header">
+  <a href="/subcategoria.html?id=${child.id}" class="netflix-row-banner">
+    ${media}
+    <div class="netflix-row-banner-overlay">
       <h2>${child.nombre}</h2>
-      <a href="/subcategoria.html?id=${child.id}" class="row-link">Ver más →</a>
+      <span class="btn-pill btn-pill-sm btn-pink">Ver más</span>
     </div>
-    <div class="netflix-row-scroll" data-drag-scroll>${cardsHtml}</div>
-  </div>`;
+  </a>`;
 }
 
 /* ---------------- Grid normal de productos (sin subcategorías anidadas) ---------------- */

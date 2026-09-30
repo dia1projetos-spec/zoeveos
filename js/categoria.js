@@ -61,7 +61,7 @@ function renderCard(sc) {
     <div class="thumb">${media}</div>
     <div class="info">
       <h3>${sc.nombre}</h3>
-      <span>Ver más →</span>
+      <span class="btn-pill btn-pill-sm btn-taupe">Ver más</span>
     </div>
   </a>`;
 }
