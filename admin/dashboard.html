@@ -18,6 +18,8 @@
       <button data-tab="subcategorias">📁 Subcategorías</button>
       <button data-tab="productos">🛍️ Productos</button>
       <button data-tab="stock">📊 Stock</button>
+      <button data-tab="descuentos">🏷️ Descuentos</button>
+      <button data-tab="popups">🔔 Popups</button>
       <button data-tab="pedidos">📦 Pedidos</button>
       <button data-tab="blog">📝 Blog</button>
     </nav>
@@ -45,6 +47,10 @@
         <div class="form-row">
           <label for="whatsappNumber">WhatsApp de la tienda (con código de país, sin espacios ni +)</label>
           <input type="text" id="whatsappNumber" placeholder="Ej: 5493515551234">
+        </div>
+        <div class="form-row">
+          <label for="envioGratisMonto">Envío gratis a partir de (ARS) — dejá 0 para desactivar</label>
+          <input type="number" id="envioGratisMonto" value="0" min="0">
         </div>
         <button class="btn btn-primary" id="saveConfigBtn">Guardar configuración</button>
       </div>
@@ -226,6 +232,112 @@
         <table class="admin-table">
           <thead><tr><th></th><th>Producto</th><th>Variación</th><th>Subcategoría</th><th>Stock</th></tr></thead>
           <tbody id="stockTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DESCUENTOS -->
+    <section class="tab-panel" id="panel-descuentos">
+      <h1>Descuentos automáticos</h1>
+      <p class="admin-sub">El sistema detecta solo cuándo el carrito cumple la condición y le muestra al cliente un cupón para aplicar, como en Shopee.</p>
+
+      <div class="admin-card">
+        <h3 style="margin-bottom:16px;" id="descFormTitle">Nuevo descuento</h3>
+        <input type="hidden" id="descId">
+        <div class="form-row"><label>Nombre (para vos y para mostrarle al cliente)</label><input type="text" id="descNombre" placeholder="Ej: 10% en compras +$50.000"></div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Condición</label>
+            <select id="descTipo">
+              <option value="monto">Monto mínimo de compra ($)</option>
+              <option value="cantidad">Cantidad mínima de productos</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label id="descUmbralLabel">Monto mínimo ($)</label>
+            <input type="number" id="descUmbral" min="0" placeholder="Ej: 50000">
+          </div>
+        </div>
+
+        <div class="form-row" style="max-width:260px;">
+          <label>Porcentaje de descuento (%)</label>
+          <input type="number" id="descPorcentaje" min="1" max="100" placeholder="Ej: 10">
+        </div>
+
+        <div class="form-row">
+          <label>Se aplica a</label>
+          <select id="descAlcance">
+            <option value="todos">Todos los productos</option>
+            <option value="categoria">Una categoría específica</option>
+            <option value="producto">Un producto específico</option>
+          </select>
+        </div>
+        <div class="form-row" id="descAlcanceCategoriaWrap" style="display:none;">
+          <label>Categoría</label>
+          <select id="descAlcanceCategoriaId"></select>
+        </div>
+        <div class="form-row" id="descAlcanceProductoWrap" style="display:none;">
+          <label>Producto</label>
+          <select id="descAlcanceProductoId"></select>
+        </div>
+
+        <div class="form-row"><label><input type="checkbox" id="descActivo" checked style="width:auto;"> Activo</label></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveDescBtn">Guardar descuento</button>
+          <button class="btn btn-secondary" id="cancelDescBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th>Nombre</th><th>Condición</th><th>Descuento</th><th>Se aplica a</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="descTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- POPUPS -->
+    <section class="tab-panel" id="panel-popups">
+      <h1>Popups</h1>
+      <p class="admin-sub">Ventanas que aparecen sobre la tienda después de unos segundos, con imagen o video y dos botones fijos: Cerrar y Ver más.</p>
+
+      <div class="admin-card">
+        <h3 style="margin-bottom:16px;" id="popupFormTitle">Nuevo popup</h3>
+        <input type="hidden" id="popupId">
+        <div class="form-row"><label>Nombre (interno, para identificarlo acá)</label><input type="text" id="popupNombre" placeholder="Ej: Promo Día de la Madre"></div>
+
+        <div class="form-row">
+          <label>Imagen o video (PNG, JPG o MP4)</label>
+          <div class="slides-manager" id="popupMediaWrap"></div>
+          <div class="upload-box" id="popupUploadBox">Subir archivo</div>
+          <input type="file" id="popupFileInput" accept="image/*,video/mp4" style="display:none;">
+          <div class="upload-progress" id="popupProgress"></div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Aparece después de (segundos)</label>
+            <input type="number" id="popupDelay" min="0" value="3">
+          </div>
+          <div class="form-row">
+            <label>Link del botón "Ver más" (opcional)</label>
+            <input type="text" id="popupLink" placeholder="/categoria.html?id=... o https://...">
+          </div>
+        </div>
+
+        <div class="form-row"><label><input type="checkbox" id="popupActivo" style="width:auto;"> Activo (se muestra en la tienda)</label></div>
+        <p style="font-size:0.8rem;color:var(--text-soft);margin-top:-6px;">Si activás más de un popup, solo se muestra el primero activo. A cada visitante se le muestra una sola vez por visita.</p>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn btn-primary" id="savePopupBtn">Guardar popup</button>
+          <button class="btn btn-secondary" id="cancelPopupBtn" style="display:none;">Cancelar edición</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th></th><th>Nombre</th><th>Retraso</th><th>Link</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="popupTableBody"></tbody>
         </table>
       </div>
     </section>

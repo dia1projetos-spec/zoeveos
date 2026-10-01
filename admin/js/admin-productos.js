@@ -48,6 +48,20 @@ function genId() {
   return "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// Sube por la cadena de subcategorías (subcategoriaPadreId) hasta encontrar la categoría
+// principal raíz. Así los descuentos "por categoría" funcionan sin importar cuán anidado
+// esté el producto.
+function resolveCategoriaId(subcategoriaId) {
+  const subcats = getCachedSubcategorias();
+  let current = subcats.find((s) => s.id === subcategoriaId);
+  let guard = 0;
+  while (current && !current.categoriaId && current.subcategoriaPadreId && guard < 12) {
+    current = subcats.find((s) => s.id === current.subcategoriaPadreId);
+    guard++;
+  }
+  return current?.categoriaId || "";
+}
+
 /* ---------------- Variantes ---------------- */
 
 function renderVariants() {
@@ -212,6 +226,7 @@ async function saveProducto() {
   const payload = {
     nombre,
     subcategoriaId,
+    categoriaId: resolveCategoriaId(subcategoriaId),
     precio,
     stock: Number(document.getElementById("prodStock").value) || 0,
     descripcion: document.getElementById("prodDescripcion").value.trim(),

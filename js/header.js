@@ -52,6 +52,7 @@ const CART_DRAWER_HTML = `
     <button id="cartCloseBtn" aria-label="Cerrar carrito">✕</button>
   </div>
   <div class="cart-items" id="cartItemsList"></div>
+  <div class="cart-promo" id="cartPromoWrap"></div>
   <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
     <div class="cart-total-row"><span>Total</span><strong id="cartTotalValue">$0</strong></div>
     <a href="/checkout.html" class="btn-full">Finalizar compra</a>

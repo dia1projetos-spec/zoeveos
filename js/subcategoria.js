@@ -217,7 +217,7 @@ function bindAddButtons(container) {
     btn.addEventListener("click", () => {
       const p = allProductsById[btn.dataset.id];
       if (!p) return;
-      addToCart({ id: p.id, nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
+      addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
       btn.textContent = "¡Agregado!";
       setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
     });

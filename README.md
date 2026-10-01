@@ -64,6 +64,14 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null;
     }
+    match /descuentos/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /popups/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
     match /pedidos/{id} {
       allow create: if true;               // cualquiera puede crear un pedido desde el checkout
       allow read, update, delete: if request.auth != null;  // solo vos en el panel
@@ -153,15 +161,40 @@ La pestaña **Stock** del panel muestra todo el inventario en una sola tabla: un
 
 El menú (☰) ahora muestra, debajo de cada categoría que tiene subcategorías, una flechita para desplegarlas sin salir de la página — tocándola en celular, o simplemente pasando el mouse por arriba en computadora. También tiene un buscador arriba de todo: al escribir el nombre de un producto, aparecen resultados con foto y precio, tocás uno y va directo a la página de ese producto. La búsqueda funciona sobre el nombre del producto y no necesita ninguna configuración adicional.
 
-## 11. Filas estilo Netflix para subcategorías anidadas
+## 11. Subcategorías anidadas: navegación en grilla
 
-Cuando una subcategoría tiene subcategorías anidadas (ver punto 7), en vez de mostrar una simple lista para elegir y tener que entrar de nuevo, la página ya muestra una fila por cada subcategoría anidada, con sus productos en una tira que se puede arrastrar hacia el costado (con el mouse en computadora, con el dedo en celular) — igual que las filas de Netflix. Cada fila tiene un "Ver más" que lleva a la página completa de esa subcategoría específica.
+Cuando una subcategoría tiene subcategorías anidadas (ver punto 7), la página muestra una grilla de tarjetas — mismo estilo que al entrar a una categoría principal — para que el visitante elija cuál quiere ver. Recién al tocar "Ver más" en una de esas tarjetas entra a esa subcategoría puntual, donde ve su banner y sus productos (o, si esa subcategoría también tiene anidadas, otra grilla, y así sucesivamente).
 
 ## 12. Productos "por encargo" (bajo pedido)
 
 Al crear o editar un producto en el panel, tildando la opción **"Este producto es por encargo"**, ese producto deja de usar el botón "Agregar al carrito" — en su lugar aparece un botón verde **"Consultar por WhatsApp"** que abre una conversación con el número configurado en **Configuración**, ya con un mensaje armado con el nombre del producto, la variación elegida (si tiene) y la cantidad. También aparece un cartel "Por encargo" junto al producto, tanto en su página como en las fichas dentro de las listas y filas.
 
 Estos productos no llevan control de stock (no aparecen en la pestaña **Stock**), ya que se hacen bajo pedido.
+
+## 13. Descuentos automáticos (estilo Shopee)
+
+Desde la pestaña **Descuentos** del panel podés crear reglas de descuento que el sistema aplica solo, sin que vos tengas que hacer nada en cada venta:
+
+- **Condición**: por **monto mínimo de compra** (ej: "$50.000 o más") o por **cantidad mínima de productos** (ej: "3 unidades o más").
+- **Alcance**: a **todos los productos**, a **una categoría específica**, o a **un producto específico**. El monto/cantidad de la condición se calcula solo sobre los productos de ese alcance (si elegís una categoría, cuenta lo que hay en el carrito de esa categoría, no el total del carrito).
+- **Porcentaje de descuento** a aplicar.
+
+En la tienda, el carrito revisa esto automáticamente: si el cliente todavía no llega a la condición, ve un cartel tipo "Te faltan $8.000 para 10% OFF"; apenas la cumple, aparece un botón **"Aplicar"** — el cliente decide si lo usa, como en Shopee. Solo se puede tener un descuento aplicado a la vez; aplicar otro reemplaza al anterior. El descuento aplicado se ve reflejado en el carrito, en el checkout, en el pedido guardado en el panel, y en el mensaje de WhatsApp.
+
+### Envío gratis
+
+En **Configuración**, el campo **"Envío gratis a partir de"** te deja definir un monto: si el subtotal del carrito lo alcanza, en el carrito y en el checkout aparece el aviso de envío gratis (y se incluye en el mensaje de WhatsApp). Dejalo en 0 para desactivarlo.
+
+## 14. Popups
+
+Desde la pestaña **Popups** podés crear ventanas promocionales que aparecen sobre la tienda después de unos segundos. Cada popup tiene:
+
+- Una imagen (PNG/JPG) o un video (MP4) — se sube igual que las demás imágenes del sitio.
+- Un tiempo de espera en segundos antes de aparecer.
+- Dos botones fijos, siempre debajo de la imagen (para no taparla): **"Cerrar"** y, si cargaste un link, **"Ver más"**, que lleva a la página que quieras — puede ser una página del propio sitio (ej: `/categoria.html?id=...`) o un link externo completo (`https://...`).
+
+Solo se muestra un popup a la vez (si activás varios, se usa el primero activo), y a cada visitante se le muestra una sola vez por visita al sitio. El popup no aparece en la página de checkout, para no interrumpir una compra en curso.
+
 
 
 

@@ -84,7 +84,7 @@ async function renderFeaturedProduct(productId) {
   </div>`;
 
   document.getElementById("fpAddBtn").addEventListener("click", () => {
-    addToCart({ id: p.id, nombre: p.nombre, precio: p.precio, imagen: img }, 1);
+    addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", nombre: p.nombre, precio: p.precio, imagen: img }, 1);
     const btn = document.getElementById("fpAddBtn");
     btn.textContent = "¡Agregado!";
     setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);

@@ -21,6 +21,7 @@ export async function initConfigTab() {
       const data = snap.data();
       document.getElementById("siteName").value = data.siteName || "";
       document.getElementById("whatsappNumber").value = data.whatsappNumber || "";
+      document.getElementById("envioGratisMonto").value = data.envioGratisMonto || 0;
       if (data.logoUrl) logoManager.setSlides([{ type: "image", url: data.logoUrl }]);
     }
   } catch (e) {
@@ -42,6 +43,7 @@ async function saveConfig() {
       {
         siteName: document.getElementById("siteName").value.trim(),
         whatsappNumber: document.getElementById("whatsappNumber").value.trim(),
+        envioGratisMonto: Number(document.getElementById("envioGratisMonto").value) || 0,
         logoUrl: slides.length ? slides[0].url : "",
       },
       { merge: true }

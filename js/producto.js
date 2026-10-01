@@ -201,11 +201,13 @@ function onAddToCart(images) {
   const cartItem = hasVariants
     ? {
         id: `${p.id}__${selectedVariant.id}`,
+        productoId: p.id,
+        categoriaId: p.categoriaId || "",
         nombre: `${p.nombre} - ${selectedVariant.nombre}`,
         precio: p.precio,
         imagen: selectedVariant.imagen || images[0],
       }
-    : { id: p.id, nombre: p.nombre, precio: p.precio, imagen: images[0] };
+    : { id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", nombre: p.nombre, precio: p.precio, imagen: images[0] };
 
   addToCart(cartItem, qty);
   addBtn.textContent = "¡Agregado al carrito!";
