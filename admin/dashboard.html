@@ -159,6 +159,13 @@
           <div class="form-row"><label>Precio (ARS)</label><input type="number" id="prodPrecio"></div>
           <div class="form-row" id="prodStockSimpleWrap"><label>Stock</label><input type="number" id="prodStock" value="0"></div>
         </div>
+        <div class="form-row">
+          <label>Código interno (opcional)</label>
+          <input type="text" id="prodCodigo" placeholder="Ej: MP-001">
+          <p style="font-size:0.8rem;color:var(--text-soft);margin-top:6px;">
+            No se muestra en la tienda. Sirve para identificar el producto en el pedido: viaja con la compra y aparece en la pestaña Pedidos y en el mensaje de WhatsApp cuando el cliente finaliza la compra.
+          </p>
+        </div>
         <div class="form-row"><label>Descripción</label><textarea id="prodDescripcion"></textarea></div>
         <div class="form-row">
           <label>Imágenes del producto (carrusel)</label>
@@ -172,7 +179,7 @@
         <div class="form-row">
           <label>Variaciones (opcional — color, estampa, etc.)</label>
           <p style="font-size:0.8rem;color:var(--text-soft);margin:-2px 0 10px;">
-            Si agregás variaciones, el stock se controla por variación (el campo "Stock" de arriba se ignora) y el cliente va a tener que elegir una antes de agregar al carrito.
+            Si agregás variaciones, el stock se controla por variación (el campo "Stock" de arriba se ignora) y el cliente va a tener que elegir una antes de agregar al carrito. El precio por variación es opcional: si lo dejás vacío se usa el precio del producto.
           </p>
           <div id="prodVariantsWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
           <button type="button" class="btn btn-secondary" id="addVariantBtn">+ Agregar variación</button>

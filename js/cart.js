@@ -42,11 +42,13 @@ export function getCartCount() {
 }
 
 /**
- * product: { id, nombre, precio, imagen, productoId?, categoriaId? }
+ * product: { id, nombre, precio, imagen, productoId?, categoriaId?, codigo? }
  * - id: identificador único en el carrito (puede incluir la variación, ej "prod123__varAzul")
  * - productoId: id real del producto en Firestore (sin la variación), para que los descuentos
  *   por "producto específico" matcheen aunque haya variaciones.
  * - categoriaId: categoría raíz del producto, para los descuentos por categoría.
+ * - codigo: código interno del producto (no se muestra en la tienda). Viaja oculto en el carrito
+ *   y aparece en el pedido guardado y en el mensaje de WhatsApp al finalizar la compra.
  */
 export function addToCart(product, qty = 1) {
   const items = readCart();
@@ -58,6 +60,7 @@ export function addToCart(product, qty = 1) {
       id: product.id,
       productoId: product.productoId || product.id,
       categoriaId: product.categoriaId || "",
+      codigo: product.codigo || "",
       nombre: product.nombre,
       precio: Number(product.precio) || 0,
       imagen: product.imagen || "",

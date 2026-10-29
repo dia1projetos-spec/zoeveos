@@ -34,7 +34,7 @@ async function loadPedidos() {
 function renderRow(p) {
   const fecha = p.fecha?.toDate ? p.fecha.toDate().toLocaleString("es-AR") : "—";
   const cliente = p.cliente || {};
-  const itemsList = (p.items || []).map((it) => `${it.cantidad}x ${it.nombre}`).join(", ");
+  const itemsList = (p.items || []).map((it) => `${it.cantidad}x ${it.nombre}${it.codigo ? ` [${it.codigo}]` : ""}`).join(", ");
   const estado = p.estado || "pendiente";
   return `
   <tr>

@@ -195,6 +195,13 @@ Desde la pestaña **Popups** podés crear ventanas promocionales que aparecen so
 
 Solo se muestra un popup a la vez (si activás varios, se usa el primero activo), y a cada visitante se le muestra una sola vez por visita al sitio. El popup no aparece en la página de checkout, para no interrumpir una compra en curso.
 
+## 15. Código interno del producto
+
+En el formulario de cada producto hay un campo **"Código interno"**, totalmente opcional. No aparece en ningún lado de la tienda — el cliente nunca lo ve. Sirve para identificar el producto puertas adentro (por ejemplo, tu propio código de stock): viaja oculto junto con el producto en el carrito, y aparece automáticamente en la pestaña **Pedidos** del panel y en el mensaje de WhatsApp que se arma cuando el cliente finaliza la compra (y también en el botón de consulta de los productos "por encargo"). Así, cuando te llega el pedido por WhatsApp, ya sabés exactamente qué código de tu stock preparar.
 
 
 
+
+
+## 16. Precio opcional por variación
+En cada variación del producto hay un campo **Precio (opc.)**. Si lo completás, esa variación usa su propio precio (en la ficha del producto el precio cambia al elegirla, y ese precio va al carrito, descuentos, checkout y pedido). Si lo dejás vacío, usa el precio del producto. En las tarjetas se muestra "Desde $X" cuando hay precios distintos. Los productos anteriores siguen funcionando sin cambios.

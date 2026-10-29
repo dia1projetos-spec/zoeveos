@@ -24,10 +24,16 @@ export async function initPopupsTab() {
 async function loadPopups() {
   const tbody = document.getElementById("popupTableBody");
   tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Cargando...</td></tr>`;
-  const q = query(collection(db, "popups"), orderBy("nombre", "asc"));
-  const snap = await getDocs(q);
-  const popups = [];
-  snap.forEach((d) => popups.push({ id: d.id, ...d.data() }));
+  let popups = [];
+  try {
+    const q = query(collection(db, "popups"), orderBy("nombre", "asc"));
+    const snap = await getDocs(q);
+    snap.forEach((d) => popups.push({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("Error al cargar popups:", e);
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">No se pudieron cargar los popups. Revisá las reglas de Firestore (colección "popups").</td></tr>`;
+    return;
+  }
 
   if (popups.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Todavía no creaste ningún popup.</td></tr>`;

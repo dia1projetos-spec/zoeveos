@@ -46,8 +46,27 @@ export function createSlidesManager(options) {
 
   uploadBox?.addEventListener("click", () => fileInput.click());
 
-  fileInput?.addEventListener("change", async (e) => {
+  uploadBox?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadBox.classList.add("drag-over");
+  });
+  uploadBox?.addEventListener("dragleave", () => {
+    uploadBox.classList.remove("drag-over");
+  });
+  uploadBox?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadBox.classList.remove("drag-over");
+    if (e.dataTransfer?.files?.length) {
+      handleFiles(Array.from(e.dataTransfer.files));
+    }
+  });
+
+  fileInput?.addEventListener("change", (e) => {
     const files = Array.from(e.target.files || []);
+    handleFiles(files);
+  });
+
+  async function handleFiles(files) {
     if (files.length === 0) return;
     uploadBox.textContent = "Subiendo...";
     for (const file of files) {
@@ -65,7 +84,7 @@ export function createSlidesManager(options) {
     if (progressEl) progressEl.textContent = "";
     uploadBox.textContent = options.uploadLabel || "+ Agregar";
     fileInput.value = "";
-  });
+  }
 
   render();
 

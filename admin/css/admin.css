@@ -123,6 +123,7 @@ a{ color: inherit; }
   cursor:pointer;
 }
 .upload-box:hover{ border-color: var(--taupe); }
+.upload-box.drag-over{ border-color: var(--pink-dark); background: #fdf1ef; }
 .upload-progress{ font-size: 0.78rem; color: var(--taupe-dark); margin-top: 6px; }
 
 .tab-panel{ display:none; }
@@ -142,3 +143,6 @@ a{ color: inherit; }
   .admin-main{ margin-left: 0; padding: 24px 18px 60px; }
   .form-grid-2{ grid-template-columns: 1fr; }
 }
+
+.variant-row input[data-field="precio"] { width: 110px; }
+@media (max-width: 640px) { .variant-row { flex-wrap: wrap; } .variant-row input[data-field="precio"] { width: 100px; } }

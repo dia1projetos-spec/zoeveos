@@ -76,7 +76,7 @@ function render() {
   <div class="pd-info">
     <h1>${p.nombre}</h1>
     ${p.porEncargo ? `<span class="badge-encargo">Por encargo</span>` : ""}
-    <div class="price">${formatPrice(p.precio)}</div>
+    <div class="price" id="pdPrice">${formatPrice(p.precio)}</div>
     <p class="desc">${p.descripcion || ""}</p>
 
     ${hasVariants ? renderVariantSelector(p) : ""}
@@ -126,6 +126,10 @@ function render() {
   }
 }
 
+function variantPrice(p, v) {
+  return v && v.precio != null && v.precio !== "" && Number(v.precio) > 0 ? Number(v.precio) : p.precio;
+}
+
 function renderVariantSelector(p) {
   return `
   <div class="variant-selector">
@@ -152,6 +156,8 @@ function bindVariantPills(p) {
       document.querySelectorAll(".variant-pill").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       selectedVariant = p.variantes.find((v) => v.id === btn.dataset.id) || null;
+      const priceEl = document.getElementById("pdPrice");
+      if (priceEl) priceEl.textContent = formatPrice(variantPrice(p, selectedVariant));
 
       if (p.porEncargo) {
         const encargoBtn = document.getElementById("encargoBtn");
@@ -184,6 +190,7 @@ function updateEncargoLink(btn, hasVariants) {
     `¡Hola! Quiero consultar sobre este producto por encargo:`,
     `${p.nombre}${variantText}`,
     `Cantidad: ${qty}`,
+    ...(p.codigo ? [`Código: ${p.codigo}`] : []),
     window.location.href,
   ];
   btn.href = `https://wa.me/${storeWhatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
@@ -203,11 +210,12 @@ function onAddToCart(images) {
         id: `${p.id}__${selectedVariant.id}`,
         productoId: p.id,
         categoriaId: p.categoriaId || "",
+        codigo: p.codigo || "",
         nombre: `${p.nombre} - ${selectedVariant.nombre}`,
-        precio: p.precio,
+        precio: variantPrice(p, selectedVariant),
         imagen: selectedVariant.imagen || images[0],
       }
-    : { id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", nombre: p.nombre, precio: p.precio, imagen: images[0] };
+    : { id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, imagen: images[0] };
 
   addToCart(cartItem, qty);
   addBtn.textContent = "¡Agregado al carrito!";

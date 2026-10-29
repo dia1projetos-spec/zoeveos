@@ -32,15 +32,25 @@ async function boot() {
   setupTabs();
 
   // El orden importa: cada módulo depende de los datos cacheados del anterior.
-  await initConfigTab();
-  await initCategoriasTab();
-  await initSubcategoriasTab();
-  await initProductosTab();
-  await initStockTab();
-  await initDescuentosTab();
-  await initPopupsTab();
-  await initPedidosTab();
-  await initBlogTab();
+  // Cada pestaña se inicializa en su propio try/catch: si una falla (por ejemplo,
+  // por una regla de Firestore que falta), las demás igual se cargan con normalidad.
+  await safeInit("Configuración", initConfigTab);
+  await safeInit("Categorías", initCategoriasTab);
+  await safeInit("Subcategorías", initSubcategoriasTab);
+  await safeInit("Productos", initProductosTab);
+  await safeInit("Stock", initStockTab);
+  await safeInit("Descuentos", initDescuentosTab);
+  await safeInit("Popups", initPopupsTab);
+  await safeInit("Pedidos", initPedidosTab);
+  await safeInit("Blog", initBlogTab);
+}
+
+async function safeInit(nombre, fn) {
+  try {
+    await fn();
+  } catch (e) {
+    console.error(`Error al inicializar la pestaña "${nombre}":`, e);
+  }
 }
 
 function setupTabs() {

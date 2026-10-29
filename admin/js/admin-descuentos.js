@@ -44,10 +44,16 @@ function updateAlcanceVisibility() {
 async function loadDescuentos() {
   const tbody = document.getElementById("descTableBody");
   tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Cargando...</td></tr>`;
-  const q = query(collection(db, "descuentos"), orderBy("umbral", "asc"));
-  const snap = await getDocs(q);
-  const descuentos = [];
-  snap.forEach((d) => descuentos.push({ id: d.id, ...d.data() }));
+  let descuentos = [];
+  try {
+    const q = query(collection(db, "descuentos"), orderBy("umbral", "asc"));
+    const snap = await getDocs(q);
+    snap.forEach((d) => descuentos.push({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("Error al cargar descuentos:", e);
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">No se pudieron cargar los descuentos. Revisá las reglas de Firestore (colección "descuentos").</td></tr>`;
+    return;
+  }
 
   if (descuentos.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-row">Todavía no creaste ningún descuento.</td></tr>`;

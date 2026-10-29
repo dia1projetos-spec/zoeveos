@@ -114,7 +114,7 @@ function buildWhatsappMessage(pedidoId, cliente, items, summary) {
     `¡Hola! Quiero finalizar mi compra en Zoë νέος 🌿`,
     `Pedido: #${pedidoId.slice(0, 6).toUpperCase()}`,
     ``,
-    ...items.map((it) => `• ${it.cantidad}x ${it.nombre} - ${formatPrice(it.precio * it.cantidad)}`),
+    ...items.map((it) => `• ${it.cantidad}x ${it.nombre}${it.codigo ? ` [Cod: ${it.codigo}]` : ""} - ${formatPrice(it.precio * it.cantidad)}`),
     ``,
   ];
 

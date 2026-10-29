@@ -175,7 +175,7 @@ function renderProductCard(p) {
     <div class="p-info">
       <h3><a href="/producto.html?id=${p.id}">${p.nombre}</a></h3>
       ${p.porEncargo ? `<span class="badge-encargo" style="margin-bottom:0;">Por encargo</span>` : ""}
-      <div class="price">${formatPrice(p.precio)}</div>
+      <div class="price">${priceLabel(p)}</div>
       ${
         p.porEncargo
           ? `<a href="/producto.html?id=${p.id}" class="add-btn add-btn-encargo">Consultar</a>`
@@ -217,7 +217,7 @@ function bindAddButtons(container) {
     btn.addEventListener("click", () => {
       const p = allProductsById[btn.dataset.id];
       if (!p) return;
-      addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
+      addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
       btn.textContent = "¡Agregado!";
       setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
     });
@@ -225,3 +225,14 @@ function bindAddButtons(container) {
 }
 
 load();
+
+function priceLabel(p) {
+  const precios = [Number(p.precio)];
+  (p.variantes || []).forEach((v) => {
+    if (v.precio != null && v.precio !== "" && Number(v.precio) > 0) precios.push(Number(v.precio));
+  });
+  const min = Math.min(...precios);
+  const max = Math.max(...precios);
+  // Si algunas variaciones usan el precio base, éste ya está en la lista
+  return min !== max ? "Desde " + formatPrice(min) : formatPrice(p.precio);
+}
