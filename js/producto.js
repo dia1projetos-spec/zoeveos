@@ -146,33 +146,47 @@ function renderVariantSelector(p) {
         })
         .join("")}
     </div>
+    <button type="button" class="variant-clear" id="variantClear" hidden>✕ Quitar variación (volver al producto original)</button>
   </div>`;
 }
 
 function bindVariantPills(p) {
   const pills = document.querySelectorAll(".variant-pill:not(.disabled)");
+  const clearBtn = document.getElementById("variantClear");
+  const waIcon = `<svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>`;
+
+  function applySelection(variant) {
+    selectedVariant = variant;
+    document.querySelectorAll(".variant-pill").forEach((b) =>
+      b.classList.toggle("active", !!variant && b.dataset.id === variant.id)
+    );
+    const priceEl = document.getElementById("pdPrice");
+    if (priceEl) priceEl.textContent = formatPrice(variantPrice(p, variant));
+    if (clearBtn) clearBtn.hidden = !variant;
+
+    if (p.porEncargo) {
+      const encargoBtn = document.getElementById("encargoBtn");
+      encargoBtn.classList.toggle("is-disabled", !variant);
+      encargoBtn.innerHTML = `${waIcon} ${variant ? "Consultar por WhatsApp" : "Elegí una variación"}`;
+      updateEncargoLink(encargoBtn, true);
+    } else {
+      const addBtn = document.getElementById("addToCartBtn");
+      addBtn.disabled = !variant;
+      addBtn.textContent = variant ? "Agregar al carrito" : "Elegí una variación";
+    }
+  }
+
   pills.forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".variant-pill").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      selectedVariant = p.variantes.find((v) => v.id === btn.dataset.id) || null;
-      const priceEl = document.getElementById("pdPrice");
-      if (priceEl) priceEl.textContent = formatPrice(variantPrice(p, selectedVariant));
-
-      if (p.porEncargo) {
-        const encargoBtn = document.getElementById("encargoBtn");
-        encargoBtn.classList.remove("is-disabled");
-        encargoBtn.innerHTML = `
-          <svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>
-          Consultar por WhatsApp`;
-        updateEncargoLink(encargoBtn, true);
-      } else {
-        const addBtn = document.getElementById("addToCartBtn");
-        addBtn.disabled = false;
-        addBtn.textContent = "Agregar al carrito";
+      // Clic en la variación ya elegida = volver al producto original
+      if (selectedVariant && selectedVariant.id === btn.dataset.id) {
+        applySelection(null);
+        return;
       }
+      applySelection(p.variantes.find((v) => v.id === btn.dataset.id) || null);
     });
   });
+  if (clearBtn) clearBtn.addEventListener("click", () => applySelection(null));
 }
 
 function updateEncargoLink(btn, hasVariants) {

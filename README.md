@@ -205,3 +205,5 @@ En el formulario de cada producto hay un campo **"Código interno"**, totalmente
 
 ## 16. Precio opcional por variación
 En cada variación del producto hay un campo **Precio (opc.)**. Si lo completás, esa variación usa su propio precio (en la ficha del producto el precio cambia al elegirla, y ese precio va al carrito, descuentos, checkout y pedido). Si lo dejás vacío, usa el precio del producto. En las tarjetas se muestra "Desde $X" cuando hay precios distintos. Los productos anteriores siguen funcionando sin cambios.
+
+Para volver al producto original, el cliente puede tocar de nuevo la variación elegida o usar el enlace "Quitar variación": el precio vuelve al del producto y se vuelve a pedir elegir una variación para agregar al carrito.
