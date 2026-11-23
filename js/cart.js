@@ -42,7 +42,7 @@ export function getCartCount() {
 }
 
 /**
- * product: { id, nombre, precio, imagen, productoId?, categoriaId?, codigo? }
+ * product: { id, nombre, precio, precioTransferencia?, imagen, productoId?, categoriaId?, codigo? }
  * - id: identificador único en el carrito (puede incluir la variación, ej "prod123__varAzul")
  * - productoId: id real del producto en Firestore (sin la variación), para que los descuentos
  *   por "producto específico" matcheen aunque haya variaciones.
@@ -63,6 +63,7 @@ export function addToCart(product, qty = 1) {
       codigo: product.codigo || "",
       nombre: product.nombre,
       precio: Number(product.precio) || 0,
+      precioTransferencia: Number(product.precioTransferencia) > 0 ? Number(product.precioTransferencia) : null,
       imagen: product.imagen || "",
       cantidad: qty,
     });

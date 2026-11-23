@@ -212,3 +212,22 @@ Para volver al producto original, el cliente puede tocar de nuevo la variación 
 - Meta tag de Google (Search Console / Merchant Center) incluida en el `<head>` de todas las páginas HTML: `google-site-verification` = `BYMNfA_rqkTLMFft4u-P8ko_mnDU1vcFyelOSOb1ZEA`.
 - Archivo de verificación `google904a1df829652e56.html` en la raíz (se accede en `https://www.zoeveos.com/google904a1df829652e56.html`).
 Mantener ambos en todas las versiones.
+
+## 18. Precio por transferencia y medios de pago
+- **Producto → "Precio por transferencia (ARS)"** (opcional). Vacío = igual al precio normal. Cada variación también puede tener su precio y su precio por transferencia (opcionales).
+- **Configuración → Medios de pago**: cargás los que quieras, cada uno con un tipo: *Precio por transferencia*, *Sin recargo*, *Recargo en $* (monto fijo, una vez por pedido) o *Recargo en %* (sobre el total del pedido, ya con descuentos).
+- En el checkout el cliente elige el medio y el total se recalcula. El pedido guarda `metodoPago`, `recargo`, los precios aplicados y el total final; el medio aparece en la pestaña Pedidos y en el mensaje de WhatsApp.
+- Si no cargás ningún medio de pago, el checkout funciona como antes (sin selector).
+
+## 19. App instalable (PWA) y actualización obligatoria
+- Archivos: `manifest.webmanifest`, `sw.js`, `version.json`, `js/pwa.js`, carpeta `icons/` y `vercel.json`.
+- La home muestra una barra superior y una sección con el botón **Descargar la app** (en Android/PC abre la instalación; en iPhone muestra los pasos de "Agregar a pantalla de inicio"). Se oculta sola si la app ya está instalada.
+- El service worker pide siempre la versión más nueva al servidor (la copia guardada solo se usa sin conexión) y, cuando hay una versión nueva, la página se recarga sola, también con la app instalada.
+- **En cada publicación se actualiza el número de versión** (`VERSION` en `sw.js` y `version.json`; ya viene hecho en cada ZIP).
+- Los íconos de `icons/` son provisorios (una "Z"). Para usar tu logo, reemplazá `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` (512×512 con margen), `apple-touch-icon.png` (180×180) y `favicon-32.png`, manteniendo los nombres.
+
+## 20. Producto "Vendido"
+Casilla **Marcar como vendido** en el producto: en la vitrina la imagen se ve en blanco y negro con el cartel "VENDIDO" centrado, y no se puede agregar al carrito.
+
+## 21. Variaciones con foto
+Al elegir una variación se muestra su foto. El producto principal pasa a ser una opción más (con su foto, precio y stock — el "Stock" del formulario es el del producto principal) y tocándolo se vuelve a él. Se quitó el enlace "Quitar variación" porque ya no hace falta.

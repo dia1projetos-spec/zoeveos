@@ -4,6 +4,7 @@
 // puede aplicar con un clic. También calcula el envío gratis a partir de un monto configurado.
 
 import { db, collection, getDocs, doc, getDoc, query, where } from "./firebase-config.js";
+import { unitPrice, recargoFor } from "./payments.js";
 
 let cachedDescuentos = null;
 let cachedEnvioGratisMonto = null;
@@ -65,7 +66,9 @@ export function evaluateDescuento(descuento, items) {
  * y sigue siendo válido), total final, estado del envío gratis, y la lista de evaluaciones
  * de todos los descuentos activos (para mostrar el progreso de cada uno).
  */
-export async function getCartSummary(items, appliedDiscountId) {
+export async function getCartSummary(items, appliedDiscountId, metodo = null) {
+  // Con medio "transferencia", cada item usa su precio por transferencia (si tiene).
+  items = items.map((it) => ({ ...it, precio: unitPrice(it, metodo) }));
   const descuentos = await loadDescuentos();
   const envioGratisMonto = await loadEnvioGratisMonto();
   const subtotal = items.reduce((s, it) => s + it.precio * it.cantidad, 0);
@@ -79,6 +82,8 @@ export async function getCartSummary(items, appliedDiscountId) {
 
   const discountAmount = appliedEval ? appliedEval.montoDescuento : 0;
   const total = Math.max(0, subtotal - discountAmount);
+  const recargo = recargoFor(metodo, total);
+  const totalFinal = total + recargo;
 
   const envioGratis = envioGratisMonto > 0 && subtotal >= envioGratisMonto;
   const envioGratisFaltante = envioGratisMonto > 0 ? Math.max(0, envioGratisMonto - subtotal) : 0;
@@ -89,6 +94,9 @@ export async function getCartSummary(items, appliedDiscountId) {
     appliedEval,
     discountAmount,
     total,
+    recargo,
+    totalFinal,
+    items,
     envioGratisMonto,
     envioGratis,
     envioGratisFaltante,

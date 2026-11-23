@@ -33,6 +33,17 @@ function buildRows() {
     if (p.porEncargo) return; // los productos por encargo no llevan control de stock
     const subNombre = subsById[p.subcategoriaId] || "—";
     if (p.variantes && p.variantes.length > 0) {
+      // El producto principal también es una opción con su propio stock
+      rows.push({
+        productoId: p.id,
+        nombre: p.nombre,
+        variante: "Principal (sin variación)",
+        varianteId: null,
+        subNombre,
+        subcategoriaId: p.subcategoriaId,
+        thumb: (p.images && p.images[0]) || "",
+        stock: Number(p.stock) || 0,
+      });
       p.variantes.forEach((v) => {
         rows.push({
           productoId: p.id,

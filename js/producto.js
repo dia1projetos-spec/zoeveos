@@ -3,7 +3,7 @@ import { db, doc, getDoc } from "./firebase-config.js";
 import { initHeader } from "./header.js";
 import { addToCart } from "./cart.js";
 import { optimizedUrl } from "./cloudinary.js";
-import { getParam, formatPrice } from "./utils.js";
+import { getParam, formatPrice, priceInfo } from "./utils.js";
 
 await initHeader();
 
@@ -52,17 +52,24 @@ async function getStoreWhatsapp() {
   return "";
 }
 
-function render() {
-  const p = currentProduct;
-  const images = p.images && p.images.length ? p.images : ["https://placehold.co/700x600/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre)];
-  const hasVariants = p.variantes && p.variantes.length > 0;
-  const sinStockSimple = !p.porEncargo && !hasVariants && Number(p.stock) <= 0;
+const WA_ICON = `<svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>`;
+const MAIN_ID = "__main__";
 
-  wrap.innerHTML = `
-  <div class="pd-gallery">
-    <div class="product-carousel" id="pdCarousel">
+function mainImages(p) {
+  return p.images && p.images.length ? p.images : ["https://placehold.co/700x600/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre)];
+}
+
+// Disponibilidad del producto principal (cuando hay variaciones) o del producto simple
+function mainAvailable(p) {
+  return !!p.porEncargo || Number(p.stock) > 0;
+}
+
+function renderGallery(images, sold) {
+  const el = document.getElementById("pdGallery");
+  el.innerHTML = `
+    <div class="product-carousel ${sold ? "is-sold" : ""}" id="pdCarousel">
       <div class="pc-track">
-        ${images.map((img, i) => `<div class="pc-slide ${i === 0 ? "active" : ""}"><img src="${optimizedUrl(img, 900)}" alt="${p.nombre}"></div>`).join("")}
+        ${images.map((img, i) => `<div class="pc-slide ${i === 0 ? "active" : ""}"><img src="${optimizedUrl(img, 900)}" alt="${currentProduct.nombre}"></div>`).join("")}
       </div>
       ${
         images.length > 1
@@ -71,70 +78,117 @@ function render() {
              <div class="pc-dots">${images.map((_, i) => `<span class="${i === 0 ? "active" : ""}"></span>`).join("")}</div>`
           : ""
       }
-    </div>
-  </div>
+    </div>`;
+  initCarousel(images);
+}
+
+function priceHtml(info) {
+  return `${formatPrice(info.precio)}${
+    info.precioTransferencia ? `<div class="price-transf">💸 ${formatPrice(info.precioTransferencia)} <span>pagando por transferencia</span></div>` : ""
+  }`;
+}
+
+function render() {
+  const p = currentProduct;
+  const hasVariants = p.variantes && p.variantes.length > 0;
+  const sold = !!p.vendido;
+
+  wrap.innerHTML = `
+  <div class="pd-gallery" id="pdGallery"></div>
   <div class="pd-info">
     <h1>${p.nombre}</h1>
     ${p.porEncargo ? `<span class="badge-encargo">Por encargo</span>` : ""}
-    <div class="price" id="pdPrice">${formatPrice(p.precio)}</div>
+    ${sold ? `<span class="badge-sold">Vendido</span>` : ""}
+    <div class="price" id="pdPrice"></div>
     <p class="desc">${p.descripcion || ""}</p>
 
-    ${hasVariants ? renderVariantSelector(p) : ""}
+    ${hasVariants && !sold ? renderVariantSelector(p) : ""}
 
-    <div class="qty-selector">
+    ${sold ? "" : `<div class="qty-selector">
       <button id="qtyMinus">−</button>
       <span id="qtyValue">1</span>
       <button id="qtyPlus">+</button>
-    </div>
+    </div>`}
 
-    ${
-      p.porEncargo
-        ? `<a href="#" id="encargoBtn" class="whatsapp-btn ${hasVariants ? "is-disabled" : ""}" style="max-width:320px;" target="_blank" rel="noopener">
-             <svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>
-             ${hasVariants ? "Elegí una variación" : "Consultar por WhatsApp"}
-           </a>
-           <p class="encargo-hint">Este producto es por encargo. Te vamos a confirmar tiempos y detalles por WhatsApp.</p>`
-        : `<button class="btn-full" id="addToCartBtn" style="max-width:320px;" ${hasVariants || sinStockSimple ? "disabled" : ""}>
-             ${sinStockSimple ? "Sin stock" : hasVariants ? "Elegí una variación" : "Agregar al carrito"}
-           </button>`
-    }
+    <div id="pdAction"></div>
   </div>`;
 
-  initCarousel(images);
-
-  document.getElementById("qtyMinus").addEventListener("click", () => {
-    qty = Math.max(1, qty - 1);
-    document.getElementById("qtyValue").textContent = qty;
-    if (p.porEncargo) updateEncargoLink(document.getElementById("encargoBtn"), hasVariants);
-  });
-  document.getElementById("qtyPlus").addEventListener("click", () => {
-    qty += 1;
-    document.getElementById("qtyValue").textContent = qty;
-    if (p.porEncargo) updateEncargoLink(document.getElementById("encargoBtn"), hasVariants);
-  });
-
-  if (hasVariants) bindVariantPills(p);
-
-  if (p.porEncargo) {
-    const btn = document.getElementById("encargoBtn");
-    updateEncargoLink(btn, hasVariants);
-    btn.addEventListener("click", (e) => {
-      if (hasVariants && !selectedVariant) e.preventDefault();
-    });
-  } else {
-    document.getElementById("addToCartBtn").addEventListener("click", () => onAddToCart(images));
+  // Selección inicial: el producto principal (o la primera variación si el principal no está disponible)
+  let initial = null;
+  if (hasVariants && !mainAvailable(p) && !p.porEncargo) {
+    initial = p.variantes.find((v) => Number(v.stock) > 0) || null;
+    if (!initial) selectedVariant = null;
   }
+  applySelection(initial, true);
+
+  if (!sold) {
+    document.getElementById("qtyMinus").addEventListener("click", () => {
+      qty = Math.max(1, qty - 1);
+      document.getElementById("qtyValue").textContent = qty;
+      refreshEncargoLink();
+    });
+    document.getElementById("qtyPlus").addEventListener("click", () => {
+      qty += 1;
+      document.getElementById("qtyValue").textContent = qty;
+      refreshEncargoLink();
+    });
+  }
+  if (hasVariants && !sold) bindVariantPills(p);
 }
 
-function variantPrice(p, v) {
-  return v && v.precio != null && v.precio !== "" && Number(v.precio) > 0 ? Number(v.precio) : p.precio;
+// Aplica la opción elegida: null = producto principal, objeto = una variación.
+// Cambia foto, precio, botón y marca la opción activa.
+function applySelection(variant, first = false) {
+  const p = currentProduct;
+  const hasVariants = p.variantes && p.variantes.length > 0;
+  selectedVariant = variant;
+
+  document.querySelectorAll(".variant-pill").forEach((b) => {
+    const isMain = b.dataset.id === MAIN_ID;
+    b.classList.toggle("active", variant ? b.dataset.id === variant.id : isMain && mainAvailable(p));
+  });
+
+  // Foto: la de la variación (si tiene) o las del producto principal
+  const images = variant && variant.imagen ? [variant.imagen] : mainImages(p);
+  renderGallery(images, !!p.vendido);
+
+  document.getElementById("pdPrice").innerHTML = priceHtml(priceInfo(p, variant));
+  renderAction(p, variant, hasVariants);
+}
+
+function renderAction(p, variant, hasVariants) {
+  const box = document.getElementById("pdAction");
+  if (p.vendido) {
+    box.innerHTML = `<button class="btn-full" style="max-width:320px;" disabled>Vendido</button>`;
+    return;
+  }
+  const noOption = hasVariants && !variant && !mainAvailable(p); // nada elegible
+  const outOfStock = !p.porEncargo && (variant ? Number(variant.stock) <= 0 : Number(p.stock) <= 0);
+
+  if (p.porEncargo) {
+    box.innerHTML = `<a href="#" id="encargoBtn" class="whatsapp-btn" style="max-width:320px;" target="_blank" rel="noopener">${WA_ICON} Consultar por WhatsApp</a>
+      <p class="encargo-hint">Este producto es por encargo. Te vamos a confirmar tiempos y detalles por WhatsApp.</p>`;
+    refreshEncargoLink();
+    return;
+  }
+  box.innerHTML = `<button class="btn-full" id="addToCartBtn" style="max-width:320px;" ${noOption || outOfStock ? "disabled" : ""}>
+      ${noOption ? "Sin stock" : outOfStock ? "Sin stock" : "Agregar al carrito"}
+    </button>`;
+  const btn = document.getElementById("addToCartBtn");
+  btn.addEventListener("click", () => onAddToCart());
 }
 
 function renderVariantSelector(p) {
+  const mainDisabled = !mainAvailable(p);
+  const mainImg = mainImages(p)[0];
   return `
   <div class="variant-selector">
-    <label>Elegí una variación</label>
+    <label>Elegí una opción</label>
     <div class="variant-pills" id="variantPills">
+      <button type="button" class="variant-pill ${mainDisabled ? "disabled" : ""}" data-id="${MAIN_ID}" ${mainDisabled ? "disabled" : ""}>
+        <img src="${optimizedUrl(mainImg, 80)}" alt="${p.nombre}">
+        <span>${p.nombre}${mainDisabled ? " (sin stock)" : ""}</span>
+      </button>
       ${p.variantes
         .map((v) => {
           const sinStock = !p.porEncargo && Number(v.stock) <= 0;
@@ -146,55 +200,25 @@ function renderVariantSelector(p) {
         })
         .join("")}
     </div>
-    <button type="button" class="variant-clear" id="variantClear" hidden>✕ Quitar variación (volver al producto original)</button>
   </div>`;
 }
 
 function bindVariantPills(p) {
-  const pills = document.querySelectorAll(".variant-pill:not(.disabled)");
-  const clearBtn = document.getElementById("variantClear");
-  const waIcon = `<svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.3 8.7 3.3 15.7c0 2.5.7 4.8 1.9 6.8L3 29l6.7-2.1c1.9 1 4.1 1.6 6.3 1.6 7 0 12.7-5.7 12.7-12.7C28.7 8.7 23 3 16 3z"/></svg>`;
-
-  function applySelection(variant) {
-    selectedVariant = variant;
-    document.querySelectorAll(".variant-pill").forEach((b) =>
-      b.classList.toggle("active", !!variant && b.dataset.id === variant.id)
-    );
-    const priceEl = document.getElementById("pdPrice");
-    if (priceEl) priceEl.textContent = formatPrice(variantPrice(p, variant));
-    if (clearBtn) clearBtn.hidden = !variant;
-
-    if (p.porEncargo) {
-      const encargoBtn = document.getElementById("encargoBtn");
-      encargoBtn.classList.toggle("is-disabled", !variant);
-      encargoBtn.innerHTML = `${waIcon} ${variant ? "Consultar por WhatsApp" : "Elegí una variación"}`;
-      updateEncargoLink(encargoBtn, true);
-    } else {
-      const addBtn = document.getElementById("addToCartBtn");
-      addBtn.disabled = !variant;
-      addBtn.textContent = variant ? "Agregar al carrito" : "Elegí una variación";
-    }
-  }
-
-  pills.forEach((btn) => {
+  document.querySelectorAll(".variant-pill:not(.disabled)").forEach((btn) => {
     btn.addEventListener("click", () => {
-      // Clic en la variación ya elegida = volver al producto original
-      if (selectedVariant && selectedVariant.id === btn.dataset.id) {
+      if (btn.dataset.id === MAIN_ID) {
         applySelection(null);
-        return;
+      } else {
+        applySelection(p.variantes.find((v) => v.id === btn.dataset.id) || null);
       }
-      applySelection(p.variantes.find((v) => v.id === btn.dataset.id) || null);
     });
   });
-  if (clearBtn) clearBtn.addEventListener("click", () => applySelection(null));
 }
 
-function updateEncargoLink(btn, hasVariants) {
+function refreshEncargoLink() {
+  const btn = document.getElementById("encargoBtn");
+  if (!btn) return;
   const p = currentProduct;
-  if (hasVariants && !selectedVariant) {
-    btn.href = "#";
-    return;
-  }
   if (!storeWhatsapp) {
     btn.href = "#";
     return;
@@ -210,26 +234,16 @@ function updateEncargoLink(btn, hasVariants) {
   btn.href = `https://wa.me/${storeWhatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
-function onAddToCart(images) {
+function onAddToCart() {
   const p = currentProduct;
-  const hasVariants = p.variantes && p.variantes.length > 0;
   const addBtn = document.getElementById("addToCartBtn");
+  const v = selectedVariant;
+  const info = priceInfo(p, v);
+  const base = { productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", precio: info.precio, precioTransferencia: info.precioTransferencia };
 
-  if (hasVariants && !selectedVariant) {
-    return; // el botón debería estar deshabilitado, pero por las dudas no hacemos nada
-  }
-
-  const cartItem = hasVariants
-    ? {
-        id: `${p.id}__${selectedVariant.id}`,
-        productoId: p.id,
-        categoriaId: p.categoriaId || "",
-        codigo: p.codigo || "",
-        nombre: `${p.nombre} - ${selectedVariant.nombre}`,
-        precio: variantPrice(p, selectedVariant),
-        imagen: selectedVariant.imagen || images[0],
-      }
-    : { id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, imagen: images[0] };
+  const cartItem = v
+    ? { ...base, id: `${p.id}__${v.id}`, nombre: `${p.nombre} - ${v.nombre}`, imagen: v.imagen || mainImages(p)[0] }
+    : { ...base, id: p.id, nombre: p.nombre, imagen: mainImages(p)[0] };
 
   addToCart(cartItem, qty);
   addBtn.textContent = "¡Agregado al carrito!";

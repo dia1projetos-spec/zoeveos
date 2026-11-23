@@ -144,5 +144,7 @@ a{ color: inherit; }
   .form-grid-2{ grid-template-columns: 1fr; }
 }
 
-.variant-row input[data-field="precio"] { width: 110px; }
-@media (max-width: 640px) { .variant-row { flex-wrap: wrap; } .variant-row input[data-field="precio"] { width: 100px; } }
+.variant-row input[data-field="precio"], .variant-row input[data-field="precioTransferencia"] { width: 110px; }
+@media (max-width: 640px) { .variant-row { flex-wrap: wrap; } .variant-row input[data-field="precio"], .variant-row input[data-field="precioTransferencia"] { width: 100px; } }
+
+.variant-row select{ max-width: 190px; }

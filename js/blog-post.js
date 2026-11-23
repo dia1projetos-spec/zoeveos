@@ -70,21 +70,22 @@ async function renderFeaturedProduct(productId) {
 
   featuredEl.innerHTML = `
   <div class="fp-card">
-    <div class="fp-img"><img src="${optimizedUrl(img, 700)}" alt="${p.nombre}"></div>
+    <div class="fp-img ${p.vendido ? "is-sold" : ""}"><img src="${optimizedUrl(img, 700)}" alt="${p.nombre}"></div>
     <div class="fp-info">
       <span class="eyebrow">Producto destacado</span>
       <h3 style="font-family:var(--font-serif);font-size:1.6rem;margin-bottom:10px;">${p.nombre}</h3>
-      <div class="price" style="color:var(--pink-dark);font-size:1.3rem;margin-bottom:16px;">${formatPrice(p.precio)}</div>
+      <div class="price" style="color:var(--pink-dark);font-size:1.3rem;margin-bottom:16px;">${formatPrice(p.precio)}${p.precioTransferencia ? `<div class="price-transf-sm">💸 ${formatPrice(p.precioTransferencia)} por transferencia</div>` : ""}</div>
       <p style="color:var(--text-soft);margin-bottom:20px;">${(p.descripcion || "").slice(0, 140)}</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
         <a href="/producto.html?id=${p.id}" class="btn-pill btn-taupe">Ver producto</a>
-        <button class="btn-pill btn-pink" id="fpAddBtn">Agregar al carrito</button>
+        ${p.vendido ? `<span class="btn-pill" style="background:#999;color:#fff;cursor:default;">Vendido</span>` : `<button class="btn-pill btn-pink" id="fpAddBtn">Agregar al carrito</button>`}
       </div>
     </div>
   </div>`;
 
-  document.getElementById("fpAddBtn").addEventListener("click", () => {
-    addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, imagen: img }, 1);
+  const fpBtn = document.getElementById("fpAddBtn");
+  if (fpBtn) fpBtn.addEventListener("click", () => {
+    addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, precioTransferencia: p.precioTransferencia || null, imagen: img }, 1);
     const btn = document.getElementById("fpAddBtn");
     btn.textContent = "¡Agregado!";
     setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
@@ -113,7 +114,7 @@ async function renderRelated(subcategoriaId, excludeId) {
           const img = (p.images && p.images[0]) || "https://placehold.co/400x320/f7f0e6/b9a488?text=" + encodeURIComponent(p.nombre);
           return `
           <a href="/producto.html?id=${p.id}" class="product-card">
-            <div class="product-carousel"><div class="pc-track"><div class="pc-slide active"><img src="${optimizedUrl(img, 400)}" alt="${p.nombre}"></div></div></div>
+            <div class="product-carousel ${p.vendido ? "is-sold" : ""}"><div class="pc-track"><div class="pc-slide active"><img src="${optimizedUrl(img, 400)}" alt="${p.nombre}"></div></div></div>
             <div class="p-info">
               <h3>${p.nombre}</h3>
               <div class="price">${formatPrice(p.precio)}</div>

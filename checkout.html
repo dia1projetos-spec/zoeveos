@@ -6,6 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Finalizar compra · Zoë νέος</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#e2867a">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zoë νέος">
 </head>
 <body>
 
@@ -38,6 +45,10 @@
         <label for="region">Provincia</label>
         <select id="region" name="region" required></select>
       </div>
+      <div class="form-group" id="paymentSection" style="display:none;">
+        <label>Medio de pago</label>
+        <div class="pay-options" id="payOptions"></div>
+      </div>
       <button type="submit" class="btn-full" id="submitBtn">Confirmar pedido</button>
     </form>
   </section>
@@ -55,5 +66,6 @@
 <div id="app-cart-drawer"></div>
 
 <script type="module" src="/js/checkout.js"></script>
+<script type="module" src="/js/pwa.js"></script>
 </body>
 </html>

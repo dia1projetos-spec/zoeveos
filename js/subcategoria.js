@@ -160,7 +160,7 @@ function renderProductCard(p) {
 
   return `
   <article class="product-card">
-    <a href="/producto.html?id=${p.id}" class="product-carousel" id="pcard-${i}" data-images='${JSON.stringify(images).replace(/'/g, "&#39;")}'>
+    <a href="/producto.html?id=${p.id}" class="product-carousel ${p.vendido ? "is-sold" : ""}" id="pcard-${i}" data-images='${JSON.stringify(images).replace(/'/g, "&#39;")}'>
       <div class="pc-track">
         ${images.map((img, si) => `<div class="pc-slide ${si === 0 ? "active" : ""}"><img src="${optimizedUrl(img, 600)}" alt="${p.nombre}"></div>`).join("")}
       </div>
@@ -175,9 +175,11 @@ function renderProductCard(p) {
     <div class="p-info">
       <h3><a href="/producto.html?id=${p.id}">${p.nombre}</a></h3>
       ${p.porEncargo ? `<span class="badge-encargo" style="margin-bottom:0;">Por encargo</span>` : ""}
-      <div class="price">${priceLabel(p)}</div>
+      <div class="price">${priceLabel(p)}${p.precioTransferencia ? `<div class="price-transf-sm">💸 ${formatPrice(p.precioTransferencia)} por transferencia</div>` : ""}</div>
       ${
-        p.porEncargo
+        p.vendido
+          ? `<span class="add-btn add-btn-sold">Vendido</span>`
+          : p.porEncargo
           ? `<a href="/producto.html?id=${p.id}" class="add-btn add-btn-encargo">Consultar</a>`
           : hasVariants
           ? `<a href="/producto.html?id=${p.id}" class="add-btn">Ver opciones</a>`
@@ -217,7 +219,7 @@ function bindAddButtons(container) {
     btn.addEventListener("click", () => {
       const p = allProductsById[btn.dataset.id];
       if (!p) return;
-      addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, imagen: (p.images && p.images[0]) || "" }, 1);
+      addToCart({ id: p.id, productoId: p.id, categoriaId: p.categoriaId || "", codigo: p.codigo || "", nombre: p.nombre, precio: p.precio, precioTransferencia: p.precioTransferencia || null, imagen: (p.images && p.images[0]) || "" }, 1);
       btn.textContent = "¡Agregado!";
       setTimeout(() => (btn.textContent = "Agregar al carrito"), 1200);
     });

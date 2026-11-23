@@ -7,7 +7,7 @@ import { getCachedSubcategorias } from "./admin-subcategorias.js";
 let imagesManager;
 let editingId = null;
 let cachedProductos = [];
-let variants = []; // [{ id, nombre, imagen, stock }]
+let variants = []; // [{ id, nombre, imagen, stock, precio?, precioTransferencia? }]
 let variantFileTargetId = null;
 
 export async function initProductosTab() {
@@ -67,8 +67,7 @@ function resolveCategoriaId(subcategoriaId) {
 function renderVariants() {
   const wrap = document.getElementById("prodVariantsWrap");
   const simpleStockWrap = document.getElementById("prodStockSimpleWrap");
-  simpleStockWrap.style.opacity = variants.length > 0 ? "0.45" : "1";
-  document.getElementById("prodStock").disabled = variants.length > 0;
+  document.getElementById("prodStockLabel").textContent = variants.length > 0 ? "Stock del producto principal" : "Stock";
 
   if (variants.length === 0) {
     wrap.innerHTML = `<p style="font-size:0.85rem;color:var(--text-soft);">Todavía no agregaste ninguna variación.</p>`;
@@ -85,6 +84,7 @@ function renderVariants() {
       <input type="text" placeholder="Ej: Celeste, Rayas..." value="${v.nombre.replace(/"/g, "&quot;")}" data-field="nombre" data-id="${v.id}">
       <input type="number" placeholder="Stock" value="${v.stock}" data-field="stock" data-id="${v.id}">
       <input type="number" min="0" step="any" placeholder="Precio (opc.)" title="Precio propio de esta variación (opcional). Vacío = usa el precio del producto." value="${v.precio != null && v.precio !== "" ? v.precio : ""}" data-field="precio" data-id="${v.id}">
+      <input type="number" min="0" step="any" placeholder="Transf. (opc.)" title="Precio por transferencia de esta variación (opcional)." value="${v.precioTransferencia != null && v.precioTransferencia !== "" ? v.precioTransferencia : ""}" data-field="precioTransferencia" data-id="${v.id}">
       <button type="button" class="remove-variant" data-remove="${v.id}">Eliminar</button>
     </div>`
     )
@@ -106,6 +106,12 @@ function renderVariants() {
     el.addEventListener("input", () => {
       const v = variants.find((x) => x.id === el.dataset.id);
       if (v) v.stock = Number(el.value) || 0;
+    })
+  );
+  wrap.querySelectorAll('input[data-field="precioTransferencia"]').forEach((el) =>
+    el.addEventListener("input", () => {
+      const v = variants.find((x) => x.id === el.dataset.id);
+      if (v) v.precioTransferencia = el.value === "" ? null : Number(el.value);
     })
   );
   wrap.querySelectorAll('input[data-field="precio"]').forEach((el) =>
@@ -161,9 +167,9 @@ async function loadProductos() {
       return `
       <tr>
         <td>${thumb ? `<img src="${thumb}">` : ""}</td>
-        <td>${p.codigo ? `<span style="font-size:0.78rem;color:var(--taupe-dark);">[${p.codigo}]</span> ` : ""}${p.nombre}${p.variantes && p.variantes.length ? ` <span style="font-size:0.75rem;color:var(--text-soft);">(${p.variantes.length} variaciones)</span>` : ""}${p.porEncargo ? ` <span class="badge badge-low">Por encargo</span>` : ""}</td>
+        <td>${p.codigo ? `<span style="font-size:0.78rem;color:var(--taupe-dark);">[${p.codigo}]</span> ` : ""}${p.nombre}${p.variantes && p.variantes.length ? ` <span style="font-size:0.75rem;color:var(--text-soft);">(${p.variantes.length} variaciones)</span>` : ""}${p.porEncargo ? ` <span class="badge badge-low">Por encargo</span>` : ""}${p.vendido ? ` <span class="badge badge-zero">Vendido</span>` : ""}</td>
         <td>${subsById[p.subcategoriaId] || "—"}</td>
-        <td>$${Number(p.precio || 0).toLocaleString("es-AR")}</td>
+        <td>$${Number(p.precio || 0).toLocaleString("es-AR")}${p.precioTransferencia ? `<br><span style="font-size:0.75rem;color:var(--text-soft);">Transf. $${Number(p.precioTransferencia).toLocaleString("es-AR")}</span>` : ""}</td>
         <td><span class="badge ${p.activo === false ? "badge-inactive" : "badge-active"}">${p.activo === false ? "Inactivo" : "Activo"}</span></td>
         <td class="row-actions">
           <button class="btn-secondary btn" data-edit="${p.id}">Editar</button>
@@ -186,6 +192,8 @@ async function editProducto(id) {
   document.getElementById("prodNombre").value = p.nombre || "";
   document.getElementById("prodSubcategoriaId").value = p.subcategoriaId || "";
   document.getElementById("prodPrecio").value = p.precio || 0;
+  document.getElementById("prodPrecioTransf").value = p.precioTransferencia || "";
+  document.getElementById("prodVendido").checked = !!p.vendido;
   document.getElementById("prodStock").value = p.stock || 0;
   document.getElementById("prodCodigo").value = p.codigo || "";
   document.getElementById("prodDescripcion").value = p.descripcion || "";
@@ -203,6 +211,8 @@ function resetForm() {
   document.getElementById("prodFormTitle").textContent = "Nuevo producto";
   document.getElementById("prodNombre").value = "";
   document.getElementById("prodPrecio").value = "";
+  document.getElementById("prodPrecioTransf").value = "";
+  document.getElementById("prodVendido").checked = false;
   document.getElementById("prodStock").value = 0;
   document.getElementById("prodCodigo").value = "";
   document.getElementById("prodDescripcion").value = "";
@@ -224,7 +234,7 @@ async function saveProducto() {
   }
 
   const variantesLimpias = variants
-    .map((v) => ({ id: v.id, nombre: v.nombre.trim(), imagen: v.imagen || "", stock: Number(v.stock) || 0, precio: v.precio != null && v.precio !== "" && Number(v.precio) > 0 ? Number(v.precio) : null }))
+    .map((v) => ({ id: v.id, nombre: v.nombre.trim(), imagen: v.imagen || "", stock: Number(v.stock) || 0, precio: v.precio != null && v.precio !== "" && Number(v.precio) > 0 ? Number(v.precio) : null, precioTransferencia: Number(v.precioTransferencia) > 0 ? Number(v.precioTransferencia) : null }))
     .filter((v) => v.nombre);
 
   if (variants.length > 0 && variantesLimpias.length === 0) {
@@ -237,6 +247,8 @@ async function saveProducto() {
     subcategoriaId,
     categoriaId: resolveCategoriaId(subcategoriaId),
     precio,
+    precioTransferencia: Number(document.getElementById("prodPrecioTransf").value) > 0 ? Number(document.getElementById("prodPrecioTransf").value) : null,
+    vendido: document.getElementById("prodVendido").checked,
     stock: Number(document.getElementById("prodStock").value) || 0,
     codigo: document.getElementById("prodCodigo").value.trim(),
     descripcion: document.getElementById("prodDescripcion").value.trim(),

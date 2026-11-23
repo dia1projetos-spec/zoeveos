@@ -36,3 +36,24 @@ export const PROVINCIAS_AR = [
   "Salta", "San Juan", "San Luis", "Santa Cruz", "Santa Fe",
   "Santiago del Estero", "Tierra del Fuego", "Tucumán",
 ];
+
+// ---------- Precios (base, por variación y por transferencia) ----------
+export function numPos(v) {
+  const n = Number(v);
+  return n > 0 ? n : null;
+}
+
+/**
+ * Precio efectivo de un producto (o de una de sus variaciones).
+ * - precio: precio normal.
+ * - precioTransferencia: precio especial pagando por transferencia (null si no hay).
+ * Si la variación tiene precio propio y no tiene precio de transferencia propio,
+ * no hereda el de transferencia del producto (sería de otro importe).
+ */
+export function priceInfo(p, v = null) {
+  const base = v && numPos(v.precio) ? numPos(v.precio) : Number(p.precio) || 0;
+  let transf;
+  if (v) transf = numPos(v.precioTransferencia) || (numPos(v.precio) ? null : numPos(p.precioTransferencia));
+  else transf = numPos(p.precioTransferencia);
+  return { precio: base, precioTransferencia: transf };
+}

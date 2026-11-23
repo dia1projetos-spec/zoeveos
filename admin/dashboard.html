@@ -53,6 +53,14 @@
           <label for="envioGratisMonto">Envío gratis a partir de (ARS) — dejá 0 para desactivar</label>
           <input type="number" id="envioGratisMonto" value="0" min="0">
         </div>
+        <div class="form-row" style="background:var(--cream-light);border-radius:12px;padding:14px 16px;">
+          <label>Medios de pago</label>
+          <p style="font-size:0.8rem;color:var(--text-soft);margin:-2px 0 10px;">
+            El cliente elige uno en el checkout. <strong>Transferencia</strong> usa el "Precio por transferencia" de cada producto (si lo tiene; si no, el precio normal). <strong>Recargo $</strong> suma un monto fijo una sola vez al pedido y <strong>Recargo %</strong> suma un porcentaje sobre el total. Si no cargás ninguno, el checkout no pide medio de pago.
+          </p>
+          <div id="metodosPagoWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
+          <button type="button" class="btn btn-secondary" id="addMetodoBtn">+ Agregar medio de pago</button>
+        </div>
         <button class="btn btn-primary" id="saveConfigBtn">Guardar configuración</button>
       </div>
     </section>
@@ -158,8 +166,15 @@
         </div>
         <div class="form-grid-2">
           <div class="form-row"><label>Precio (ARS)</label><input type="number" id="prodPrecio"></div>
-          <div class="form-row" id="prodStockSimpleWrap"><label>Stock</label><input type="number" id="prodStock" value="0"></div>
+          <div class="form-row"><label>Precio por transferencia (ARS) — opcional</label><input type="number" id="prodPrecioTransf" min="0" placeholder="Vacío = igual al precio normal"></div>
         </div>
+        <div class="form-grid-2">
+          <div class="form-row" id="prodStockSimpleWrap"><label id="prodStockLabel">Stock</label><input type="number" id="prodStock" value="0"></div>
+          <div class="form-row" style="display:flex;align-items:flex-end;">
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><input type="checkbox" id="prodVendido" style="width:auto;"> Marcar como <strong>&nbsp;vendido</strong></label>
+          </div>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-soft);margin:-8px 0 14px;">Un producto "vendido" sigue visible en la tienda pero con la imagen en blanco y negro y el cartel "VENDIDO"; no se puede comprar.</p>
         <div class="form-row">
           <label>Código interno (opcional)</label>
           <input type="text" id="prodCodigo" placeholder="Ej: MP-001">
@@ -180,7 +195,7 @@
         <div class="form-row">
           <label>Variaciones (opcional — color, estampa, etc.)</label>
           <p style="font-size:0.8rem;color:var(--text-soft);margin:-2px 0 10px;">
-            Si agregás variaciones, el stock se controla por variación (el campo "Stock" de arriba se ignora) y el cliente va a tener que elegir una antes de agregar al carrito. El precio por variación es opcional: si lo dejás vacío se usa el precio del producto.
+            Al agregar variaciones, el producto principal pasa a ser una opción más: el cliente ve su foto, y al tocar una variación se muestra la foto de esa variación (y el principal queda como opción para volver). El "Stock" de arriba es el del producto principal; cada variación tiene el suyo. El precio (y el precio por transferencia) de cada variación son opcionales: si los dejás vacíos se usan los del producto.
           </p>
           <div id="prodVariantsWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
           <button type="button" class="btn btn-secondary" id="addVariantBtn">+ Agregar variación</button>
