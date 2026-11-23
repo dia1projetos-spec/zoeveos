@@ -797,3 +797,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   width: 100%; background: linear-gradient(135deg, var(--pink), var(--pink-dark)); color: #fff;
   border: none; border-radius: 999px; padding: 12px; font: inherit; font-weight: 500; cursor: pointer;
 }
+
+/* Versión grande y destacada */
+.install-bar{ padding: 14px 48px 14px 16px; font-size: 1.05rem; }
+.install-bar-btn{ padding: 10px 24px; font-size: 1rem; }
+.app-download{
+  max-width: 1100px; margin: 18px auto 8px; border-radius: var(--radius-lg);
+  padding: 26px 30px; gap: 22px;
+  background: linear-gradient(135deg, #fdf1ef, var(--cream-dark));
+  border: 1.5px solid var(--pink); box-shadow: var(--shadow-soft);
+}
+.app-download-icon{ font-size: 3rem; line-height: 1; }
+.app-download-text{ text-align: left; flex: 1 1 260px; }
+.app-download h2{ font-size: 1.7rem; }
+.app-download-btn{ padding: 16px 36px; font-size: 1.1rem; font-weight: 600; }
+@media (max-width: 700px){ .app-download{ margin: 14px 14px 6px; padding: 22px 18px; text-align: center; } .app-download-text{ text-align: center; } .app-download-btn{ width: 100%; } }
+@media (min-width: 701px){ .app-download{ width: calc(100% - 48px); } }

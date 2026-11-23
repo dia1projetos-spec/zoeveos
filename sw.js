@@ -4,7 +4,7 @@
 // página actualizada aunque tenga la app instalada.
 // Cambiar VERSION en cada publicación hace que el navegador instale el service worker nuevo
 // y la página se recargue sola (ver js/pwa.js).
-const VERSION = "2026-11-23.1";
+const VERSION = "2026-11-23.2";
 const CACHE = "zoeveos-" + VERSION;
 
 self.addEventListener("install", () => {
