@@ -231,3 +231,6 @@ Casilla **Marcar como vendido** en el producto: en la vitrina la imagen se ve en
 
 ## 21. Variaciones con foto
 Al elegir una variación se muestra su foto. El producto principal pasa a ser una opción más (con su foto, precio y stock — el "Stock" del formulario es el del producto principal) y tocándolo se vuelve a él. Se quitó el enlace "Quitar variación" porque ya no hace falta.
+
+## 22. Vercel (sitio estático)
+`vercel.json` indica `outputDirectory: "."` y sin comando de build, porque el sitio es estático y `index.html` está en la raíz. Si el repositorio tiene un `package.json` con un script `build`, Vercel buscaba una carpeta `public`; con esta configuración ya no.
