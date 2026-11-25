@@ -24,7 +24,7 @@ if (items.length === 0) {
   formSection.innerHTML = `<div class="empty-state">Tu carrito está vacío. <a href="/index.html" style="color:var(--pink-dark);text-decoration:underline;">Volver a la tienda</a></div>`;
 } else {
   metodos = await loadMetodosPago();
-  metodoSel = metodos[0] || null;
+  metodoSel = null; // el cliente debe elegir uno
   renderPayOptions();
   renderSummary();
   fillRegions();
@@ -52,6 +52,7 @@ function renderPayOptions() {
   box.querySelectorAll("input").forEach((inp) =>
     inp.addEventListener("change", () => {
       metodoSel = metodos[Number(inp.value)];
+      document.getElementById("payError").hidden = true;
       renderPayOptions();
       renderSummary();
     })
@@ -94,14 +95,23 @@ function fillRegions() {
 
 async function onSubmit(e) {
   e.preventDefault();
+  if (metodos.length && !metodoSel) {
+    const err = document.getElementById("payError");
+    err.hidden = false;
+    document.getElementById("paymentSection").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
   submitBtn.disabled = true;
   submitBtn.textContent = "Enviando...";
 
   const cliente = {
     nombre: form.nombre.value.trim(),
+    dni: form.dni.value.replace(/\D/g, ""),
+    email: form.email.value.trim(),
     whatsapp: form.whatsapp.value.trim(),
     calle: form.calle.value.trim(),
     ciudad: form.ciudad.value.trim(),
+    codigoPostal: form.cp.value.trim().toUpperCase(),
     region: form.region.value,
   };
 
@@ -169,7 +179,7 @@ function buildWhatsappMessage(pedidoId, cliente, items, summary) {
   }
   lines.push(`Total: ${formatPrice(summary.totalFinal)}`);
   if (summary.envioGratis) lines.push(`Envío: gratis 🚚`);
-  lines.push(``, `Datos de envío:`, `Nombre: ${cliente.nombre}`, `Dirección: ${cliente.calle}, ${cliente.ciudad}, ${cliente.region}`, ``, `Quedo a la espera para coordinar el pago${summary.envioGratis ? "" : " y el costo de envío"}. ¡Gracias!`);
+  lines.push(``, `Datos del cliente:`, `Nombre: ${cliente.nombre}`, `DNI: ${cliente.dni}`, `Email: ${cliente.email}`, `WhatsApp: ${cliente.whatsapp}`, `Dirección: ${cliente.calle}, ${cliente.ciudad}, CP ${cliente.codigoPostal}, ${cliente.region}`, ``, `Quedo a la espera para coordinar el pago${summary.envioGratis ? "" : " y el costo de envío"}. ¡Gracias!`);
 
   return lines.join("\n");
 }

@@ -210,6 +210,37 @@
           </p>
         </div>
 
+        <div class="form-row" style="background:var(--cream-light);border-radius:12px;padding:14px 16px;">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <input type="checkbox" id="prodLandingActiva" style="width:auto;"> Crear <strong>landing page</strong> para este producto (opcional, optimizada para Google e IAs)
+          </label>
+          <p style="font-size:0.8rem;color:var(--text-soft);margin:4px 0 0;">
+            Genera una página propia, lista para buscadores, en <strong>www.zoeveos.com/p/tu-url</strong>. Cuanto más completa y específica, mejor posiciona. Se agrega sola al sitemap de Google.
+          </p>
+          <div id="landingFields" style="display:none;margin-top:14px;">
+            <div class="form-row"><label>URL de la página (se genera sola, podés cambiarla)</label>
+              <input type="text" id="landSlug" placeholder="juego-sabanas-alcoyana-144-hilos">
+              <small id="landUrlPreview" style="color:var(--text-soft);"></small></div>
+            <div class="form-row"><label>Título para Google (ideal: hasta 60 caracteres) <small id="landTitleCount" style="color:var(--text-soft);"></small></label>
+              <input type="text" id="landSeoTitle" maxlength="90" placeholder="Ej: Juego de sábanas Alcoyana 144 hilos 2 ½ plazas | Zoë νέος"></div>
+            <div class="form-row"><label>Descripción para Google (ideal: 120–155 caracteres) <small id="landDescCount" style="color:var(--text-soft);"></small></label>
+              <textarea id="landSeoDesc" rows="2" maxlength="200" placeholder="Qué es, para quién es y por qué comprarlo. Incluí la palabra clave principal."></textarea></div>
+            <div class="form-row"><label>Título principal de la página (H1) — vacío = nombre del producto</label>
+              <input type="text" id="landH1" placeholder="Ej: Juego de sábanas estampadas Alcoyana 144 hilos"></div>
+            <div class="form-row"><label>Introducción (1–2 frases que resumen el producto)</label>
+              <textarea id="landIntro" rows="2"></textarea></div>
+            <div class="form-row"><label>Beneficios / características (uno por línea)</label>
+              <textarea id="landBeneficios" rows="4" placeholder="100% algodón percal&#10;Colores que no destiñen&#10;Envíos a todo el país"></textarea></div>
+            <div class="form-row"><label>Contenido completo (para posicionar mejor: materiales, medidas, usos, cuidados…). Separá los párrafos con una línea en blanco; un título de sección se escribe con "## " al inicio.</label>
+              <textarea id="landContenido" rows="9" placeholder="## Para quién es ideal&#10;Texto…&#10;&#10;## Cómo cuidarlo&#10;Texto…"></textarea></div>
+            <div class="form-row"><label>Preguntas frecuentes (ayudan a aparecer en Google y en respuestas de IAs)</label>
+              <div id="landFaqWrap" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;"></div>
+              <button type="button" class="btn btn-secondary" id="addFaqBtn">+ Agregar pregunta</button></div>
+            <div class="form-row"><label>Palabras clave (separadas por coma)</label>
+              <input type="text" id="landKeywords" placeholder="sábanas 2 1/2 plazas, sábanas estampadas, ropa de cama"></div>
+          </div>
+        </div>
+
         <div class="form-row"><label><input type="checkbox" id="prodActivo" checked style="width:auto;"> Activo</label></div>
         <div style="display:flex;gap:10px;">
           <button class="btn btn-primary" id="saveProdBtn">Guardar producto</button>

@@ -88,7 +88,15 @@ function priceHtml(info) {
   }`;
 }
 
+function setCanonical(p) {
+  if (!p.landingActiva || !p.landingSlug) return;
+  let link = document.querySelector('link[rel="canonical"]');
+  if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+  link.href = `https://www.zoeveos.com/p/${p.landingSlug}`;
+}
+
 function render() {
+  setCanonical(currentProduct);
   const p = currentProduct;
   const hasVariants = p.variantes && p.variantes.length > 0;
   const sold = !!p.vendido;

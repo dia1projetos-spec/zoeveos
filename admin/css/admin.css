@@ -8,8 +8,8 @@
   --text-soft: #7a6a58;
   --taupe: #b9a488;
   --taupe-dark: #a58d6c;
-  --pink: #e9a79e;
-  --pink-dark: #e2867a;
+  --pink: #b79c76;
+  --pink-dark: #8c6f4b;
   --line: #ddccb6;
   --danger: #d1594b;
   --white: #fff;
@@ -123,7 +123,7 @@ a{ color: inherit; }
   cursor:pointer;
 }
 .upload-box:hover{ border-color: var(--taupe); }
-.upload-box.drag-over{ border-color: var(--pink-dark); background: #fdf1ef; }
+.upload-box.drag-over{ border-color: var(--pink-dark); background: #f6f0e6; }
 .upload-progress{ font-size: 0.78rem; color: var(--taupe-dark); margin-top: 6px; }
 
 .tab-panel{ display:none; }

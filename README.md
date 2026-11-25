@@ -234,3 +234,20 @@ Al elegir una variación se muestra su foto. El producto principal pasa a ser un
 
 ## 22. Vercel (sitio estático)
 `vercel.json` indica `outputDirectory: "."` y sin comando de build, porque el sitio es estático y `index.html` está en la raíz. Si el repositorio tiene un `package.json` con un script `build`, Vercel buscaba una carpeta `public`; con esta configuración ya no.
+
+## 23. Checkout: datos del cliente y medio de pago
+El formulario pide Nombre, **DNI**, **correo electrónico**, WhatsApp, calle, ciudad, **código postal** y provincia. Si hay medios de pago cargados, el cliente **debe elegir uno** (no hay ninguno preseleccionado). Todo se guarda en `pedidos.cliente` (`dni`, `email`, `codigoPostal`), aparece en la pestaña Pedidos y en el mensaje de WhatsApp.
+
+## 24. Paleta de colores
+Se eliminó el rosa: el sitio usa blanco, beige claro y taupe. Los colores están en las variables de `css/style.css` (`--cream*`, `--pink`/`--pink-dark` — nombres históricos que ahora son tonos arena/taupe) y `admin/css/admin.css`.
+
+## 25. App instalable: ícono = logo
+El manifest y los íconos se generan solos desde el **logo cargado en Configuración** (funciones `api/manifest.js` y `api/icon.js`; si no hay logo se usan los de `icons/`). Si cambiás el logo, el ícono nuevo se ve en instalaciones nuevas (quien ya instaló debe reinstalar). El botón de instalación espera al navegador, detecta navegadores internos (Instagram, Facebook, WhatsApp…) y muestra los pasos correctos para iPhone y Android.
+
+## 26. Landing pages por producto (SEO + IAs)
+- En **Productos → Crear landing page** (opcional) completás URL, título y descripción para Google, H1, introducción, beneficios, contenido, preguntas frecuentes y palabras clave.
+- La página se publica en `https://www.zoeveos.com/p/tu-url` y se genera **en el servidor** (`api/landing.js`): el HTML llega completo a Google y a los rastreadores de IA (no depende de JavaScript). Incluye title/description/canonical, Open Graph, Twitter, `hreflang es-AR`, imágenes optimizadas con `alt`, migas de pan y datos estructurados JSON-LD (Organization, WebSite, BreadcrumbList, Product con precio/stock, FAQPage).
+- `sitemap.xml` (dinámico), `robots.txt` (permite Google y buscadores de IA) y `llms.txt` (resumen del sitio para asistentes de IA) se actualizan solos.
+- Después de publicar: en Google Search Console → Sitemaps, agregá `sitemap.xml`.
+- La página normal del producto declara como canónica a la landing cuando existe.
+- Requiere que Vercel despliegue la carpeta `api/` (funciones). `vercel.json` ya trae las reglas.

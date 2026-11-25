@@ -39,9 +39,9 @@ function renderRow(p) {
   return `
   <tr>
     <td>${fecha}</td>
-    <td>${cliente.nombre || "—"}<br><span style="font-size:0.78rem;color:var(--text-soft);">${itemsList}</span>${p.metodoPago ? `<br><span style="font-size:0.78rem;color:var(--taupe-dark);">💳 ${p.metodoPago.nombre}${p.recargo > 0 ? " (recargo $" + Number(p.recargo).toLocaleString("es-AR") + ")" : ""}</span>` : ""}</td>
+    <td>${cliente.nombre || "—"}${cliente.dni ? `<br><span style="font-size:0.78rem;color:var(--text-soft);">DNI ${cliente.dni}</span>` : ""}${cliente.email ? `<br><span style="font-size:0.78rem;color:var(--text-soft);">✉ ${cliente.email}</span>` : ""}<br><span style="font-size:0.78rem;color:var(--text-soft);">${itemsList}</span>${p.metodoPago ? `<br><span style="font-size:0.78rem;color:var(--taupe-dark);">💳 ${p.metodoPago.nombre}${p.recargo > 0 ? " (recargo $" + Number(p.recargo).toLocaleString("es-AR") + ")" : ""}</span>` : ""}</td>
     <td>${cliente.whatsapp || "—"}</td>
-    <td>${cliente.calle || ""}, ${cliente.ciudad || ""}, ${cliente.region || ""}</td>
+    <td>${cliente.calle || ""}, ${cliente.ciudad || ""}${cliente.codigoPostal ? ", CP " + cliente.codigoPostal : ""}, ${cliente.region || ""}</td>
     <td>$${Number(p.total || 0).toLocaleString("es-AR")}</td>
     <td><span class="badge badge-${estado}">${estado === "completado" ? "Completado" : "Pendiente"}</span></td>
     <td class="row-actions">

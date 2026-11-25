@@ -60,33 +60,55 @@ window.addEventListener("appinstalled", () => {
   document.querySelectorAll(".js-install-hide").forEach((el) => el.remove());
 });
 
-async function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    try { await deferredPrompt.userChoice; } catch (e) {}
+const isInAppBrowser = () => /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|MicroMessenger|Snapchat|TikTok|Messenger|; wv\)/i.test(navigator.userAgent);
+
+// Espera (hasta 2,5 s) a que el navegador habilite la instalación directa
+function waitForPrompt(ms = 2500) {
+  return new Promise((resolve) => {
+    if (deferredPrompt) return resolve(deferredPrompt);
+    const t = setTimeout(() => resolve(null), ms);
+    window.addEventListener("beforeinstallprompt", () => { clearTimeout(t); setTimeout(() => resolve(deferredPrompt), 0); }, { once: true });
+  });
+}
+
+async function installApp(btn) {
+  if (isStandalone()) return;
+  if (isInAppBrowser()) return showInstallHelp("inapp");
+  if (isIos()) return showInstallHelp("ios");
+  const original = btn && btn.textContent;
+  if (!deferredPrompt && btn) btn.textContent = "Preparando…";
+  const prompt = await waitForPrompt();
+  if (btn && original) btn.textContent = original;
+  if (prompt) {
+    prompt.prompt();
+    try { await prompt.userChoice; } catch (e) {}
     deferredPrompt = null;
     return;
   }
-  showInstallHelp();
+  showInstallHelp("generic");
 }
 
-function showInstallHelp() {
+function showInstallHelp(kind) {
   if (document.getElementById("installHelp")) return;
-  const steps = isIos()
-    ? `<ol><li>Tocá el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba) en Safari.</li><li>Elegí <strong>“Agregar a pantalla de inicio”</strong>.</li><li>Tocá <strong>Agregar</strong>. ¡Listo!</li></ol>`
-    : `<ol><li>Abrí el menú del navegador (los tres puntitos <strong>⋮</strong>).</li><li>Elegí <strong>“Instalar aplicación”</strong> o <strong>“Agregar a pantalla de inicio”</strong>.</li><li>Confirmá. ¡Listo!</li></ol>`;
+  const steps = {
+    ios: `<ol><li>Abrí esta página en <strong>Safari</strong>.</li><li>Tocá el botón <strong>Compartir</strong> (cuadrado con flecha hacia arriba).</li><li>Elegí <strong>“Agregar a pantalla de inicio”</strong> y tocá <strong>Agregar</strong>.</li></ol>`,
+    inapp: `<p>Estás viendo la tienda dentro de otra app (Instagram, Facebook, WhatsApp…), que no permite instalar.</p><ol><li>Tocá los tres puntitos <strong>⋮</strong> (o el ícono de compartir) de arriba.</li><li>Elegí <strong>“Abrir en el navegador”</strong> (Chrome o Safari).</li><li>Ahí tocá de nuevo <strong>Descargar la app</strong>.</li></ol><button type="button" class="install-help-copy">Copiar enlace de la tienda</button>`,
+    generic: `<ol><li>Abrí el menú del navegador (<strong>⋮</strong> arriba a la derecha).</li><li>Elegí <strong>“Instalar aplicación”</strong> o <strong>“Agregar a pantalla de inicio”</strong>.</li><li>Confirmá. ¡Listo!</li></ol>`,
+  }[kind];
   const modal = document.createElement("div");
   modal.id = "installHelp";
   modal.className = "install-help-backdrop";
   modal.innerHTML = `
     <div class="install-help">
       <h3>Descargá la app de Zoë νέος</h3>
-      <p>Tenela en tu pantalla de inicio, como cualquier otra app:</p>
       ${steps}
       <button type="button" class="install-help-close">Entendido</button>
     </div>`;
-  modal.addEventListener("click", (e) => {
+  modal.addEventListener("click", async (e) => {
     if (e.target === modal || e.target.classList.contains("install-help-close")) modal.remove();
+    if (e.target.classList.contains("install-help-copy")) {
+      try { await navigator.clipboard.writeText(location.origin + "/"); e.target.textContent = "¡Enlace copiado! Pegalo en tu navegador"; } catch (err) { e.target.textContent = location.origin; }
+    }
   });
   document.body.appendChild(modal);
 }
@@ -107,7 +129,7 @@ function mountInstallUi() {
     });
     document.body.insertBefore(bar, document.body.firstChild);
   }
-  document.querySelectorAll("[data-install]").forEach((btn) => btn.addEventListener("click", installApp));
+  document.querySelectorAll("[data-install]").forEach((btn) => btn.addEventListener("click", () => installApp(btn)));
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountInstallUi);

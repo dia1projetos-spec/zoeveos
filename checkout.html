@@ -6,10 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Finalizar compra · Zoë νέος</title>
 <link rel="stylesheet" href="/css/style.css">
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#e2867a">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/api/manifest">
+<meta name="theme-color" content="#faf6ef">
+<link rel="icon" type="image/png" sizes="32x32" href="/api/icon?size=32">
+<link rel="apple-touch-icon" href="/api/icon?size=180">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Zoë νέος">
@@ -30,6 +30,14 @@
         <input type="text" id="nombre" name="nombre" required>
       </div>
       <div class="form-group">
+        <label for="dni">DNI</label>
+        <input type="text" id="dni" name="dni" inputmode="numeric" autocomplete="off" placeholder="Ej: 30123456" pattern="[0-9.\s]{6,12}" title="Ingresá tu DNI (solo números)" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" required>
+      </div>
+      <div class="form-group">
         <label for="whatsapp">WhatsApp</label>
         <input type="tel" id="whatsapp" name="whatsapp" placeholder="Ej: 351 555 1234" required>
       </div>
@@ -42,12 +50,17 @@
         <input type="text" id="ciudad" name="ciudad" required>
       </div>
       <div class="form-group">
+        <label for="cp">Código postal</label>
+        <input type="text" id="cp" name="cp" inputmode="text" autocomplete="postal-code" placeholder="Ej: 5000 o C1425ABC" maxlength="8" required>
+      </div>
+      <div class="form-group">
         <label for="region">Provincia</label>
         <select id="region" name="region" required></select>
       </div>
       <div class="form-group" id="paymentSection" style="display:none;">
-        <label>Medio de pago</label>
+        <label>Elegí cómo querés pagar</label>
         <div class="pay-options" id="payOptions"></div>
+        <p class="pay-error" id="payError" hidden>Elegí un medio de pago para continuar.</p>
       </div>
       <button type="submit" class="btn-full" id="submitBtn">Confirmar pedido</button>
     </form>

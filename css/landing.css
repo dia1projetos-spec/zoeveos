@@ -1,0 +1,67 @@
+/* css/landing.css — Landing pages de producto (renderizadas en el servidor) */
+.lp-body{ background: var(--cream); color: var(--text-main); font-family: var(--font-sans); margin: 0; }
+.lp-header{ display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.lp-logo{ display: inline-flex; align-items: center; text-decoration: none; color: var(--text-main); font-family: var(--font-serif); font-size: 1.4rem; }
+.lp-logo img{ height: 48px; width: auto; display: block; }
+.lp-nav{ display: flex; align-items: center; gap: 20px; }
+.lp-nav a{ color: var(--text-main); text-decoration: none; font-size: 0.95rem; }
+.lp-nav a:hover{ color: var(--pink-dark); }
+.lp-nav-cta{ background: var(--pink-dark); color: #fff !important; padding: 8px 20px; border-radius: 999px; }
+
+.lp-main{ max-width: 1100px; margin: 0 auto; padding: 22px 20px 50px; }
+.lp-breadcrumb{ font-size: 0.85rem; color: var(--text-soft); margin-bottom: 18px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lp-breadcrumb a{ color: var(--text-soft); text-decoration: none; }
+.lp-breadcrumb a:hover{ text-decoration: underline; }
+
+.lp-product{ display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+.lp-gallery{ position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.lp-gallery img{ width: 100%; height: auto; border-radius: 16px; background: #fff; object-fit: cover; display: block; }
+.lp-img-main{ grid-column: 1 / -1; aspect-ratio: 1 / 1; border-radius: 24px !important; }
+.lp-img-thumb{ aspect-ratio: 1 / 1; }
+.lp-gallery.is-sold{ position: relative; }
+
+.lp-info h1{ font-family: var(--font-serif); font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.15; margin: 0 0 14px; }
+.lp-price{ font-size: 1.8rem; margin: 0 0 4px; color: var(--pink-dark); }
+.lp-price strong{ font-weight: 500; }
+.lp-currency{ font-size: 0.85rem; color: var(--text-soft); }
+.lp-transf{ margin: 0 0 8px; color: #2f7a45; }
+.lp-availability{ margin: 0 0 16px; color: var(--text-soft); font-size: 0.92rem; }
+.lp-intro{ font-size: 1.05rem; line-height: 1.65; margin: 0 0 22px; }
+.lp-actions{ display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 22px; }
+.lp-btn{ display: inline-block; text-align: center; background: linear-gradient(135deg, var(--pink), var(--pink-dark)); color: #fff; text-decoration: none; padding: 15px 30px; border-radius: 999px; font-weight: 500; box-shadow: var(--shadow-btn); transition: transform .2s; }
+.lp-btn:hover{ transform: translateY(-2px); }
+.lp-btn-wa{ background: var(--whatsapp); }
+.lp-btn-disabled{ background: #b3aca4; box-shadow: none; cursor: default; }
+.lp-trust{ list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 0.9rem; color: var(--text-soft); }
+.lp-trust li::before{ content: "✓ "; color: var(--taupe-dark); }
+
+.lp-section{ margin-top: 46px; background: #fff; border-radius: 24px; padding: 28px 30px; box-shadow: var(--shadow-soft); }
+.lp-section h2{ font-family: var(--font-serif); font-size: 1.55rem; margin: 0 0 14px; }
+.lp-content h2{ margin-top: 26px; }
+.lp-content h2:first-child{ margin-top: 0; }
+.lp-content p{ line-height: 1.75; margin: 0 0 14px; }
+.lp-benefits{ margin: 0; padding-left: 20px; line-height: 1.9; }
+.lp-variants{ list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+.lp-variants li{ display: flex; align-items: center; gap: 10px; background: var(--cream-light); border-radius: 14px; padding: 8px 14px 8px 8px; }
+.lp-variants img{ width: 56px; height: 56px; border-radius: 10px; object-fit: cover; }
+.lp-faq{ border-top: 1px solid var(--line); padding: 14px 0; }
+.lp-faq:first-of-type{ border-top: none; }
+.lp-faq h3{ font-size: 1.05rem; margin: 0 0 6px; font-weight: 500; }
+.lp-faq p{ margin: 0; line-height: 1.65; color: var(--text-soft); }
+.lp-related{ list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.lp-related a{ display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--text-main); }
+.lp-related img{ width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; }
+.lp-related strong{ color: var(--pink-dark); font-weight: 500; }
+.lp-footer{ text-align: center; padding: 30px 20px 40px; color: var(--text-soft); font-size: 0.9rem; }
+.lp-footer a{ color: var(--text-soft); }
+
+@media (max-width: 800px){
+  .lp-product{ grid-template-columns: 1fr; gap: 24px; }
+  .lp-header{ padding: 10px 16px; }
+  .lp-nav{ gap: 12px; }
+  .lp-section{ padding: 22px 18px; border-radius: 20px; }
+  .lp-btn{ width: 100%; }
+}
+
+.lp-benefits{ list-style: disc; }
+.lp-benefits li::marker{ color: var(--taupe-dark); }
